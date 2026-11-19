@@ -27,7 +27,8 @@
         'hacienda_inmuebles',
         'hacienda_vehiculos',
         'hacienda_publicidad',
-        'hacienda_popups'
+        'hacienda_popups',
+        'hacienda_carrusel'
     ];
 
     const TABLE_SCHEMAS = {
@@ -87,6 +88,10 @@
         ],
         'hacienda_popups': [
             'id', 'titulo', 'mensaje', 'tipo', 'imagen_url', 'enlace_url', 'destino', 'activo', 'created_at', 'updated_at'
+        ],
+        'hacienda_carrusel': [
+            'id', 'tag', 'titulo', 'descripcion', 'btn_texto', 'btn_icono', 'btn_enlace',
+            'badge_bg', 'gradient', 'icon', 'imagen_url', 'activo', 'orden', 'created_at', 'updated_at'
         ]
     };
 

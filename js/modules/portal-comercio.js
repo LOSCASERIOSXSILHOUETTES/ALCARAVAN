@@ -212,8 +212,22 @@
         _slideTimer: null,
         _categoriaOrdenanzas: 'todas',
 
+        getCarruselSlides: function() {
+            const store = global.HaciendaStore;
+            if (store) {
+                const slides = store.get('hacienda_carrusel') || [];
+                const activos = slides.filter(s => s.activo !== false);
+                if (activos.length > 0) {
+                    return activos.sort((a, b) => (a.orden || 0) - (b.orden || 0));
+                }
+            }
+            return AVISOS_CARRUSEL;
+        },
+
         moveSlide: function(dir) {
-            this._slideIndex = (this._slideIndex + dir + AVISOS_CARRUSEL.length) % AVISOS_CARRUSEL.length;
+            const slides = this.getCarruselSlides();
+            if (slides.length === 0) return;
+            this._slideIndex = (this._slideIndex + dir + slides.length) % slides.length;
             this.actualizarCarrusel();
         },
 
@@ -241,35 +255,63 @@
             if (this._slideTimer) clearInterval(this._slideTimer);
             this._slideTimer = setInterval(() => {
                 this.moveSlide(1);
-            }, 6000);
+            }, 7000);
+        },
+
+        ejecutarAccionSlide: function(enlace) {
+            if (!enlace || enlace === '#buscador-rif') {
+                const input = document.getElementById('pc-rif-numero');
+                if (input) {
+                    input.focus();
+                    input.scrollIntoView({ behavior: 'smooth' });
+                }
+                return;
+            }
+            if (enlace.startsWith('modal:')) {
+                const ordId = enlace.replace('modal:', '').trim();
+                this.abrirDetalleOrdenanza(ordId);
+                return;
+            }
+            if (enlace.startsWith('#')) {
+                const target = document.querySelector(enlace);
+                if (target) target.scrollIntoView({ behavior: 'smooth' });
+                return;
+            }
+            if (enlace.startsWith('http://') || enlace.startsWith('https://')) {
+                window.open(enlace, '_blank');
+                return;
+            }
         },
 
         renderCarruselAvisos: function() {
+            const slides = this.getCarruselSlides();
+            if (!slides || slides.length === 0) return '';
+
             return `
                 <div class="relative w-full max-w-5xl mx-auto rounded-3xl overflow-hidden border border-white/[0.08] shadow-2xl group bg-[#0e0e11]"
                      onmouseenter="if(window.PortalComercio._slideTimer) clearInterval(window.PortalComercio._slideTimer)"
                      onmouseleave="window.PortalComercio.iniciarCarrusel()">
                     <div id="avisos-carousel-track" class="flex transition-transform duration-700 ease-out" style="transform: translateX(0%);">
-                        ${AVISOS_CARRUSEL.map(slide => `
-                            <div class="w-full flex-shrink-0 p-8 sm:p-12 relative flex flex-col justify-between min-h-[260px] bg-gradient-to-r ${slide.gradient}">
+                        ${slides.map(slide => `
+                            <div class="w-full flex-shrink-0 p-8 sm:p-12 relative flex flex-col justify-between min-h-[260px] bg-gradient-to-r ${slide.gradient || 'from-sky-950/80 via-neutral-900/90 to-[#0e0e11]'}">
                                 <div class="absolute -right-6 -bottom-6 w-52 h-52 rounded-full bg-white/[0.03] blur-2xl pointer-events-none"></div>
                                 <div class="space-y-4 max-w-2xl relative z-10 text-left">
-                                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider uppercase border ${slide.badge_bg}">
-                                        <i class="fas ${slide.icon} text-[10px]"></i>
-                                        <span>${slide.tag}</span>
+                                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider uppercase border ${slide.badge_bg || 'bg-sky-500/10 text-sky-400 border-sky-500/25'}">
+                                        <i class="fas ${slide.icon || 'fa-landmark'} text-[10px]"></i>
+                                        <span>${slide.tag || 'COMUNICADO'}</span>
                                     </div>
                                     <h2 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight leading-snug drop-shadow-md">
                                         ${slide.titulo}
                                     </h2>
                                     <p class="text-xs sm:text-sm text-neutral-300 font-normal leading-relaxed">
-                                        ${slide.descripcion}
+                                        ${slide.descripcion || ''}
                                     </p>
                                 </div>
                                 <div class="pt-6 relative z-10 text-left">
-                                    <button onclick="document.getElementById('pc-rif-numero')?.focus(); document.getElementById('pc-rif-numero')?.scrollIntoView({behavior: 'smooth'})"
+                                    <button onclick="window.PortalComercio.ejecutarAccionSlide('${slide.btn_enlace || '#buscador-rif'}')"
                                             class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-black text-xs font-semibold hover:bg-neutral-200 transition shadow-lg">
-                                        <span>${slide.btn_texto}</span>
-                                        <i class="fas ${slide.btn_icono} text-[10px]"></i>
+                                        <span>${slide.btn_texto || 'Ver Más'}</span>
+                                        <i class="fas ${slide.btn_icono || 'fa-arrow-right'} text-[10px]"></i>
                                     </button>
                                 </div>
                             </div>
@@ -277,22 +319,26 @@
                     </div>
 
                     <!-- Controles Flechas -->
-                    <button onclick="window.PortalComercio.moveSlide(-1)" 
-                            class="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 hover:bg-black/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition backdrop-blur-sm border border-white/10 z-20">
-                        <i class="fas fa-chevron-left text-xs"></i>
-                    </button>
-                    <button onclick="window.PortalComercio.moveSlide(1)" 
-                            class="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 hover:bg-black/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition backdrop-blur-sm border border-white/10 z-20">
-                        <i class="fas fa-chevron-right text-xs"></i>
-                    </button>
+                    ${slides.length > 1 ? `
+                        <button onclick="window.PortalComercio.moveSlide(-1)" 
+                                class="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 hover:bg-black/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition backdrop-blur-sm border border-white/10 z-20">
+                            <i class="fas fa-chevron-left text-xs"></i>
+                        </button>
+                        <button onclick="window.PortalComercio.moveSlide(1)" 
+                                class="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 hover:bg-black/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition backdrop-blur-sm border border-white/10 z-20">
+                            <i class="fas fa-chevron-right text-xs"></i>
+                        </button>
+                    ` : ''}
 
                     <!-- Puntos Indicadores -->
-                    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
-                        ${AVISOS_CARRUSEL.map((_, idx) => `
-                            <button onclick="window.PortalComercio.goToSlide(${idx})" 
-                                    class="aviso-dot ${idx === 0 ? 'w-8 bg-white' : 'w-2 bg-white/30'} h-1.5 rounded-full transition-all duration-300"></button>
-                        `).join('')}
-                    </div>
+                    ${slides.length > 1 ? `
+                        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
+                            ${slides.map((_, idx) => `
+                                <button onclick="window.PortalComercio.goToSlide(${idx})" 
+                                        class="aviso-dot ${idx === 0 ? 'w-8 bg-white' : 'w-2 bg-white/30'} h-1.5 rounded-full transition-all duration-300"></button>
+                            `).join('')}
+                        </div>
+                    ` : ''}
                 </div>
             `;
         },

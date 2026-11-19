@@ -221,8 +221,27 @@ CREATE TABLE IF NOT EXISTS "public"."hacienda_popups" (
     "updated_at" TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- 15. TABLA: hacienda_carrusel (Slides y Avisos del Hero Carrusel de Portada)
+CREATE TABLE IF NOT EXISTS "public"."hacienda_carrusel" (
+    "id" TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    "tag" TEXT,
+    "titulo" TEXT NOT NULL,
+    "descripcion" TEXT,
+    "btn_texto" TEXT,
+    "btn_icono" TEXT,
+    "btn_enlace" TEXT,
+    "badge_bg" TEXT,
+    "gradient" TEXT,
+    "icon" TEXT,
+    "imagen_url" TEXT,
+    "activo" BOOLEAN DEFAULT true,
+    "orden" INTEGER DEFAULT 1,
+    "created_at" TIMESTAMPTZ DEFAULT NOW(),
+    "updated_at" TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- ============================================================================
--- ACTIVACION DE ROW LEVEL SECURITY (RLS) EN LAS 13 TABLAS
+-- ACTIVACION DE ROW LEVEL SECURITY (RLS) EN TODAS LAS TABLAS
 -- ============================================================================
 
 ALTER TABLE "public"."hacienda_contribuyentes" ENABLE ROW LEVEL SECURITY;
@@ -239,6 +258,7 @@ ALTER TABLE "public"."hacienda_inmuebles" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."hacienda_vehiculos" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."hacienda_publicidad" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."hacienda_popups" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."hacienda_carrusel" ENABLE ROW LEVEL SECURITY;
 
 -- ============================================================================
 -- POLITICAS PERMISIVAS (ARQUITECTURA SGB 0MS OFFLINE-FIRST)
@@ -286,6 +306,9 @@ CREATE POLICY "Permisivo hacienda_publicidad" ON "public"."hacienda_publicidad" 
 DROP POLICY IF EXISTS "Permisivo hacienda_popups" ON "public"."hacienda_popups";
 CREATE POLICY "Permisivo hacienda_popups" ON "public"."hacienda_popups" FOR ALL USING (true) WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Permisivo hacienda_carrusel" ON "public"."hacienda_carrusel";
+CREATE POLICY "Permisivo hacienda_carrusel" ON "public"."hacienda_carrusel" FOR ALL USING (true) WITH CHECK (true);
+
 -- ============================================================================
 -- OTORGAR PRIVILEGIOS COMPLETOS A LOS ROLES DE SUPABASE
 -- ============================================================================
@@ -304,6 +327,7 @@ GRANT ALL ON "public"."hacienda_inmuebles" TO "anon", "authenticated", "service_
 GRANT ALL ON "public"."hacienda_vehiculos" TO "anon", "authenticated", "service_role";
 GRANT ALL ON "public"."hacienda_publicidad" TO "anon", "authenticated", "service_role";
 GRANT ALL ON "public"."hacienda_popups" TO "anon", "authenticated", "service_role";
+GRANT ALL ON "public"."hacienda_carrusel" TO "anon", "authenticated", "service_role";
 
 -- ============================================================================
 -- PUBLICACION PARA SUPABASE REALTIME (POSTGRES CHANGES)
@@ -325,7 +349,8 @@ BEGIN
             "public"."hacienda_inmuebles",
             "public"."hacienda_vehiculos",
             "public"."hacienda_publicidad",
-            "public"."hacienda_popups";
+            "public"."hacienda_popups",
+            "public"."hacienda_carrusel";
     EXCEPTION WHEN duplicate_object THEN
         -- Ya estaban agregadas a la publicacion
     END;

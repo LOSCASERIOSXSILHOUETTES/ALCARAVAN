@@ -187,6 +187,15 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
   - Cache local persistente para funcionamiento offline continuo si se pierde la conexion.
   - Bump de Service Worker a `alcaravan-v3-cache-v3.5.0`.
 
+### Version 3.7.2 — 19/11/2026
+- **Carrusel Hero Configurable Dinamicamente desde el ERP Administrativo (`admin.html`):**
+  - Creacion del modulo unificado `js/modules/comunicacion/comunicacion.js` (`ComunicacionModule`) que gestiona tanto el **Carrusel Hero de Portada** como los **Popups Emergentes** en un solo panel con selector de subpestanas.
+  - CRUD completo para slides de portada: titulo, badge / tag, descripcion, seleccion de paleta de color y gradiente (Esmeralda LOCAT, Zafiro Tributos, Ambar Calendario, Indigo Solvencias, Rosa Decretos), icono FontAwesome, orden numerico y switch de activo/pausado.
+  - Ruteador de acciones de boton configurables: scroll al buscador RIF (`#buscador-rif`), apertura de ordenanza en modal (`modal:id_ordenanza`) o enlaces externos.
+  - Registro de la 15ta tabla `hacienda_carrusel` en `store.js` (`TABLE_SCHEMAS`), `realtime-sync.js` (`SYNCABLE_TABLES`) y `sql/schema_hacienda.sql`.
+  - Consumo dinamico en `js/modules/portal-comercio.js`: lectura a 0ms desde LocalForage con fallback elegante a los slides iniciales de la LOCAT 2026 si la base de datos esta en frio.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.7.2`.
+
 ### Version 3.7.1 — 19/11/2026
 - **Gestion Dinamica de Popups Oficiales desde el ERP (`admin.html`):**
   - Implementacion del modulo administrativo `js/modules/comunicacion/popups.js` (`PopupsModule`) en el panel ERP de funcionarios.

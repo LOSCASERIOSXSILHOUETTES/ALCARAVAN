@@ -23,7 +23,8 @@
         'hacienda_inmuebles',
         'hacienda_vehiculos',
         'hacienda_publicidad',
-        'hacienda_popups'
+        'hacienda_popups',
+        'hacienda_carrusel'
     ]);
 
     function queueTableRefresh(table) {
