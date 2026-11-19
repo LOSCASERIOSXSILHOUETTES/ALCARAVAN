@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Tributario del Contribuyente — Alcaldía Municipal (LOCAT)</title>
+    <title>Alcaraván — Portal del Contribuyente</title>
     <link rel="stylesheet" href="libs/tailwind/tailwind.min.css">
     <link rel="stylesheet" href="libs/fontawesome/css/all.min.css">
     <script src="libs/localforage.min.js"></script>
@@ -13,74 +13,61 @@
     <script src="libs/jspdf/jspdf.umd.min.js"></script>
 
     <style>
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #020617; }
-        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #334155; }
-        body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-        .bg-grid-pattern {
-            background-image: radial-gradient(rgba(14, 165, 233, 0.08) 1px, transparent 1px);
-            background-size: 24px 24px;
+        * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Inter, sans-serif;
+            background-color: #000000;
+            background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(120, 119, 198, 0.12), transparent);
+            color: #f5f5f7;
+        }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
     </style>
 </head>
 
-<body class="bg-slate-950 text-slate-100 antialiased min-h-screen flex flex-col select-none bg-grid-pattern">
+<body class="min-h-screen flex flex-col select-none">
 
-    <!-- Cintillo Institucional Nacional -->
-    <div class="bg-slate-900 border-b border-slate-800/80 py-1.5 px-6 sm:px-12 text-[10px] sm:text-[11px] font-mono text-slate-400 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-            <span>República Bolivariana de Venezuela · Estado Bolivariano de Guárico · Alcaldía Municipal</span>
-        </div>
-        <div class="hidden md:block text-slate-500">
-            Gaceta Oficial Extraordinaria N° 6.755 (LOCAT)
-        </div>
-    </div>
-
-    <!-- Barra de Navegación Principal -->
-    <header class="h-20 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 flex items-center justify-between px-6 sm:px-12 sticky top-0 z-40">
-        <div class="flex items-center gap-3.5">
-            <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center text-white text-xl font-black shadow-lg shadow-sky-900/30">
-                <i class="fas fa-landmark"></i>
-            </div>
-            <div>
-                <h1 class="text-sm sm:text-base font-black text-slate-100 uppercase tracking-wider">Hacienda Municipal</h1>
-                <span class="text-[10px] text-sky-400 font-bold font-mono">PORTAL DE AUTOGESTIÓN COMERCIAL · LOCAT</span>
-            </div>
+    <!-- Apple-style Frosted Navbar -->
+    <header class="h-16 sticky top-0 z-50 backdrop-blur-2xl bg-black/60 border-b border-white/[0.08] px-6 sm:px-12 flex items-center justify-between transition-all">
+        <div class="flex items-center gap-3">
+            <span class="font-semibold text-sm tracking-tight text-white">Alcaraván</span>
+            <span class="text-[10px] text-neutral-400 font-mono tracking-wider px-2 py-0.5 rounded-full bg-white/[0.04] border border-white/5 uppercase">Hacienda</span>
         </div>
 
-        <div class="flex items-center gap-4">
-            <div class="hidden sm:flex items-center gap-2.5 bg-slate-900/80 px-4 py-2 rounded-2xl border border-slate-800 text-xs">
-                <span class="text-slate-400 font-medium">Tasa Oficial BCV:</span>
-                <span class="font-mono font-bold text-amber-400">56,50 Bs./TCMMV</span>
+        <div class="flex items-center gap-4 text-xs">
+            <div class="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/5 text-neutral-400 font-mono text-[11px]">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                <span>BCV: 56,50 Bs.</span>
             </div>
 
-            <!-- Acceso a Ruta Especial de Funcionarios -->
             <a href="admin.html" 
-               class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white font-bold text-xs rounded-xl border border-slate-800 transition flex items-center gap-2 shadow-sm">
-                <i class="fas fa-user-shield text-sky-400"></i>
-                <span class="hidden md:inline">Acceso Funcionarios / Fiscales</span>
-                <span class="md:hidden">ERP</span>
+               class="text-neutral-400 hover:text-white text-xs font-medium transition flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-white/[0.05]">
+                <span>Funcionarios</span>
+                <i class="fas fa-chevron-right text-[9px] opacity-70"></i>
             </a>
         </div>
     </header>
 
-    <!-- Contenido Dinámico del Portal del Comercio -->
-    <main class="flex-1 overflow-y-auto px-4 sm:px-8 py-6">
+    <!-- Main Dynamic Content -->
+    <main class="flex-1 px-6 sm:px-12 py-8 overflow-y-auto">
         <div id="portal-main-content">
             <!-- Renderizado dinámico del módulo PortalComercio -->
         </div>
     </main>
 
-    <!-- Pie de Página Institucional -->
-    <footer class="bg-slate-950/90 border-t border-slate-900 py-6 px-6 sm:px-12 text-center text-xs text-slate-500">
-        <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+    <!-- Apple Minimal Footer -->
+    <footer class="py-8 px-6 sm:px-12 border-t border-white/[0.05] text-center text-xs text-neutral-500 font-normal">
+        <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px]">
             <div>
-                Alcaldía Municipal · Dirección de Hacienda y Administración Tributaria
+                Alcaldía Municipal · Sistema Tributario Digital
             </div>
-            <div class="font-mono text-[11px] text-slate-400">
-                Cumplimiento Ley LOCAT · Motor SGB 0ms Offline-First
+            <div class="text-neutral-600 font-mono">
+                LOCAT 2026 · SGB 0ms
             </div>
         </div>
     </footer>
@@ -95,7 +82,7 @@
                     window.HACIENDA_CONFIG.SUPABASE_ANON_KEY
                 );
             } catch (err) {
-                console.warn("[Hacienda] Error inicializando Supabase:", err);
+                console.warn("[Hacienda] Supabase:", err);
             }
         }
     </script>
@@ -104,10 +91,9 @@
     <script src="js/modules/patentes/catalogo-locat.js"></script>
     <script src="js/modules/portal-comercio.js"></script>
 
-    <!-- Inicializador del Portal del Contribuyente -->
+    <!-- Inicializador -->
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            console.log("[Portal Contribuyente] Inicializando a 0ms...");
             if (window.HaciendaStore) {
                 await window.HaciendaStore.init();
             }

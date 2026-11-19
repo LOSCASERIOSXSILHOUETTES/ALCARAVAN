@@ -1,7 +1,6 @@
 /**
- * GUIRIRI SISTEMA HACIENDA V3 — Portal Oficial del Contribuyente (LOCAT)
- * Interfaz pública institucional para comercios y contribuyentes del Municipio.
- * Arquitectura SGB Silhouettes V3 (0ms Latencia, Offline-First, LocalForage).
+ * ALCARAVAN — Portal del Contribuyente
+ * Apple-grade Minimalist Experience (Dark Mode, Bento Grids, 0ms LocalForage).
  */
 (function definePortalComercio(global) {
     "use strict";
@@ -21,103 +20,92 @@
         render: function(container) {
             const store = global.HaciendaStore;
             if (!store) {
-                container.innerHTML = '<div class="p-8 text-center text-rose-400 font-mono">HaciendaStore no disponible</div>';
+                container.innerHTML = '<div class="p-12 text-center text-neutral-500 font-mono text-xs">Sistema inicializando...</div>';
                 return;
             }
 
             if (!activeContribuyente) {
-                this.renderPantallaConsulta(container);
+                this.renderConsultaHero(container);
             } else {
                 this.renderDashboard(container);
             }
         },
 
-        renderPantallaConsulta: function(container) {
+        renderConsultaHero: function(container) {
             container.innerHTML = `
-                <div class="max-w-3xl mx-auto space-y-8 py-8 animate-fade-in">
-                    <!-- Membrete y Encabezado Institucional -->
-                    <div class="text-center space-y-3">
-                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-sky-400 font-mono text-[11px] font-bold uppercase tracking-wider">
-                            <span class="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
-                            Dirección de Administración Tributaria y Hacienda Municipal
+                <div class="max-w-4xl mx-auto space-y-16 py-12 sm:py-20 text-center">
+                    <!-- Apple Hero Headline -->
+                    <div class="space-y-4">
+                        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/10 text-neutral-300 text-xs font-medium tracking-wide">
+                            <span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
+                            <span>Hacienda Digital · LOCAT 2026</span>
                         </div>
-                        <h2 class="text-3xl sm:text-4xl font-black text-slate-100 tracking-tight">
-                            Portal Tributario del Contribuyente
-                        </h2>
-                        <p class="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto leading-relaxed">
-                            Gestión electrónica de actividades económicas, autoliquidación mensual conforme a la Ley LOCAT, consignación de comprobantes y emisión de solvencias municipales con validación QR.
+                        <h1 class="text-4xl sm:text-6xl md:text-7xl font-semibold tracking-tight text-white leading-tight">
+                            Tributos.<br>
+                            <span class="text-neutral-500">Hecho simple.</span>
+                        </h1>
+                        <p class="text-neutral-400 text-sm sm:text-base max-w-lg mx-auto font-normal leading-relaxed pt-2">
+                            Autoliquidaciones mensuales, consignación de transferencias y emisión de tu Solvencia Municipal con código QR al instante.
                         </p>
                     </div>
 
-                    <!-- Tarjeta Principal de Consulta por RIF -->
-                    <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-8 sm:p-10 shadow-2xl backdrop-blur-sm relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-64 h-64 bg-sky-600/5 rounded-full blur-3xl pointer-events-none"></div>
+                    <!-- Apple Search Capsule -->
+                    <div class="max-w-md mx-auto space-y-4">
+                        <div class="flex items-center bg-[#161618] border border-white/10 hover:border-white/20 focus-within:border-white/30 rounded-full p-1.5 shadow-2xl transition duration-200">
+                            <select id="pc-rif-tipo" class="bg-transparent text-white font-medium text-xs px-3.5 py-2.5 outline-none border-r border-white/10 cursor-pointer">
+                                <option value="J" class="bg-[#1c1c1e] text-white">J</option>
+                                <option value="V" class="bg-[#1c1c1e] text-white">V</option>
+                                <option value="G" class="bg-[#1c1c1e] text-white">G</option>
+                                <option value="E" class="bg-[#1c1c1e] text-white">E</option>
+                            </select>
+                            <input type="text" id="pc-rif-numero" placeholder="RIF (ej. 30123456-7)" 
+                                   onkeydown="if(event.key==='Enter') window.PortalComercio.ejecutarConsultaRif()"
+                                   class="w-full bg-transparent text-white text-xs sm:text-sm font-mono px-3.5 py-2 outline-none placeholder:text-neutral-600">
+                            <button onclick="window.PortalComercio.ejecutarConsultaRif()" 
+                                    class="bg-white hover:bg-neutral-200 text-black text-xs font-semibold rounded-full px-5 py-2.5 transition shrink-0 flex items-center gap-1.5 shadow-sm">
+                                <span>Ingresar</span>
+                                <i class="fas fa-arrow-right text-[10px]"></i>
+                            </button>
+                        </div>
 
-                        <div class="space-y-6 relative z-10">
-                            <div>
-                                <label class="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-2">
-                                    Ingrese el RIF del Establecimiento o Razón Social:
-                                </label>
-                                <div class="flex flex-col sm:flex-row items-stretch gap-3">
-                                    <div class="flex items-center bg-slate-950 border border-slate-700/80 rounded-2xl overflow-hidden focus-within:border-sky-500 transition shadow-inner">
-                                        <select id="pc-rif-tipo" class="bg-slate-900 text-sky-400 font-mono font-bold text-sm px-4 py-3.5 border-r border-slate-800 outline-none">
-                                            <option value="J">J - Jurídico</option>
-                                            <option value="V">V - Natural / Firma Personal</option>
-                                            <option value="G">G - Gubernamental</option>
-                                            <option value="E">E - Extranjero</option>
-                                        </select>
-                                        <input type="text" id="pc-rif-numero" placeholder="Ej: 30123456-7" 
-                                               onkeydown="if(event.key==='Enter') window.PortalComercio.ejecutarConsultaRif()"
-                                               class="w-full bg-transparent text-slate-100 font-mono text-base font-bold px-4 py-3.5 outline-none placeholder:text-slate-600">
-                                    </div>
-                                    <button onclick="window.PortalComercio.ejecutarConsultaRif()" 
-                                            class="px-8 py-3.5 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-bold text-xs rounded-2xl shadow-lg shadow-sky-900/30 transition flex items-center justify-center gap-2 shrink-0">
-                                        <i class="fas fa-search text-xs"></i>
-                                        <span>Consultar Contribuyente</span>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div class="pt-4 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-                                <span class="text-slate-400">¿Su establecimiento aún no está inscrito en el RUC?</span>
-                                <button onclick="window.PortalComercio.abrirModalInscripcion()" 
-                                        class="text-sky-400 hover:text-sky-300 font-bold transition flex items-center gap-1.5">
-                                    <i class="fas fa-plus-circle text-xs"></i>
-                                    <span>Solicitar Inscripción en el Padrón Comercial</span>
-                                </button>
-                            </div>
+                        <div>
+                            <button onclick="window.PortalComercio.abrirModalInscripcion()" 
+                                    class="text-neutral-500 hover:text-neutral-300 text-xs font-medium transition inline-flex items-center gap-1">
+                                <span>¿Establecimiento no registrado? Solicitar censo municipal</span>
+                                <span>→</span>
+                            </button>
                         </div>
                     </div>
 
-                    <!-- Marco de Garantías Tributarias LOCAT -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-                        <div class="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-2">
-                            <div class="w-8 h-8 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 font-bold">
-                                <i class="fas fa-balance-scale"></i>
+                    <!-- Bento Grid Minimalista (Estilo Apple) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-8 text-left">
+                        <div class="p-8 rounded-3xl bg-[#121214] border border-white/[0.06] space-y-3 relative overflow-hidden group hover:border-white/[0.12] transition">
+                            <div class="w-10 h-10 rounded-2xl bg-white/[0.06] border border-white/10 flex items-center justify-center text-white text-sm">
+                                <i class="fas fa-calculator"></i>
                             </div>
-                            <h4 class="font-bold text-slate-200">Armonización LOCAT</h4>
-                            <p class="text-slate-400 leading-relaxed text-[11px]">
-                                Alícuotas máximas y mínimos tributables expresados en Tipo de Cambio BCV, protegiendo al comerciante de cobros discrecionales.
+                            <h3 class="text-sm font-semibold text-white">Autoliquidación 0ms</h3>
+                            <p class="text-xs text-neutral-400 leading-relaxed">
+                                Cálculo inmediato comparando la alícuota de tu actividad económica contra el mínimo legal en TCMMV del BCV.
                             </p>
                         </div>
 
-                        <div class="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-2">
-                            <div class="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold">
-                                <i class="fas fa-shield-alt"></i>
+                        <div class="p-8 rounded-3xl bg-[#121214] border border-white/[0.06] space-y-3 relative overflow-hidden group hover:border-white/[0.12] transition">
+                            <div class="w-10 h-10 rounded-2xl bg-white/[0.06] border border-white/10 flex items-center justify-center text-white text-sm">
+                                <i class="fas fa-wallet"></i>
                             </div>
-                            <h4 class="font-bold text-slate-200">Seguridad Jurídica</h4>
-                            <p class="text-slate-400 leading-relaxed text-[11px]">
-                                Cada autoliquidación genera una constancia correlativa verificable directamente ante los fiscales y la taquilla municipal.
+                            <h3 class="text-sm font-semibold text-white">Consignación Simple</h3>
+                            <p class="text-xs text-neutral-400 leading-relaxed">
+                                Datos bancarios oficiales de la Alcaldía listos para transferir con un toque y reportar tu número de comprobante.
                             </p>
                         </div>
 
-                        <div class="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-2">
-                            <div class="w-8 h-8 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 font-bold">
+                        <div class="p-8 rounded-3xl bg-[#121214] border border-white/[0.06] space-y-3 relative overflow-hidden group hover:border-white/[0.12] transition">
+                            <div class="w-10 h-10 rounded-2xl bg-white/[0.06] border border-white/10 flex items-center justify-center text-white text-sm">
                                 <i class="fas fa-qrcode"></i>
                             </div>
-                            <h4 class="font-bold text-slate-200">Solvencias con QR</h4>
-                            <p class="text-slate-400 leading-relaxed text-[11px]">
-                                Validación instantánea en vitrina mediante lectura de código QR oficial con vigencia legal de 30 días continuos.
+                            <h3 class="text-sm font-semibold text-white">Solvencia Oficial QR</h3>
+                            <p class="text-xs text-neutral-400 leading-relaxed">
+                                Certificado con código QR oficial para colocar en la vitrina de tu negocio, con validez legal verificable en línea.
                             </p>
                         </div>
                     </div>
@@ -144,149 +132,133 @@
             const cuentas = store.get('hacienda_cuentas') || [];
 
             container.innerHTML = `
-                <div class="max-w-5xl mx-auto space-y-6 py-4 animate-fade-in">
-                    <!-- Tarjeta de Identidad del Establecimiento -->
-                    <div class="bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 border border-slate-800 p-6 sm:p-8 rounded-3xl shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                        <div class="flex items-start gap-5">
-                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-sky-900/30 shrink-0">
-                                <i class="fas fa-store"></i>
+                <div class="max-w-4xl mx-auto space-y-8 py-6">
+                    <!-- Ficha del Comercio (Apple Bento Header) -->
+                    <div class="p-8 rounded-3xl bg-[#121214] border border-white/[0.08] shadow-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-3">
+                                <h2 class="text-xl sm:text-2xl font-semibold text-white tracking-tight">${c.razon_social}</h2>
+                                ${esSolvente ? `
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-medium">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                                        Solvente
+                                    </span>
+                                ` : `
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[11px] font-medium">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                                        ${declaracionesPendientes.length} por pagar
+                                    </span>
+                                `}
                             </div>
-                            <div class="space-y-1">
-                                <div class="flex flex-wrap items-center gap-2.5">
-                                    <h2 class="text-xl sm:text-2xl font-black text-slate-100">${c.razon_social}</h2>
-                                    ${esSolvente ? `
-                                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1.5">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                                            Solvente
-                                        </span>
-                                    ` : `
-                                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center gap-1.5">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                                            ${declaracionesPendientes.length} Pendiente(s)
-                                        </span>
-                                    `}
-                                </div>
-                                <div class="text-xs text-slate-400 flex flex-wrap items-center gap-x-4 gap-y-1 pt-1 font-mono">
-                                    <span><strong class="text-slate-300">RIF:</strong> ${c.rif}</span>
-                                    <span><strong class="text-slate-300">Patente:</strong> ${patenteActiva ? patenteActiva.numero_patente : 'En trámite'}</span>
-                                    <span><strong class="text-slate-300">Actividad:</strong> ${patenteActiva ? (patenteActiva.codigo_locat + ' · ' + patenteActiva.descripcion_actividad) : 'General'}</span>
-                                </div>
-                                <div class="text-[11px] text-slate-500">
-                                    ${c.direccion_fiscal || 'Sin dirección fiscal registrada'}
-                                </div>
+                            <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-neutral-400 font-mono">
+                                <span>${c.rif}</span>
+                                <span class="text-neutral-600">·</span>
+                                <span>${patenteActiva ? patenteActiva.numero_patente : 'Patente en trámite'}</span>
+                                <span class="text-neutral-600">·</span>
+                                <span>${patenteActiva ? patenteActiva.descripcion_actividad : 'Comercio General'}</span>
                             </div>
                         </div>
 
-                        <div class="shrink-0 flex items-center gap-3">
-                            <button onclick="window.PortalComercio.cerrarConsulta()" 
-                                    class="px-4 py-2.5 bg-slate-800/80 hover:bg-slate-800 text-slate-300 hover:text-white font-bold text-xs rounded-xl border border-slate-700 transition flex items-center gap-2 shadow">
-                                <i class="fas fa-sign-out-alt text-xs"></i>
-                                <span>Consultar otro RIF</span>
+                        <button onclick="window.PortalComercio.cerrarConsulta()" 
+                                class="text-xs text-neutral-400 hover:text-white px-4 py-2 rounded-full border border-white/10 hover:border-white/20 transition shrink-0">
+                            Cambiar RIF
+                        </button>
+                    </div>
+
+                    <!-- Apple Segmented Control (Pill Tabs) -->
+                    <div class="flex justify-center">
+                        <div class="inline-flex p-1 bg-[#161618] border border-white/10 rounded-full">
+                            <button onclick="window.PortalComercio.cambiarTab('declarar')" 
+                                    class="px-5 py-2 rounded-full text-xs font-medium transition ${activeTab === 'declarar' ? 'bg-white text-black shadow-sm' : 'text-neutral-400 hover:text-white'}">
+                                Autoliquidar
+                            </button>
+                            <button onclick="window.PortalComercio.cambiarTab('pagar')" 
+                                    class="px-5 py-2 rounded-full text-xs font-medium transition flex items-center gap-1.5 ${activeTab === 'pagar' ? 'bg-white text-black shadow-sm' : 'text-neutral-400 hover:text-white'}">
+                                <span>Pagar</span>
+                                ${declaracionesPendientes.length > 0 ? `
+                                    <span class="w-4 h-4 rounded-full ${activeTab === 'pagar' ? 'bg-black text-white' : 'bg-white/20 text-white'} text-[9px] flex items-center justify-center font-bold">
+                                        ${declaracionesPendientes.length}
+                                    </span>
+                                ` : ''}
+                            </button>
+                            <button onclick="window.PortalComercio.cambiarTab('solvencia')" 
+                                    class="px-5 py-2 rounded-full text-xs font-medium transition ${activeTab === 'solvencia' ? 'bg-white text-black shadow-sm' : 'text-neutral-400 hover:text-white'}">
+                                Solvencia QR
+                            </button>
+                            <button onclick="window.PortalComercio.cambiarTab('historial')" 
+                                    class="px-5 py-2 rounded-full text-xs font-medium transition ${activeTab === 'historial' ? 'bg-white text-black shadow-sm' : 'text-neutral-400 hover:text-white'}">
+                                Historial
                             </button>
                         </div>
                     </div>
 
-                    <!-- Navegación por Pestañas del Comercio -->
-                    <div class="flex items-center gap-2 border-b border-slate-800 pb-2 overflow-x-auto">
-                        <button onclick="window.PortalComercio.cambiarTab('declarar')" 
-                                class="px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 whitespace-nowrap ${activeTab === 'declarar' ? 'bg-sky-600 text-white shadow-lg shadow-sky-900/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'}">
-                            <i class="fas fa-calculator text-xs"></i>
-                            <span>1. Autoliquidación Mensual (LOCAT)</span>
-                        </button>
-                        <button onclick="window.PortalComercio.cambiarTab('pagar')" 
-                                class="px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 whitespace-nowrap ${activeTab === 'pagar' ? 'bg-sky-600 text-white shadow-lg shadow-sky-900/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'}">
-                            <i class="fas fa-wallet text-xs"></i>
-                            <span>2. Consignar Pago (${declaracionesPendientes.length})</span>
-                        </button>
-                        <button onclick="window.PortalComercio.cambiarTab('solvencia')" 
-                                class="px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 whitespace-nowrap ${activeTab === 'solvencia' ? 'bg-sky-600 text-white shadow-lg shadow-sky-900/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'}">
-                            <i class="fas fa-stamp text-xs"></i>
-                            <span>3. Solvencia Municipal QR</span>
-                        </button>
-                        <button onclick="window.PortalComercio.cambiarTab('historial')" 
-                                class="px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 whitespace-nowrap ${activeTab === 'historial' ? 'bg-sky-600 text-white shadow-lg shadow-sky-900/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'}">
-                            <i class="fas fa-history text-xs"></i>
-                            <span>4. Historial (${declaraciones.length})</span>
-                        </button>
-                    </div>
-
-                    <!-- Contenido Dinámico de la Pestaña -->
-                    <div>
-                        ${this.renderContenidoTab(activeTab, c, patenteActiva, declaraciones, declaracionesPendientes, totalDeudaBs, esSolvente, pagos, cuentas)}
+                    <!-- Contenedor de la Vista Activa -->
+                    <div class="pt-2">
+                        ${this.renderTabContent(activeTab, c, patenteActiva, declaraciones, declaracionesPendientes, totalDeudaBs, esSolvente, pagos, cuentas)}
                     </div>
                 </div>
             `;
         },
 
-        renderContenidoTab: function(tab, c, patenteActiva, declaraciones, declaracionesPendientes, totalDeudaBs, esSolvente, pagos, cuentas) {
+        renderTabContent: function(tab, c, patenteActiva, declaraciones, declaracionesPendientes, totalDeudaBs, esSolvente, pagos, cuentas) {
             const alicuota = patenteActiva ? Number(patenteActiva.alicuota || 0.01) : 0.01;
             const minimoTcmmv = patenteActiva ? Number(patenteActiva.minimo_tcmmv || 0.30) : 0.30;
             const minimoBs = minimoTcmmv * TASA_BCV_DEFAULT;
 
             if (tab === 'declarar') {
                 return `
-                    <div class="bg-slate-900 border border-slate-800 p-6 sm:p-8 rounded-3xl shadow-xl space-y-6">
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-800 pb-4">
-                            <div>
-                                <h3 class="text-base font-black text-slate-100 flex items-center gap-2">
-                                    <i class="fas fa-calculator text-sky-400"></i>
-                                    Autoliquidación Mensual de Ingresos Brutos
-                                </h3>
-                                <p class="text-xs text-slate-400 mt-0.5">
-                                    Conforme al clasificador y alícuotas armonizadas de la Ley LOCAT.
-                                </p>
-                            </div>
-                            <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono">
-                                <span class="text-slate-400">Alícuota Oficial:</span>
-                                <span class="text-sky-400 font-bold">${(alicuota * 100).toFixed(2)}%</span>
-                            </div>
+                    <div class="p-8 sm:p-10 rounded-3xl bg-[#121214] border border-white/[0.08] shadow-2xl space-y-8">
+                        <div class="space-y-1">
+                            <h3 class="text-lg font-semibold text-white">Declaración Mensual de Ingresos</h3>
+                            <p class="text-xs text-neutral-400">
+                                Alícuota aplicable: <strong class="text-white">${(alicuota * 100).toFixed(2)}%</strong> · Mínimo tributable: <strong class="text-white">${minimoTcmmv.toFixed(2)} TCMMV (${minimoBs.toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs.)</strong>
+                            </p>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                            <div>
-                                <label class="text-xs font-bold text-slate-400 uppercase block mb-1.5">Mes a Declarar:</label>
-                                <select id="dec-mes" class="w-full bg-slate-800 border border-slate-700 text-slate-100 font-bold text-xs rounded-xl px-4 py-3 outline-none focus:border-sky-500">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div class="space-y-1.5">
+                                <label class="text-[11px] font-medium text-neutral-400 uppercase tracking-wider block">Mes a Declarar</label>
+                                <select id="dec-mes" class="w-full bg-[#18181b] border border-white/10 text-white text-xs font-medium rounded-2xl px-4 py-3.5 outline-none focus:border-white/30 transition cursor-pointer">
                                     ${MESES.map((m, idx) => `<option value="${idx + 1}" ${new Date().getMonth() + 1 === (idx + 1) ? 'selected' : ''}>${m}</option>`).join('')}
                                 </select>
                             </div>
-                            <div>
-                                <label class="text-xs font-bold text-slate-400 uppercase block mb-1.5">Año Fiscal:</label>
-                                <input type="number" id="dec-anio" value="${new Date().getFullYear()}" class="w-full bg-slate-800 border border-slate-700 text-slate-100 font-mono font-bold text-xs rounded-xl px-4 py-3 outline-none focus:border-sky-500">
-                            </div>
-                            <div>
-                                <label class="text-xs font-bold text-slate-400 uppercase block mb-1.5">Ingresos Brutos del Mes (Bs):</label>
-                                <input type="number" step="0.01" id="dec-base-imponible" placeholder="0.00" 
-                                       oninput="window.PortalComercio.calcularEnVivo(${alicuota}, ${minimoBs})"
-                                       class="w-full bg-slate-950 border border-slate-700 text-emerald-400 font-mono font-black text-base rounded-xl px-4 py-2.5 outline-none focus:border-sky-500 shadow-inner">
+                            <div class="space-y-1.5">
+                                <label class="text-[11px] font-medium text-neutral-400 uppercase tracking-wider block">Año Fiscal</label>
+                                <input type="number" id="dec-anio" value="${new Date().getFullYear()}" 
+                                       class="w-full bg-[#18181b] border border-white/10 text-white text-xs font-mono font-medium rounded-2xl px-4 py-3.5 outline-none focus:border-white/30 transition">
                             </div>
                         </div>
 
-                        <!-- Desglose de Cálculo a 0ms -->
-                        <div class="bg-slate-950 border border-slate-800/80 rounded-2xl p-6 space-y-4">
-                            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
-                                Determinación Tributaria en Tiempo Real (0ms)
-                            </span>
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono text-xs">
-                                <div>
-                                    <span class="text-slate-500">Impuesto por Alícuota (${(alicuota * 100).toFixed(2)}%):</span>
-                                    <div id="calc-imp-alicuota" class="text-sm font-bold text-slate-300 mt-1">0,00 Bs.</div>
-                                </div>
-                                <div>
-                                    <span class="text-slate-500">Mínimo Tributable LOCAT:</span>
-                                    <div id="calc-min-tributable" class="text-sm font-bold text-slate-300 mt-1">${minimoBs.toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs.</div>
-                                </div>
-                                <div class="sm:border-l sm:border-slate-800 sm:pl-4">
-                                    <span class="text-slate-400 font-bold">Total Determinado a Pagar:</span>
-                                    <div id="calc-total-pagar" class="text-xl font-black text-emerald-400 mt-1">0,00 Bs.</div>
-                                </div>
+                        <!-- Input Protagónico de Ventas (Apple Style) -->
+                        <div class="space-y-2 p-6 rounded-2xl bg-[#0a0a0c] border border-white/[0.06]">
+                            <label class="text-[11px] font-medium text-neutral-400 uppercase tracking-wider block">Ingresos Brutos Facturados del Mes (Bs)</label>
+                            <input type="number" step="0.01" id="dec-base-imponible" placeholder="0,00" 
+                                   oninput="window.PortalComercio.calcularEnVivo(${alicuota}, ${minimoBs})"
+                                   class="w-full bg-transparent text-white text-3xl sm:text-4xl font-semibold tracking-tight outline-none placeholder:text-neutral-700 font-mono">
+                            <span class="text-[11px] text-neutral-500 block">Monto en bolívares según tus libros contables o facturación emitida.</span>
+                        </div>
+
+                        <!-- Resumen Bento a 0ms -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="p-5 rounded-2xl bg-[#161618] border border-white/5 space-y-1">
+                                <span class="text-[11px] text-neutral-500 uppercase tracking-wider block font-medium">Por Alícuota</span>
+                                <div id="calc-imp-alicuota" class="text-base font-semibold text-neutral-300 font-mono">0,00 Bs.</div>
+                            </div>
+                            <div class="p-5 rounded-2xl bg-[#161618] border border-white/5 space-y-1">
+                                <span class="text-[11px] text-neutral-500 uppercase tracking-wider block font-medium">Mínimo LOCAT</span>
+                                <div id="calc-min-tributable" class="text-base font-semibold text-neutral-300 font-mono">${minimoBs.toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs.</div>
+                            </div>
+                            <div class="p-5 rounded-2xl bg-[#161618] border border-white/10 space-y-1">
+                                <span class="text-[11px] text-white uppercase tracking-wider block font-semibold">Total a Pagar</span>
+                                <div id="calc-total-pagar" class="text-xl font-bold text-white font-mono">0,00 Bs.</div>
                             </div>
                         </div>
 
                         <div class="flex justify-end pt-2">
                             <button onclick="window.PortalComercio.presentarDeclaracion(${alicuota}, ${minimoBs})" 
-                                    class="px-8 py-3.5 bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-sky-900/30 transition flex items-center gap-2">
-                                <i class="fas fa-check-circle"></i>
-                                <span>Presentar Autoliquidación Jurada</span>
+                                    class="bg-white hover:bg-neutral-200 text-black text-xs font-semibold rounded-full px-8 py-3.5 transition shadow-lg flex items-center gap-2">
+                                <span>Presentar Declaración</span>
+                                <i class="fas fa-arrow-right text-[10px]"></i>
                             </button>
                         </div>
                     </div>
@@ -294,88 +266,78 @@
             } else if (tab === 'pagar') {
                 return `
                     <div class="space-y-6">
-                        <!-- Tarjetas de Cuentas Bancarias Municipales -->
-                        <div class="bg-slate-900 border border-slate-800 p-6 sm:p-8 rounded-3xl shadow-xl space-y-4">
-                            <h3 class="text-base font-black text-slate-100 flex items-center gap-2">
-                                <i class="fas fa-university text-sky-400"></i>
-                                Cuentas Bancarias Recaudadoras del Municipio
-                            </h3>
-                            <p class="text-xs text-slate-400">
-                                Transfiera o realice pago móvil a cualquiera de las cuentas oficiales de la Alcaldía e ingrese la referencia bancaria para su conciliación automática.
-                            </p>
-
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                                ${cuentas.map(cta => `
-                                    <div class="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2 relative group">
-                                        <div class="flex items-center justify-between">
-                                            <span class="text-xs font-black text-sky-400 uppercase tracking-wider">${cta.banco || cta.banco_nombre}</span>
-                                            <span class="text-[10px] font-mono text-slate-400 uppercase">${cta.tipo || 'Corriente'}</span>
-                                        </div>
-                                        <div class="text-sm font-mono font-bold text-slate-200 select-all tracking-wider">${cta.numero || cta.numero_cuenta}</div>
-                                        <div class="text-[11px] text-slate-400 flex items-center justify-between">
-                                            <span>${cta.concepto || 'Recaudación Tributaria'}</span>
-                                            <button onclick="window.PortalComercio.copiarAlPortapapeles('${cta.numero || cta.numero_cuenta}')" 
-                                                    class="text-sky-400 hover:text-sky-300 font-bold transition flex items-center gap-1">
-                                                <i class="fas fa-copy text-[10px]"></i>
-                                                <span>Copiar</span>
-                                            </button>
-                                        </div>
+                        <!-- Tarjetas de Cuentas Bancarias (Apple Card Style) -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            ${cuentas.map(cta => `
+                                <div class="p-6 rounded-3xl bg-gradient-to-br from-[#1c1c1e] to-[#121214] border border-white/10 shadow-xl space-y-4 relative group">
+                                    <div class="flex items-center justify-between">
+                                        <div class="text-xs font-bold text-white uppercase tracking-wider">${cta.banco || cta.banco_nombre}</div>
+                                        <span class="text-[10px] text-neutral-400 font-mono uppercase px-2 py-0.5 rounded-full bg-white/5 border border-white/5">${cta.tipo || 'Corriente'}</span>
                                     </div>
-                                `).join('')}
-                            </div>
+                                    <div class="space-y-1">
+                                        <div class="text-base font-mono font-bold text-white tracking-wider select-all">${cta.numero || cta.numero_cuenta}</div>
+                                        <div class="text-xs text-neutral-400">${cta.concepto || 'Recaudación Tributaria Municipal'}</div>
+                                    </div>
+                                    <button onclick="window.PortalComercio.copiarAlPortapapeles('${cta.numero || cta.numero_cuenta}')" 
+                                            class="w-full py-2 bg-white/[0.06] hover:bg-white/[0.12] text-neutral-300 hover:text-white text-xs font-medium rounded-xl transition flex items-center justify-center gap-1.5 border border-white/5">
+                                        <i class="fas fa-copy text-[10px]"></i>
+                                        <span>Copiar Número de Cuenta</span>
+                                    </button>
+                                </div>
+                            `).join('')}
                         </div>
 
-                        <!-- Formulario de Consignación de Comprobante -->
-                        <div class="bg-slate-900 border border-slate-800 p-6 sm:p-8 rounded-3xl shadow-xl space-y-6">
-                            <h3 class="text-base font-black text-slate-100 flex items-center gap-2">
-                                <i class="fas fa-receipt text-emerald-400"></i>
-                                Consignar Comprobante de Pago
-                            </h3>
+                        <!-- Formulario de Consignación -->
+                        <div class="p-8 sm:p-10 rounded-3xl bg-[#121214] border border-white/[0.08] shadow-2xl space-y-6">
+                            <div class="space-y-1">
+                                <h3 class="text-lg font-semibold text-white">Reportar Transferencia Realizada</h3>
+                                <p class="text-xs text-neutral-400">Ingresa los datos del pago para que sea conciliado por taquilla.</p>
+                            </div>
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="text-xs font-bold text-slate-400 uppercase block mb-1.5">Declaración a Cancelar:</label>
-                                    <select id="pago-declaracion-id" class="w-full bg-slate-800 border border-slate-700 text-slate-100 font-bold text-xs rounded-xl px-4 py-3 outline-none focus:border-sky-500">
+                                <div class="space-y-1.5">
+                                    <label class="text-[11px] font-medium text-neutral-400 uppercase tracking-wider block">Declaración a Cancelar</label>
+                                    <select id="pago-declaracion-id" class="w-full bg-[#18181b] border border-white/10 text-white text-xs font-medium rounded-2xl px-4 py-3 outline-none focus:border-white/30 transition">
                                         ${declaracionesPendientes.length === 0 ? `
-                                            <option value="">No presenta declaraciones pendientes</option>
+                                            <option value="">No tienes declaraciones pendientes</option>
                                         ` : declaracionesPendientes.map(d => `
                                             <option value="${d.id}">${MESES[d.mes - 1]} ${d.anio} — ${Number(d.impuesto_determinado_bs || 0).toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs.</option>
                                         `).join('')}
                                     </select>
                                 </div>
-                                <div>
-                                    <label class="text-xs font-bold text-slate-400 uppercase block mb-1.5">Banco de Origen (Su Banco):</label>
-                                    <input type="text" id="pago-banco-origen" placeholder="Ej: Banesco, Banco de Venezuela, Mercantil" 
-                                           class="w-full bg-slate-800 border border-slate-700 text-slate-100 text-xs font-bold rounded-xl px-4 py-3 outline-none focus:border-sky-500">
+                                <div class="space-y-1.5">
+                                    <label class="text-[11px] font-medium text-neutral-400 uppercase tracking-wider block">Banco de Origen (Tu Banco)</label>
+                                    <input type="text" id="pago-banco-origen" placeholder="Ej: Banesco, Mercantil, BDV" 
+                                           class="w-full bg-[#18181b] border border-white/10 text-white text-xs font-medium rounded-2xl px-4 py-3 outline-none focus:border-white/30 transition">
                                 </div>
-                                <div>
-                                    <label class="text-xs font-bold text-slate-400 uppercase block mb-1.5">Banco Destino (Municipio):</label>
-                                    <select id="pago-banco-destino" class="w-full bg-slate-800 border border-slate-700 text-slate-100 font-bold text-xs rounded-xl px-4 py-3 outline-none focus:border-sky-500">
+                                <div class="space-y-1.5">
+                                    <label class="text-[11px] font-medium text-neutral-400 uppercase tracking-wider block">Banco Receptor (Alcaldía)</label>
+                                    <select id="pago-banco-destino" class="w-full bg-[#18181b] border border-white/10 text-white text-xs font-medium rounded-2xl px-4 py-3 outline-none focus:border-white/30 transition">
                                         ${cuentas.map(cta => `<option value="${cta.banco || cta.banco_nombre}">${cta.banco || cta.banco_nombre}</option>`).join('')}
                                     </select>
                                 </div>
-                                <div>
-                                    <label class="text-xs font-bold text-slate-400 uppercase block mb-1.5">Número de Referencia Bancaria:</label>
+                                <div class="space-y-1.5">
+                                    <label class="text-[11px] font-medium text-neutral-400 uppercase tracking-wider block">Número de Referencia Bancaria</label>
                                     <input type="text" id="pago-referencia" placeholder="Ej: 000987654321" 
-                                           class="w-full bg-slate-800 border border-slate-700 text-sky-400 font-mono font-bold text-xs rounded-xl px-4 py-3 outline-none focus:border-sky-500">
+                                           class="w-full bg-[#18181b] border border-white/10 text-white font-mono text-xs font-medium rounded-2xl px-4 py-3 outline-none focus:border-white/30 transition">
                                 </div>
-                                <div>
-                                    <label class="text-xs font-bold text-slate-400 uppercase block mb-1.5">Monto Transferido en Bs:</label>
-                                    <input type="number" step="0.01" id="pago-monto" placeholder="0.00" 
-                                           class="w-full bg-slate-800 border border-slate-700 text-emerald-400 font-mono font-bold text-xs rounded-xl px-4 py-3 outline-none focus:border-sky-500">
+                                <div class="space-y-1.5">
+                                    <label class="text-[11px] font-medium text-neutral-400 uppercase tracking-wider block">Monto Pagado en Bs</label>
+                                    <input type="number" step="0.01" id="pago-monto" placeholder="0,00" 
+                                           class="w-full bg-[#18181b] border border-white/10 text-white font-mono text-xs font-medium rounded-2xl px-4 py-3 outline-none focus:border-white/30 transition">
                                 </div>
-                                <div>
-                                    <label class="text-xs font-bold text-slate-400 uppercase block mb-1.5">Fecha del Pago:</label>
+                                <div class="space-y-1.5">
+                                    <label class="text-[11px] font-medium text-neutral-400 uppercase tracking-wider block">Fecha de Pago</label>
                                     <input type="date" id="pago-fecha" value="${new Date().toISOString().split('T')[0]}" 
-                                           class="w-full bg-slate-800 border border-slate-700 text-slate-100 font-bold text-xs rounded-xl px-4 py-3 outline-none focus:border-sky-500">
+                                           class="w-full bg-[#18181b] border border-white/10 text-white text-xs font-medium rounded-2xl px-4 py-3 outline-none focus:border-white/30 transition">
                                 </div>
                             </div>
 
                             <div class="flex justify-end pt-2">
                                 <button onclick="window.PortalComercio.guardarPago()" 
-                                        class="px-8 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-900/30 transition flex items-center gap-2">
-                                    <i class="fas fa-paper-plane"></i>
-                                    <span>Consignar Pago a Taquilla</span>
+                                        class="bg-white hover:bg-neutral-200 text-black text-xs font-semibold rounded-full px-8 py-3.5 transition shadow-lg flex items-center gap-2">
+                                    <span>Consignar Comprobante</span>
+                                    <i class="fas fa-check text-[10px]"></i>
                                 </button>
                             </div>
                         </div>
@@ -383,125 +345,113 @@
                 `;
             } else if (tab === 'solvencia') {
                 return `
-                    <div class="space-y-6">
+                    <div class="max-w-2xl mx-auto space-y-6">
                         ${esSolvente ? `
-                            <!-- Certificado de Solvencia Oficial -->
-                            <div class="bg-slate-900 border border-slate-800 p-8 sm:p-12 rounded-3xl shadow-2xl space-y-8 relative overflow-hidden" id="solvencia-oficial-print">
-                                <div class="text-center space-y-2 border-b border-slate-800 pb-6">
-                                    <div class="text-xs font-black tracking-widest text-slate-400 uppercase">REPÚBLICA BOLIVARIANA DE VENEZUELA</div>
-                                    <div class="text-sm font-black text-slate-300 uppercase">ESTADO BOLIVARIANO DE GUÁRICO · ALCALDÍA MUNICIPAL</div>
-                                    <div class="text-xs font-bold text-sky-400 font-mono uppercase tracking-wider">DIRECCIÓN DE HACIENDA Y ADMINISTRACIÓN TRIBUTARIA</div>
-                                    <h2 class="text-2xl font-black text-slate-100 pt-2 tracking-tight">CERTIFICADO OFICIAL DE SOLVENCIA MUNICIPAL</h2>
-                                    <div class="text-xs font-mono text-emerald-400 font-bold">VIGENCIA FISCAL: 30 DÍAS CONTINUOS</div>
-                                </div>
-
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 text-xs p-6 bg-slate-950/70 border border-slate-800/80 rounded-2xl">
-                                    <div class="space-y-2">
-                                        <div><span class="text-slate-500 font-bold">CONTRIBUYENTE:</span> <strong class="text-slate-200">${c.razon_social}</strong></div>
-                                        <div><span class="text-slate-500 font-bold">RIF FISCAL:</span> <strong class="font-mono text-sky-400">${c.rif}</strong></div>
-                                        <div><span class="text-slate-500 font-bold">DENOMINACIÓN:</span> <span class="text-slate-300">${c.denominacion_comercial || 'N/A'}</span></div>
-                                        <div><span class="text-slate-500 font-bold">DIRECCIÓN:</span> <span class="text-slate-400">${c.direccion_fiscal || 'Local Principal'}</span></div>
+                            <!-- Apple Wallet Pass Style Certificate -->
+                            <div class="rounded-3xl bg-gradient-to-b from-[#1c1c1e] to-[#0a0a0c] border border-white/10 p-8 sm:p-10 shadow-2xl space-y-8 relative overflow-hidden">
+                                <div class="flex items-center justify-between border-b border-white/10 pb-6">
+                                    <div class="space-y-0.5">
+                                        <div class="text-[10px] font-mono text-neutral-400 uppercase tracking-widest">Alcaldía Municipal · Hacienda</div>
+                                        <h3 class="text-base font-semibold text-white tracking-tight">Certificado de Solvencia</h3>
                                     </div>
-                                    <div class="space-y-2 sm:border-l sm:border-slate-800 sm:pl-6">
-                                        <div><span class="text-slate-500 font-bold">NRO. LICENCIA / PATENTE:</span> <strong class="font-mono text-slate-200">${patenteActiva ? patenteActiva.numero_patente : 'VIGENTE'}</strong></div>
-                                        <div><span class="text-slate-500 font-bold">ACTIVIDAD LOCAT:</span> <span class="text-slate-300">${patenteActiva ? patenteActiva.descripcion_actividad : 'Actividades Comerciales'}</span></div>
-                                        <div><span class="text-slate-500 font-bold">ESTADO DE CUENTA:</span> <span class="text-emerald-400 font-bold">AL DÍA (0 DEUDA)</span></div>
-                                        <div><span class="text-slate-500 font-bold">FECHA EMISIÓN:</span> <span class="font-mono text-slate-300">${new Date().toLocaleDateString('es-VE')}</span></div>
+                                    <div class="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-medium">
+                                        Activa (30 días)
                                     </div>
                                 </div>
 
-                                <div class="flex flex-col sm:flex-row items-center justify-between gap-6 pt-4">
-                                    <div class="flex items-center gap-4">
-                                        <div class="p-3 bg-white rounded-2xl shadow-lg">
-                                            <i class="fas fa-qrcode text-black text-6xl"></i>
-                                        </div>
-                                        <div class="text-[11px] text-slate-400 space-y-1">
-                                            <div class="font-bold text-slate-200">CÓDIGO DE VALIDACIÓN FISCAL</div>
-                                            <div class="font-mono text-sky-400 text-[10px]">HASH: ${String(c.rif).replace(/[^a-zA-Z0-9]/g, '')}-2026-OK</div>
-                                            <div>Escanee para verificar autenticidad en el servidor municipal.</div>
-                                        </div>
+                                <div class="space-y-4 text-xs font-mono">
+                                    <div class="flex justify-between border-b border-white/5 pb-2">
+                                        <span class="text-neutral-500">Contribuyente</span>
+                                        <span class="text-white font-semibold font-sans">${c.razon_social}</span>
                                     </div>
+                                    <div class="flex justify-between border-b border-white/5 pb-2">
+                                        <span class="text-neutral-500">RIF Fiscal</span>
+                                        <span class="text-white font-semibold">${c.rif}</span>
+                                    </div>
+                                    <div class="flex justify-between border-b border-white/5 pb-2">
+                                        <span class="text-neutral-500">Patente / Licencia</span>
+                                        <span class="text-white">${patenteActiva ? patenteActiva.numero_patente : 'VIGENTE'}</span>
+                                    </div>
+                                    <div class="flex justify-between border-b border-white/5 pb-2">
+                                        <span class="text-neutral-500">Fecha de Emisión</span>
+                                        <span class="text-white">${new Date().toLocaleDateString('es-VE')}</span>
+                                    </div>
+                                </div>
 
-                                    <div class="shrink-0 flex gap-3">
-                                        <button onclick="window.print()" 
-                                                class="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-lg transition flex items-center gap-2">
-                                            <i class="fas fa-print"></i>
-                                            <span>Imprimir Certificado</span>
-                                        </button>
-                                    </div>
+                                <!-- QR Central Estilo Apple Pass -->
+                                <div class="p-6 rounded-2xl bg-white flex flex-col items-center justify-center space-y-2 text-black text-center shadow-lg">
+                                    <i class="fas fa-qrcode text-6xl"></i>
+                                    <span class="text-[9px] font-mono font-bold tracking-widest uppercase text-neutral-700">Verificación Fiscal Oficial</span>
+                                </div>
+
+                                <div class="flex justify-center pt-2">
+                                    <button onclick="window.print()" 
+                                            class="bg-white hover:bg-neutral-200 text-black text-xs font-semibold rounded-full px-8 py-3.5 transition shadow-lg flex items-center gap-2">
+                                        <i class="fas fa-print text-xs"></i>
+                                        <span>Imprimir Certificado</span>
+                                    </button>
                                 </div>
                             </div>
                         ` : `
-                            <!-- Alerta de Bloqueo por Morosidad -->
-                            <div class="bg-slate-900 border border-rose-900/50 p-8 rounded-3xl shadow-xl space-y-4">
-                                <div class="flex items-center gap-3 text-rose-400">
-                                    <i class="fas fa-exclamation-triangle text-2xl"></i>
-                                    <h3 class="text-lg font-black text-slate-100">Solvencia Bloqueada por Declaraciones Pendientes</h3>
+                            <div class="p-8 rounded-3xl bg-[#121214] border border-rose-500/20 space-y-4 text-center">
+                                <div class="w-12 h-12 rounded-full bg-rose-500/10 text-rose-400 flex items-center justify-center mx-auto text-lg">
+                                    <i class="fas fa-lock"></i>
                                 </div>
-                                <p class="text-xs text-slate-300 leading-relaxed">
-                                    Conforme a la normativa tributaria municipal, la emisión de la Solvencia de Actividades Económicas requiere estar al día con la autoliquidación mensual. Presenta un saldo pendiente de <strong class="text-rose-400 font-mono">${totalDeudaBs.toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs.</strong>
-                                </p>
-                                <div class="pt-2">
-                                    <button onclick="window.PortalComercio.cambiarTab('pagar')" 
-                                            class="px-6 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs rounded-xl shadow transition">
-                                        Ir a Consignar Pagos Pendientes
-                                    </button>
+                                <div class="space-y-1">
+                                    <h3 class="text-base font-semibold text-white">Solvencia Bloqueada</h3>
+                                    <p class="text-xs text-neutral-400 max-w-md mx-auto leading-relaxed">
+                                        Presentas un saldo pendiente de <strong class="text-white font-mono">${totalDeudaBs.toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs.</strong> Liquida tus declaraciones para desbloquear tu certificado.
+                                    </p>
                                 </div>
+                                <button onclick="window.PortalComercio.cambiarTab('pagar')" 
+                                        class="bg-white hover:bg-neutral-200 text-black text-xs font-semibold rounded-full px-6 py-2.5 transition inline-flex items-center gap-1.5 shadow">
+                                    <span>Ir a Pagar Deuda</span>
+                                    <i class="fas fa-arrow-right text-[10px]"></i>
+                                </button>
                             </div>
                         `}
                     </div>
                 `;
             } else if (tab === 'historial') {
                 return `
-                    <div class="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-xl p-6 sm:p-8 space-y-4">
-                        <div class="flex items-center justify-between border-b border-slate-800 pb-4">
-                            <h3 class="text-base font-black text-slate-100 flex items-center gap-2">
-                                <i class="fas fa-history text-sky-400"></i>
-                                Historial de Declaraciones y Pagos del Comercio
-                            </h3>
-                            <span class="text-xs font-mono text-slate-500">${declaraciones.length} registros</span>
+                    <div class="p-8 rounded-3xl bg-[#121214] border border-white/[0.08] shadow-2xl space-y-6">
+                        <div class="flex items-center justify-between border-b border-white/5 pb-4">
+                            <h3 class="text-base font-semibold text-white">Declaraciones y Pagos</h3>
+                            <span class="text-xs font-mono text-neutral-500">${declaraciones.length} registros</span>
                         </div>
 
                         <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse text-xs">
+                            <table class="w-full text-left text-xs font-mono">
                                 <thead>
-                                    <tr class="bg-slate-950/80 text-slate-400 uppercase font-mono tracking-wider border-b border-slate-800">
-                                        <th class="p-3">Período</th>
-                                        <th class="p-3 text-right">Base Imponible</th>
-                                        <th class="p-3 text-right">Monto Determinado</th>
-                                        <th class="p-3 text-center">Estado Declaración</th>
-                                        <th class="p-3">Pago Consignado</th>
-                                        <th class="p-3 text-center">Estado Pago</th>
+                                    <tr class="text-neutral-500 border-b border-white/5">
+                                        <th class="py-3 px-2 font-normal">Período</th>
+                                        <th class="py-3 px-2 text-right font-normal">Base Imponible</th>
+                                        <th class="py-3 px-2 text-right font-normal">Monto Determinado</th>
+                                        <th class="py-3 px-2 text-center font-normal">Estado</th>
+                                        <th class="py-3 px-2 font-normal">Referencia</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-slate-800/60 text-slate-300 font-mono">
+                                <tbody class="divide-y divide-white/[0.04] text-neutral-300">
                                     ${declaraciones.length === 0 ? `
                                         <tr>
-                                            <td colspan="6" class="p-8 text-center text-slate-500 font-sans">
-                                                No posee declaraciones registradas todavía. Inicie en la pestaña de Autoliquidación.
+                                            <td colspan="5" class="py-8 text-center text-neutral-500 font-sans">
+                                                No tienes declaraciones registradas aún.
                                             </td>
                                         </tr>
                                     ` : declaraciones.map(d => {
                                         const pago = pagos.find(p => String(p.declaracion_id) === String(d.id));
                                         return `
-                                            <tr class="hover:bg-slate-800/40 transition">
-                                                <td class="p-3 font-bold text-slate-200 font-sans">${MESES[d.mes - 1]} ${d.anio}</td>
-                                                <td class="p-3 text-right text-slate-400">${Number(d.base_imponible_bs || 0).toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs.</td>
-                                                <td class="p-3 text-right font-bold text-sky-300">${Number(d.impuesto_determinado_bs || 0).toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs.</td>
-                                                <td class="p-3 text-center">
-                                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${d.estado === 'pagada' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'}">
+                                            <tr class="hover:bg-white/[0.02] transition">
+                                                <td class="py-3 px-2 text-white font-sans font-medium">${MESES[d.mes - 1]} ${d.anio}</td>
+                                                <td class="py-3 px-2 text-right text-neutral-400">${Number(d.base_imponible_bs || 0).toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs.</td>
+                                                <td class="py-3 px-2 text-right text-white font-semibold">${Number(d.impuesto_determinado_bs || 0).toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs.</td>
+                                                <td class="py-3 px-2 text-center">
+                                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-sans font-medium ${d.estado === 'pagada' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}">
                                                         ${d.estado || 'pendiente'}
                                                     </span>
                                                 </td>
-                                                <td class="p-3 text-slate-400">
-                                                    ${pago ? `${pago.banco_destino} Ref: ${pago.referencia_bancaria}` : 'Sin pago reportado'}
-                                                </td>
-                                                <td class="p-3 text-center">
-                                                    ${pago ? `
-                                                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${pago.estado === 'conciliado' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-800 text-slate-400 border border-slate-700'}">
-                                                            ${pago.estado}
-                                                        </span>
-                                                    ` : '-'}
+                                                <td class="py-3 px-2 text-neutral-400">
+                                                    ${pago ? `${pago.banco_destino} Ref: ${pago.referencia_bancaria}` : '—'}
                                                 </td>
                                             </tr>
                                         `;
@@ -518,51 +468,43 @@
             const catalogo = global.CatalogoLocat ? global.CatalogoLocat.getAll() : [];
 
             return `
-                <div id="modal-inscripcion-comercio" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-                    <div class="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
-                        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/60">
-                            <div>
-                                <h3 class="text-sm font-black text-slate-100 flex items-center gap-2">
-                                    <i class="fas fa-file-signature text-sky-400"></i>
-                                    Inscripción en el Padrón Comercial (RUC)
-                                </h3>
-                                <p class="text-xs text-slate-400 mt-0.5">Registre su establecimiento para autoliquidación y solvencias en línea.</p>
+                <div id="modal-inscripcion-comercio" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+                    <div class="bg-[#121214] border border-white/10 rounded-3xl w-full max-w-lg shadow-2xl p-6 sm:p-8 space-y-6">
+                        <div class="flex items-center justify-between border-b border-white/5 pb-4">
+                            <div class="space-y-0.5">
+                                <h3 class="text-base font-semibold text-white">Inscripción en el Padrón Comercial</h3>
+                                <p class="text-xs text-neutral-400">Registra tu comercio para autoliquidación y solvencias en línea.</p>
                             </div>
-                            <button onclick="window.PortalComercio.cerrarModalInscripcion()" class="text-slate-400 hover:text-slate-100 p-2">
-                                <i class="fas fa-times text-lg"></i>
+                            <button onclick="window.PortalComercio.cerrarModalInscripcion()" class="text-neutral-500 hover:text-white p-2">
+                                <i class="fas fa-times text-sm"></i>
                             </button>
                         </div>
 
-                        <div class="p-6 space-y-4 overflow-y-auto flex-1">
+                        <div class="space-y-4 text-xs">
                             <div class="grid grid-cols-3 gap-3">
                                 <div>
-                                    <label class="text-xs font-bold text-slate-400 uppercase block mb-1">Tipo RIF:</label>
-                                    <select id="ins-rif-tipo" class="w-full bg-slate-800 border border-slate-700 text-sky-400 font-mono font-bold text-xs rounded-xl px-3 py-2.5 outline-none focus:border-sky-500">
-                                        <option value="J">J - Jurídico</option>
-                                        <option value="V">V - Natural</option>
-                                        <option value="G">G - Gubernamental</option>
-                                        <option value="E">E - Extranjero</option>
+                                    <label class="text-[11px] font-medium text-neutral-400 uppercase block mb-1">Tipo</label>
+                                    <select id="ins-rif-tipo" class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none focus:border-white/30">
+                                        <option value="J">J</option>
+                                        <option value="V">V</option>
+                                        <option value="G">G</option>
+                                        <option value="E">E</option>
                                     </select>
                                 </div>
                                 <div class="col-span-2">
-                                    <label class="text-xs font-bold text-slate-400 uppercase block mb-1">Número de RIF:</label>
-                                    <input type="text" id="ins-rif-numero" placeholder="Ej: 30123456-7" class="w-full bg-slate-800 border border-slate-700 text-slate-100 font-mono font-bold text-xs rounded-xl px-3 py-2.5 outline-none focus:border-sky-500">
+                                    <label class="text-[11px] font-medium text-neutral-400 uppercase block mb-1">Número de RIF</label>
+                                    <input type="text" id="ins-rif-numero" placeholder="Ej: 30123456-7" class="w-full bg-[#18181b] border border-white/10 text-white font-mono rounded-xl px-3 py-2.5 outline-none focus:border-white/30">
                                 </div>
                             </div>
 
                             <div>
-                                <label class="text-xs font-bold text-slate-400 uppercase block mb-1">Razón Social (Nombre Legal):</label>
-                                <input type="text" id="ins-razon" placeholder="Ej: INVERSIONES GUIRIRI C.A." class="w-full bg-slate-800 border border-slate-700 text-slate-100 text-xs font-bold rounded-xl px-3 py-2.5 outline-none focus:border-sky-500">
+                                <label class="text-[11px] font-medium text-neutral-400 uppercase block mb-1">Razón Social (Nombre Legal)</label>
+                                <input type="text" id="ins-razon" placeholder="Ej: INVERSIONES GUIRIRI C.A." class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none focus:border-white/30">
                             </div>
 
                             <div>
-                                <label class="text-xs font-bold text-slate-400 uppercase block mb-1">Nombre Comercial (Fachada / Vitrina):</label>
-                                <input type="text" id="ins-denominacion" placeholder="Ej: SUPERMERCADO EL CENTRO" class="w-full bg-slate-800 border border-slate-700 text-slate-100 text-xs font-bold rounded-xl px-3 py-2.5 outline-none focus:border-sky-500">
-                            </div>
-
-                            <div>
-                                <label class="text-xs font-bold text-slate-400 uppercase block mb-1">Actividad Económica Principal (LOCAT):</label>
-                                <select id="ins-actividad" class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs font-bold rounded-xl px-3 py-2.5 outline-none focus:border-sky-500">
+                                <label class="text-[11px] font-medium text-neutral-400 uppercase block mb-1">Actividad Económica (LOCAT)</label>
+                                <select id="ins-actividad" class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none focus:border-white/30">
                                     ${catalogo.map(item => `
                                         <option value="${item.codigo}">[${item.codigo}] ${item.nombre} — ${(item.alicuota * 100).toFixed(2)}%</option>
                                     `).join('')}
@@ -571,24 +513,19 @@
 
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label class="text-xs font-bold text-slate-400 uppercase block mb-1">Teléfono:</label>
-                                    <input type="text" id="ins-telefono" placeholder="0414-0000000" class="w-full bg-slate-800 border border-slate-700 text-slate-100 text-xs font-bold rounded-xl px-3 py-2.5 outline-none focus:border-sky-500">
+                                    <label class="text-[11px] font-medium text-neutral-400 uppercase block mb-1">Teléfono</label>
+                                    <input type="text" id="ins-telefono" placeholder="0414-0000000" class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none focus:border-white/30">
                                 </div>
                                 <div>
-                                    <label class="text-xs font-bold text-slate-400 uppercase block mb-1">Correo Electrónico:</label>
-                                    <input type="email" id="ins-correo" placeholder="correo@comercio.com" class="w-full bg-slate-800 border border-slate-700 text-slate-100 text-xs font-bold rounded-xl px-3 py-2.5 outline-none focus:border-sky-500">
+                                    <label class="text-[11px] font-medium text-neutral-400 uppercase block mb-1">Correo Electrónico</label>
+                                    <input type="email" id="ins-correo" placeholder="correo@comercio.com" class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none focus:border-white/30">
                                 </div>
-                            </div>
-
-                            <div>
-                                <label class="text-xs font-bold text-slate-400 uppercase block mb-1">Dirección Fiscal del Local:</label>
-                                <textarea id="ins-direccion" rows="2" placeholder="Calle, avenida, centro comercial, número de local..." class="w-full bg-slate-800 border border-slate-700 text-slate-100 text-xs font-bold rounded-xl px-3 py-2 outline-none focus:border-sky-500"></textarea>
                             </div>
                         </div>
 
-                        <div class="px-6 py-4 border-t border-slate-800 bg-slate-950/60 flex justify-end gap-3">
-                            <button onclick="window.PortalComercio.cerrarModalInscripcion()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl border border-slate-700 transition">Cancelar</button>
-                            <button onclick="window.PortalComercio.guardarInscripcion()" class="px-6 py-2 bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs rounded-xl shadow-lg transition">Completar Inscripción</button>
+                        <div class="flex justify-end gap-3 pt-2 border-t border-white/5">
+                            <button onclick="window.PortalComercio.cerrarModalInscripcion()" class="px-5 py-2.5 text-xs text-neutral-400 hover:text-white rounded-full">Cancelar</button>
+                            <button onclick="window.PortalComercio.guardarInscripcion()" class="bg-white hover:bg-neutral-200 text-black text-xs font-semibold rounded-full px-6 py-2.5 transition">Registrar Comercio</button>
                         </div>
                     </div>
                 </div>
@@ -601,7 +538,7 @@
 
             if (!numero) {
                 if (typeof Swal !== 'undefined') {
-                    Swal.fire({ icon: 'warning', title: 'RIF Requerido', text: 'Ingrese el número de RIF del contribuyente.', confirmButtonColor: '#0284c7' });
+                    Swal.fire({ icon: 'warning', title: 'RIF Requerido', text: 'Ingresa el número de RIF del contribuyente.', confirmButtonColor: '#000000' });
                 }
                 return;
             }
@@ -623,11 +560,11 @@
                     Swal.fire({
                         icon: 'info',
                         title: 'Comercio no Registrado',
-                        text: `El RIF ${cleanRif} no se encuentra registrado en el Padrón Municipal (RUC). ¿Desea realizar la inscripción ahora?`,
+                        text: `El RIF ${cleanRif} no se encuentra registrado en el Padrón Municipal. ¿Deseas solicitar la inscripción?`,
                         showCancelButton: true,
-                        confirmButtonText: 'Sí, Inscribir Comercio',
+                        confirmButtonText: 'Inscribir Comercio',
                         cancelButtonText: 'Cancelar',
-                        confirmButtonColor: '#0284c7'
+                        confirmButtonColor: '#000000'
                     }).then(res => {
                         if (res.isConfirmed) {
                             this.abrirModalInscripcion(cleanRif);
@@ -677,16 +614,15 @@
             const baseImponible = parseFloat(document.getElementById('dec-base-imponible').value || 0);
 
             if (isNaN(baseImponible) || baseImponible < 0) {
-                if (typeof Swal !== 'undefined') Swal.fire({ icon: 'warning', title: 'Monto inválido', text: 'Ingrese un monto de ingresos brutos válido.', confirmButtonColor: '#0284c7' });
+                if (typeof Swal !== 'undefined') Swal.fire({ icon: 'warning', title: 'Monto inválido', text: 'Ingresa un monto de ventas válido.', confirmButtonColor: '#000000' });
                 return;
             }
 
-            // Validar si ya existe declaracion para ese mes y anio
             const declaraciones = store.get('hacienda_declaraciones') || [];
             const yaExiste = declaraciones.some(d => String(d.contribuyente_id) === String(activeContribuyente.id) && d.mes === mes && d.anio === anio);
             if (yaExiste) {
                 if (typeof Swal !== 'undefined') {
-                    Swal.fire({ icon: 'warning', title: 'Período ya declarado', text: `Ya existe una declaración presentada para ${MESES[mes - 1]} ${anio}.`, confirmButtonColor: '#0284c7' });
+                    Swal.fire({ icon: 'warning', title: 'Período ya declarado', text: `Ya existe una declaración para ${MESES[mes - 1]} ${anio}.`, confirmButtonColor: '#000000' });
                 }
                 return;
             }
@@ -718,9 +654,9 @@
             if (typeof Swal !== 'undefined') {
                 Swal.fire({
                     icon: 'success',
-                    title: 'Autoliquidación Presentada',
-                    text: `Declaración de ${MESES[mes - 1]} ${anio} registrada exitosamente. Total determinado a pagar: ${totalPagar.toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs.`,
-                    confirmButtonColor: '#0284c7'
+                    title: 'Declaración Registrada',
+                    text: `Monto determinado: ${totalPagar.toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs. Procede a reportar el pago.`,
+                    confirmButtonColor: '#000000'
                 });
             }
 
@@ -743,8 +679,8 @@
                     Swal.fire({
                         icon: 'warning',
                         title: 'Campos requeridos',
-                        text: 'Seleccione la declaración, indique número de referencia bancaria y monto válido.',
-                        confirmButtonColor: '#0284c7'
+                        text: 'Selecciona la declaración, ingresa referencia y monto válido.',
+                        confirmButtonColor: '#000000'
                     });
                 }
                 return;
@@ -770,9 +706,9 @@
             if (typeof Swal !== 'undefined') {
                 Swal.fire({
                     icon: 'success',
-                    title: 'Pago Consignado',
-                    text: 'Su pago ha sido consignado con éxito y será conciliado por taquilla.',
-                    confirmButtonColor: '#0284c7'
+                    title: 'Comprobante Consignado',
+                    text: 'El pago ha sido registrado y será conciliado por taquilla.',
+                    confirmButtonColor: '#000000'
                 });
             }
 
@@ -807,14 +743,12 @@
             const tipo = document.getElementById('ins-rif-tipo').value;
             const numero = document.getElementById('ins-rif-numero').value.trim();
             const razon = document.getElementById('ins-razon').value.trim();
-            const denominacion = document.getElementById('ins-denominacion').value.trim();
             const codigoActividad = document.getElementById('ins-actividad').value;
             const telefono = document.getElementById('ins-telefono').value.trim();
             const correo = document.getElementById('ins-correo').value.trim();
-            const direccion = document.getElementById('ins-direccion').value.trim();
 
             if (!numero || !razon) {
-                if (typeof Swal !== 'undefined') Swal.fire({ icon: 'warning', title: 'Datos requeridos', text: 'Indique número de RIF y Razón Social.', confirmButtonColor: '#0284c7' });
+                if (typeof Swal !== 'undefined') Swal.fire({ icon: 'warning', title: 'Datos requeridos', text: 'Indica RIF y Razón Social.', confirmButtonColor: '#000000' });
                 return;
             }
 
@@ -825,17 +759,16 @@
                 id: contribuyenteId,
                 rif: rifCompleto,
                 razon_social: razon,
-                denominacion_comercial: denominacion,
+                denominacion_comercial: razon,
                 tipo_persona: tipo === 'V' ? 'natural' : 'juridica',
                 correo: correo,
                 telefono: telefono,
-                direccion_fiscal: direccion,
+                direccion_fiscal: '',
                 estado: 'activo'
             };
 
             await store.set('hacienda_contribuyentes', nuevoContribuyente);
 
-            // Crear patente asociada al contribuyente
             const catalogo = global.CatalogoLocat ? global.CatalogoLocat.getAll() : [];
             const actInfo = catalogo.find(a => a.codigo === codigoActividad) || { alicuota: 0.01, minimo_tcmmv: 0.30, nombre: 'Actividades Comerciales' };
 
@@ -856,17 +789,6 @@
             await store.set('hacienda_patentes', nuevaPatente);
 
             this.cerrarModalInscripcion();
-
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Comercio Inscrito',
-                    text: 'Inscripción en el Padrón Comercial completada a 0ms.',
-                    timer: 1500,
-                    showConfirmButton: false
-                });
-            }
-
             this.seleccionarRif(rifCompleto);
         },
 
@@ -876,8 +798,8 @@
                     Swal.fire({
                         icon: 'success',
                         title: 'Copiado',
-                        text: 'Número de cuenta copiado al portapapeles.',
-                        timer: 1200,
+                        text: 'Número de cuenta copiado.',
+                        timer: 1000,
                         showConfirmButton: false
                     });
                 }
