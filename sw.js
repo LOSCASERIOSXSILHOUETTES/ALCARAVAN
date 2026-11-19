@@ -1,5 +1,5 @@
 // ALCARAVAN — Service Worker Offline-First Cache Engine (SGB Silhouettes V3)
-const CACHE_NAME = 'alcaravan-v3-cache-v3.4.0';
+const CACHE_NAME = 'alcaravan-v3-cache-v3.5.0';
 
 const STATIC_ASSETS = [
     './',
@@ -10,6 +10,7 @@ const STATIC_ASSETS = [
     './js/core/store.js',
     './js/core/auth.js',
     './js/core/uploader.js',
+    './js/services/tasas-bcv.js',
     './js/modules/patentes/catalogo-locat.js',
     './js/modules/contribuyentes/registro.js',
     './js/modules/patentes/comercial.js',
@@ -69,8 +70,8 @@ self.addEventListener('message', (event) => {
 self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
 
-    // No cachear llamadas REST o Realtime a Supabase
-    if (url.origin.includes('supabase.co')) {
+    // No cachear llamadas REST o Realtime a Supabase ni API de tasas en vivo
+    if (url.origin.includes('supabase.co') || url.origin.includes('dolarapi.com')) {
         return;
     }
 

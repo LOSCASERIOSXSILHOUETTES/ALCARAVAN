@@ -10,7 +10,29 @@
     let activeContribuyente = null;
     let activeModule = 'grid'; // 'grid', 'empresas', 'inmuebles', 'vehiculos', 'publicidad', 'tasas', 'cuentas'
     let activeEmpresaTab = 'declarar'; // 'declarar', 'pagar', 'solvencia', 'historial'
-    const TASA_MMAV = 56.50; // Bs. por TCMMV / MMAV (Art. 30 LOCAT)
+
+    function getTasaMMAV() {
+        if (global.TasasBCV && typeof global.TasasBCV.getTCMMV === 'function') {
+            return global.TasasBCV.getTCMMV();
+        }
+        return 1007.40;
+    }
+
+    function getTasasInfo() {
+        if (global.TasasBCV && typeof global.TasasBCV.getTasas === 'function') {
+            return global.TasasBCV.getTasas();
+        }
+        return {
+            usd: 917.78,
+            eur: 1007.40,
+            tcmmv: 1007.40,
+            cny: 126.76,
+            jpy: 5.94,
+            rub: 9.16,
+            try: 26.60,
+            fechaFormateada: new Date().toLocaleDateString('es-VE', { day: '2-digit', month: 'short', year: 'numeric' })
+        };
+    }
 
     const MESES = [
         'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -35,6 +57,7 @@
         },
 
         renderConsultaHero: function(container) {
+            const tasas = getTasasInfo();
             container.innerHTML = `
                 <div class="max-w-4xl mx-auto space-y-12 py-10 sm:py-16 text-center animate-fade-in">
                     <!-- Apple Hero Headline -->
@@ -101,7 +124,7 @@
                                     <span class="text-[10px] font-mono text-amber-300 font-bold uppercase tracking-wider">TCMMV (LOCAT)</span>
                                     <i class="fas fa-crown text-[10px] text-amber-400"></i>
                                 </div>
-                                <div class="text-lg font-bold text-white font-mono tracking-tight">58,20 <span class="text-xs text-amber-300 font-normal">Bs.</span></div>
+                                <div class="text-lg font-bold text-white font-mono tracking-tight"><span data-tasa="tcmmv">${tasas.tcmmv.toLocaleString('es-VE', { minimumFractionDigits: 2 })}</span> <span class="text-xs text-amber-300 font-normal">Bs.</span></div>
                                 <div class="text-[10px] text-amber-400/80 font-sans font-medium">Mayor Valor Oficial</div>
                             </div>
                             <!-- Card USD -->
@@ -110,8 +133,8 @@
                                     <span class="text-[10px] font-mono text-emerald-400 font-bold uppercase tracking-wider">Dólar (USD)</span>
                                     <i class="fas fa-dollar-sign text-[10px] text-emerald-400"></i>
                                 </div>
-                                <div class="text-lg font-bold text-white font-mono tracking-tight">54,85 <span class="text-xs text-emerald-400 font-normal">Bs.</span></div>
-                                <div class="text-[10px] text-emerald-400 font-sans font-medium">▲ +0,12% BCV</div>
+                                <div class="text-lg font-bold text-white font-mono tracking-tight"><span data-tasa="usd">${tasas.usd.toLocaleString('es-VE', { minimumFractionDigits: 2 })}</span> <span class="text-xs text-emerald-400 font-normal">Bs.</span></div>
+                                <div class="text-[10px] text-emerald-400 font-sans font-medium">▲ Oficial BCV</div>
                             </div>
                             <!-- Card EUR -->
                             <div class="p-4 rounded-2xl bg-gradient-to-b from-sky-500/10 to-sky-500/[0.02] border border-sky-500/20 space-y-1 shadow-lg hover:border-sky-400/50 hover:shadow-[0_0_20px_rgba(56,189,248,0.15)] transition duration-300">
@@ -119,8 +142,8 @@
                                     <span class="text-[10px] font-mono text-sky-400 font-bold uppercase tracking-wider">Euro (EUR)</span>
                                     <i class="fas fa-euro-sign text-[10px] text-sky-400"></i>
                                 </div>
-                                <div class="text-lg font-bold text-white font-mono tracking-tight">58,20 <span class="text-xs text-sky-400 font-normal">Bs.</span></div>
-                                <div class="text-[10px] text-sky-400 font-sans font-medium">▲ +0,09% BCV</div>
+                                <div class="text-lg font-bold text-white font-mono tracking-tight"><span data-tasa="eur">${tasas.eur.toLocaleString('es-VE', { minimumFractionDigits: 2 })}</span> <span class="text-xs text-sky-400 font-normal">Bs.</span></div>
+                                <div class="text-[10px] text-sky-400 font-sans font-medium">▲ Oficial BCV</div>
                             </div>
                             <!-- Card CNY / JPY -->
                             <div class="p-4 rounded-2xl bg-gradient-to-b from-rose-500/10 to-rose-500/[0.02] border border-rose-500/20 space-y-1 shadow-lg hover:border-rose-400/50 hover:shadow-[0_0_20px_rgba(244,63,94,0.15)] transition duration-300">
@@ -128,9 +151,11 @@
                                     <span class="text-[10px] font-mono text-rose-400 font-bold uppercase tracking-wider">Yuan (CNY)</span>
                                     <i class="fas fa-yen-sign text-[10px] text-rose-400"></i>
                                 </div>
-                                <div class="text-lg font-bold text-white font-mono tracking-tight">7,56 <span class="text-xs text-rose-400 font-normal">Bs.</span></div>
-                                <div class="text-[10px] text-neutral-400 font-sans">Yen: 0,35 · Rublo: 0,56</div>
+                                <div class="text-lg font-bold text-white font-mono tracking-tight"><span data-tasa="cny">${tasas.cny.toLocaleString('es-VE', { minimumFractionDigits: 2 })}</span> <span class="text-xs text-rose-400 font-normal">Bs.</span></div>
+                                <div class="text-[10px] text-neutral-400 font-sans">Yen: <span data-tasa="jpy">${tasas.jpy.toLocaleString('es-VE', { minimumFractionDigits: 2 })}</span> · Rub: <span data-tasa="rub">${tasas.rub.toLocaleString('es-VE', { minimumFractionDigits: 2 })}</span></div>
                             </div>
+                        </div>
+                    </div>
                         </div>
                     </div>
 
@@ -175,6 +200,8 @@
         renderDashboardSuite: function(container) {
             const store = global.HaciendaStore;
             const c = activeContribuyente;
+            const tasas = getTasasInfo();
+            const tasaMmavActual = getTasaMMAV();
 
             // Datos del contribuyente
             const patentes = (store.get('hacienda_patentes') || []).filter(p => String(p.contribuyente_id) === String(c.id));
@@ -221,19 +248,19 @@
                             <!-- Píldora Tasa TCMMV (Art 30 LOCAT) -->
                             <div class="px-4 py-2 rounded-2xl bg-amber-500/10 border border-amber-500/25 text-xs font-mono shadow-sm">
                                 <span class="text-amber-300 text-[10px] block uppercase font-sans font-semibold">TCMMV (LOCAT)</span>
-                                <span class="text-white font-bold">${TASA_MMAV.toFixed(2)} Bs.</span>
+                                <span data-tasa="tcmmv" class="text-white font-bold">${tasaMmavActual.toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs.</span>
                             </div>
 
                             <!-- Píldora Dólar BCV -->
                             <div class="px-3.5 py-2 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-xs font-mono">
                                 <span class="text-emerald-400 text-[10px] block uppercase font-sans font-semibold">USD BCV</span>
-                                <span class="text-white font-medium">54,85 Bs.</span>
+                                <span data-tasa="usd" class="text-white font-medium">${tasas.usd.toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs.</span>
                             </div>
 
                             <!-- Píldora Euro BCV -->
                             <div class="px-3.5 py-2 rounded-2xl bg-sky-500/10 border border-sky-500/20 text-xs font-mono">
                                 <span class="text-sky-400 text-[10px] block uppercase font-sans font-semibold">EUR BCV</span>
-                                <span class="text-white font-medium">58,20 Bs.</span>
+                                <span data-tasa="eur" class="text-white font-medium">${tasas.eur.toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs.</span>
                             </div>
 
                             <button onclick="window.PortalComercio.cerrarConsulta()" 
@@ -406,7 +433,8 @@
         renderModuloEmpresas: function(c, patenteActiva, declaraciones, declaracionesPendientes, totalDeudaBs, esSolvente, pagos, cuentas) {
             const alicuota = patenteActiva ? Number(patenteActiva.alicuota || 0.01) : 0.01;
             const minimoTcmmv = patenteActiva ? Number(patenteActiva.minimo_tcmmv || 0.30) : 0.30;
-            const minimoBs = minimoTcmmv * TASA_MMAV;
+            const tasaActual = getTasaMMAV();
+            const minimoBs = minimoTcmmv * tasaActual;
 
             return `
                 <div class="space-y-8 animate-fade-in">
@@ -1080,7 +1108,7 @@
                 impuesto_alicuota_bs: impAlicuota,
                 minimo_tributable_bs: minimoBs,
                 impuesto_determinado_bs: totalPagar,
-                tasa_bcv_aplicada: TASA_MMAV,
+                tasa_bcv_aplicada: getTasaMMAV(),
                 estado: 'pendiente',
                 fecha_declaracion: new Date().toISOString()
             };
