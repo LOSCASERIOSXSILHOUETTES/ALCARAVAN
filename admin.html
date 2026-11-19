@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hacienda Municipal — Panel de Administración y ERP SGB V3</title>
+    <link rel="stylesheet" href="libs/tailwind/tailwind.min.css">
+    <link rel="stylesheet" href="libs/fontawesome/css/all.min.css">
+    <script src="libs/localforage.min.js"></script>
+    <script src="libs/sweetalert2/sweetalert2.all.min.js"></script>
+    <script src="libs/supabase/supabase.min.js"></script>
+    <script src="libs/jspdf/jspdf.umd.min.js"></script>
+    <script src="libs/pdfjs/pdf.min.js"></script>
+
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #334155; }
+        body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    </style>
+</head>
+
+<body class="bg-slate-950 text-slate-100 antialiased h-screen flex overflow-hidden select-none">
+
+    <!-- Contenedor Principal de la App (Se oculta si no está autenticado) -->
+    <div id="erp-app-wrapper" class="w-full h-full flex overflow-hidden">
+        <!-- Sidebar Lateral -->
+        <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between shrink-0">
+            <div>
+                <!-- Logo / Cabecera -->
+                <div class="p-6 border-b border-slate-800 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center text-white text-lg font-black shadow-lg">
+                            <i class="fas fa-landmark"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-sm font-black text-slate-100 uppercase tracking-wider">Hacienda SGB</h1>
+                            <span class="text-[10px] text-sky-400 font-bold font-mono">ERP INTERNO · LOCAT</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Menú de Navegación -->
+                <nav class="p-4 space-y-1.5">
+                    <button onclick="window.App.switchTab('contribuyentes')" id="nav-contribuyentes" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
+                        <i class="fas fa-id-card text-sky-400 text-sm"></i>
+                        <span>Contribuyentes (RUC)</span>
+                    </button>
+                    <button onclick="window.App.switchTab('patentes')" id="nav-patentes" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
+                        <i class="fas fa-certificate text-indigo-400 text-sm"></i>
+                        <span>Licencias y Patentes</span>
+                    </button>
+                    <button onclick="window.App.switchTab('declaraciones')" id="nav-declaraciones" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
+                        <i class="fas fa-file-invoice-dollar text-emerald-400 text-sm"></i>
+                        <span>Declaraciones Juradas</span>
+                    </button>
+                    <button onclick="window.App.switchTab('caja')" id="nav-caja" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
+                        <i class="fas fa-cash-register text-amber-400 text-sm"></i>
+                        <span>Caja y Recaudación</span>
+                    </button>
+                    <button onclick="window.App.switchTab('conciliacion')" id="nav-conciliacion" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
+                        <i class="fas fa-balance-scale text-teal-400 text-sm"></i>
+                        <span>Conciliación Bancaria</span>
+                    </button>
+                    <button onclick="window.App.switchTab('solvencias')" id="nav-solvencias" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
+                        <i class="fas fa-stamp text-sky-400 text-sm"></i>
+                        <span>Solvencias con QR</span>
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Pie de Sidebar: Estatus del Sistema y Enlace a Comercio -->
+            <div class="p-4 border-t border-slate-800 space-y-2">
+                <a href="index.html" class="block w-full text-center py-2 bg-slate-800 hover:bg-slate-700 text-sky-400 font-bold text-xs rounded-xl border border-slate-700 transition">
+                    <i class="fas fa-external-link-alt text-xs mr-1"></i>
+                    Ver Portal del Comercio
+                </a>
+                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800/80 flex items-center justify-between text-[11px]">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span class="text-slate-300 font-bold">Motor SGB 0ms</span>
+                    </div>
+                    <span class="font-mono text-emerald-400 text-[10px] font-bold">ONLINE</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Área de Trabajo Principal -->
+        <main class="flex-1 flex flex-col overflow-hidden bg-slate-950">
+            <!-- Barra Superior -->
+            <header class="h-16 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-8 shrink-0">
+                <div class="flex items-center gap-3">
+                    <span id="seccion-titulo" class="text-sm font-black text-slate-100 uppercase tracking-wide">
+                        Padrón de Contribuyentes
+                    </span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 text-xs">
+                        <span class="text-slate-400">Tasa BCV (LOCAT):</span>
+                        <span class="font-mono font-bold text-amber-400">56,50 Bs./TCMMV</span>
+                    </div>
+
+                    <div class="flex items-center gap-3 pl-4 border-l border-slate-800">
+                        <div class="text-right">
+                            <div id="erp-user-nombre" class="text-xs font-bold text-slate-200">Funcionario</div>
+                            <div id="erp-user-rol" class="text-[10px] font-mono text-sky-400 uppercase">Administrador</div>
+                        </div>
+                        <button onclick="window.HaciendaAuth.logout()" title="Cerrar Sesión" 
+                                class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 border border-slate-700 transition flex items-center justify-center text-xs">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Contenedor Dinámico del Módulo -->
+            <div id="app-main-content" class="flex-1 overflow-y-auto p-8">
+                <!-- Renderizado dinámico del submódulo activo -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Pantalla de Login de Funcionarios (Si no hay sesión de admin) -->
+    <div id="erp-login-modal" class="fixed inset-0 z-50 bg-slate-950 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md p-8 shadow-2xl space-y-6">
+            <div class="text-center space-y-2">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center text-white text-3xl font-black shadow-lg mx-auto">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h2 class="text-xl font-black text-slate-100">Acceso a Hacienda Municipal</h2>
+                <p class="text-xs text-slate-400">Panel administrativo interno para recaudadores, fiscales y tesorería.</p>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase block mb-1">Usuario:</label>
+                    <input type="text" id="admin-login-usuario" placeholder="admin o cajero" 
+                           class="w-full bg-slate-800 border border-slate-700 text-slate-100 font-bold text-xs rounded-xl px-4 py-3 outline-none focus:border-sky-500">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase block mb-1">Contraseña:</label>
+                    <input type="password" id="admin-login-clave" placeholder="••••••••" 
+                           class="w-full bg-slate-800 border border-slate-700 text-slate-100 font-bold text-xs rounded-xl px-4 py-3 outline-none focus:border-sky-500">
+                </div>
+                <button onclick="window.App.ejecutarLoginFuncionario()" 
+                        class="w-full py-3 bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-sky-900/30 transition flex items-center justify-center gap-2">
+                    <i class="fas fa-lock-open"></i>
+                    <span>Ingresar al Sistema ERP</span>
+                </button>
+            </div>
+
+            <!-- Accesos Rapidos de Demostracion -->
+            <div class="pt-4 border-t border-slate-800/80 space-y-2">
+                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block text-center">Acceso Rápido de Prueba:</span>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="window.App.loginRapido('admin', 'hacienda2026')" 
+                            class="py-2 bg-slate-800/60 hover:bg-slate-800 text-slate-300 text-[11px] font-bold rounded-lg border border-slate-700 transition">
+                        Admin Hacienda
+                    </button>
+                    <button onclick="window.App.loginRapido('cajero', 'caja2026')" 
+                            class="py-2 bg-slate-800/60 hover:bg-slate-800 text-slate-300 text-[11px] font-bold rounded-lg border border-slate-700 transition">
+                        Cajero Taquilla
+                    </button>
+                </div>
+            </div>
+
+            <div class="text-center pt-2">
+                <a href="index.html" class="text-xs text-sky-400 hover:text-sky-300 font-bold transition">
+                    ← Volver al Portal del Contribuyente
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts de la Aplicación -->
+    <script src="js/config.js"></script>
+    <script>
+        if (typeof supabase !== 'undefined' && window.HACIENDA_CONFIG && window.HACIENDA_CONFIG.SUPABASE_URL) {
+            try {
+                window.supabaseClient = supabase.createClient(
+                    window.HACIENDA_CONFIG.SUPABASE_URL,
+                    window.HACIENDA_CONFIG.SUPABASE_ANON_KEY
+                );
+            } catch (err) {
+                console.warn("[Hacienda] Error inicializando Supabase:", err);
+            }
+        }
+    </script>
+    <script src="js/core/store.js"></script>
+    <script src="js/core/auth.js"></script>
+    <script src="js/core/uploader.js"></script>
+    <script src="js/modules/patentes/catalogo-locat.js"></script>
+    <script src="js/modules/contribuyentes/registro.js"></script>
+    <script src="js/modules/patentes/comercial.js"></script>
+    <script src="js/modules/declaraciones/formulario.js"></script>
+    <script src="js/modules/caja/taquilla.js"></script>
+    <script src="js/modules/conciliacion/parsers.js"></script>
+    <script src="js/modules/conciliacion/smart-ledger.js"></script>
+    <script src="js/modules/conciliacion.js"></script>
+    <script src="js/modules/solvencias/emisor.js"></script>
+
+    <!-- Orquestador del ERP Interno -->
+    <script>
+        window.App = {
+            currentTab: 'contribuyentes',
+
+            init: async function() {
+                console.log("[Hacienda ERP] Inicializando panel de administración...");
+                if (typeof pdfjsLib !== 'undefined') {
+                    pdfjsLib.GlobalWorkerOptions.workerSrc = 'libs/pdfjs/pdf.worker.min.js';
+                }
+                if (window.HaciendaStore) {
+                    await window.HaciendaStore.init();
+                }
+                if (window.HaciendaAuth) {
+                    window.HaciendaAuth.init();
+                }
+
+                // Verificar autenticación de funcionario
+                this.verificarAutenticacion();
+
+                // Escuchar reactividad a 0ms
+                window.addEventListener('hacienda-db-updated', () => {
+                    this.renderCurrentTab();
+                });
+            },
+
+            verificarAutenticacion: function() {
+                const user = window.HaciendaAuth ? window.HaciendaAuth.getUser() : null;
+                const isFuncionario = window.HaciendaAuth && window.HaciendaAuth.isFuncionario();
+
+                const loginModal = document.getElementById('erp-login-modal');
+                const appWrapper = document.getElementById('erp-app-wrapper');
+
+                if (!isFuncionario) {
+                    if (loginModal) loginModal.classList.remove('hidden');
+                    if (appWrapper) appWrapper.classList.add('hidden');
+                } else {
+                    if (loginModal) loginModal.classList.add('hidden');
+                    if (appWrapper) appWrapper.classList.remove('hidden');
+
+                    const elNombre = document.getElementById('erp-user-nombre');
+                    const elRol = document.getElementById('erp-user-rol');
+                    if (elNombre) elNombre.innerText = user.nombre || 'Funcionario';
+                    if (elRol) elRol.innerText = user.rol || 'Administrador';
+
+                    this.switchTab('contribuyentes');
+                }
+            },
+
+            ejecutarLoginFuncionario: function() {
+                const u = document.getElementById('admin-login-usuario').value;
+                const p = document.getElementById('admin-login-clave').value;
+                const res = window.HaciendaAuth.loginFuncionario(u, p);
+                if (res.success) {
+                    this.verificarAutenticacion();
+                } else {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({ icon: 'error', title: 'Error de Acceso', text: res.message, confirmButtonColor: '#0284c7' });
+                    }
+                }
+            },
+
+            loginRapido: function(u, p) {
+                document.getElementById('admin-login-usuario').value = u;
+                document.getElementById('admin-login-clave').value = p;
+                this.ejecutarLoginFuncionario();
+            },
+
+            switchTab: function(tabId) {
+                this.currentTab = tabId;
+                
+                document.querySelectorAll('.nav-link').forEach(btn => {
+                    btn.classList.remove('bg-sky-600/20', 'text-sky-400', 'border', 'border-sky-500/30');
+                    btn.classList.add('text-slate-400');
+                });
+                const activeBtn = document.getElementById('nav-' + tabId);
+                if (activeBtn) {
+                    activeBtn.classList.remove('text-slate-400');
+                    activeBtn.classList.add('bg-sky-600/20', 'text-sky-400', 'border', 'border-sky-500/30');
+                }
+
+                const titulos = {
+                    'contribuyentes': 'Padrón de Contribuyentes (RUC)',
+                    'patentes': 'Licencias y Patentes Municipales (LOCAT)',
+                    'declaraciones': 'Autoliquidaciones de Actividades Económicas',
+                    'caja': 'Taquilla de Recaudación y Caja',
+                    'conciliacion': 'Conciliación Bancaria y Smart Ledger',
+                    'solvencias': 'Solvencias Municipales Automatizadas'
+                };
+                const tituloEl = document.getElementById('seccion-titulo');
+                if (tituloEl) tituloEl.innerText = titulos[tabId] || 'Hacienda Municipal';
+
+                this.renderCurrentTab();
+            },
+
+            renderCurrentTab: function() {
+                const container = document.getElementById('app-main-content');
+                if (!container) return;
+
+                if (this.currentTab === 'contribuyentes' && window.ContribuyentesModule) {
+                    window.ContribuyentesModule.render(container);
+                } else if (this.currentTab === 'patentes' && window.PatentesModule) {
+                    window.PatentesModule.render(container);
+                } else if (this.currentTab === 'declaraciones' && window.DeclaracionesModule) {
+                    window.DeclaracionesModule.render(container);
+                } else if (this.currentTab === 'caja' && window.CajaModule) {
+                    window.CajaModule.render(container);
+                } else if (this.currentTab === 'conciliacion' && window.HaciendaConciliacion) {
+                    window.HaciendaConciliacion.render(container);
+                } else if (this.currentTab === 'solvencias' && window.SolvenciasModule) {
+                    window.SolvenciasModule.render(container);
+                }
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            window.App.init();
+        });
+    </script>
+</body>
+
+</html>

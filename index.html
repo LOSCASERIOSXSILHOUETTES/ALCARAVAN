@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hacienda Municipal — Sistema Tributario SGB V3</title>
+    <title>Portal Tributario del Contribuyente — Alcaldía Municipal (LOCAT)</title>
     <link rel="stylesheet" href="libs/tailwind/tailwind.min.css">
     <link rel="stylesheet" href="libs/fontawesome/css/all.min.css">
     <script src="libs/localforage.min.js"></script>
@@ -21,199 +21,93 @@
     </style>
 </head>
 
-<body class="bg-slate-950 text-slate-100 antialiased h-screen flex overflow-hidden select-none">
+<body class="bg-slate-950 text-slate-100 antialiased min-h-screen flex flex-col select-none">
 
-    <!-- Sidebar Lateral -->
-    <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between shrink-0">
-        <div>
-            <!-- Logo / Cabecera -->
-            <div class="p-6 border-b border-slate-800 flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center text-white text-lg font-black shadow-lg">
-                    <i class="fas fa-landmark"></i>
-                </div>
-                <div>
-                    <h1 class="text-sm font-black text-slate-100 uppercase tracking-wider">Hacienda SGB</h1>
-                    <span class="text-[10px] text-sky-400 font-bold font-mono">TRIBUTOS V3 · LOCAT</span>
-                </div>
+    <!-- Barra de Navegación Pública -->
+    <header class="h-20 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-6 sm:px-12 sticky top-0 z-40">
+        <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center text-white text-xl font-black shadow-lg">
+                <i class="fas fa-landmark"></i>
             </div>
-
-            <!-- Menú de Navegación -->
-            <nav class="p-4 space-y-1.5">
-                <button onclick="window.App.switchTab('contribuyentes')" id="nav-contribuyentes" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
-                    <i class="fas fa-id-card text-sky-400 text-sm"></i>
-                    <span>Contribuyentes (RUC)</span>
-                </button>
-                <button onclick="window.App.switchTab('patentes')" id="nav-patentes" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
-                    <i class="fas fa-certificate text-indigo-400 text-sm"></i>
-                    <span>Licencias y Patentes</span>
-                </button>
-                <button onclick="window.App.switchTab('declaraciones')" id="nav-declaraciones" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
-                    <i class="fas fa-file-invoice-dollar text-emerald-400 text-sm"></i>
-                    <span>Declaraciones Juradas</span>
-                </button>
-                <button onclick="window.App.switchTab('caja')" id="nav-caja" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
-                    <i class="fas fa-cash-register text-amber-400 text-sm"></i>
-                    <span>Caja y Recaudación</span>
-                </button>
-                <button onclick="window.App.switchTab('conciliacion')" id="nav-conciliacion" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
-                    <i class="fas fa-balance-scale text-teal-400 text-sm"></i>
-                    <span>Conciliación Bancaria</span>
-                </button>
-                <button onclick="window.App.switchTab('solvencias')" id="nav-solvencias" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
-                    <i class="fas fa-stamp text-sky-400 text-sm"></i>
-                    <span>Solvencias con QR</span>
-                </button>
-            </nav>
-        </div>
-
-        <!-- Pie de Sidebar: Estatus del Sistema a 0ms -->
-        <div class="p-4 border-t border-slate-800 space-y-2">
-            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800/80 flex items-center justify-between text-[11px]">
-                <div class="flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span class="text-slate-300 font-bold">Motor SGB 0ms</span>
-                </div>
-                <span class="font-mono text-emerald-400 text-[10px] font-bold">ONLINE</span>
-            </div>
-            <div class="text-[10px] text-slate-500 text-center font-medium">
-                Alcaldía Municipal · Guárico 2026
+            <div>
+                <h1 class="text-sm sm:text-base font-black text-slate-100 uppercase tracking-wider">Hacienda Municipal</h1>
+                <span class="text-[10px] text-sky-400 font-bold font-mono">PORTAL DEL CONTRIBUYENTE · LOCAT 2026</span>
             </div>
         </div>
-    </aside>
 
-    <!-- Área de Trabajo Principal -->
-    <main class="flex-1 flex flex-col overflow-hidden bg-slate-950">
-        <!-- Barra Superior -->
-        <header class="h-16 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-8 shrink-0">
-            <div class="flex items-center gap-3">
-                <span id="seccion-titulo" class="text-sm font-black text-slate-100 uppercase tracking-wide">
-                    Padrón de Contribuyentes
-                </span>
+        <div class="flex items-center gap-4">
+            <div class="hidden sm:flex items-center gap-2 bg-slate-950 px-3.5 py-2 rounded-xl border border-slate-800 text-xs">
+                <span class="text-slate-400">Tasa Oficial BCV:</span>
+                <span class="font-mono font-bold text-amber-400">56,50 Bs./TCMMV</span>
             </div>
-            <div class="flex items-center gap-4">
-                <div class="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 text-xs">
-                    <span class="text-slate-400">Tasa BCV (LOCAT):</span>
-                    <span class="font-mono font-bold text-amber-400">56,50 Bs./TCMMV</span>
-                </div>
-                <div class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold text-sky-400">
-                    <i class="fas fa-user-shield"></i>
-                </div>
-            </div>
-        </header>
 
-        <!-- Contenedor Dinámico del Módulo -->
-        <div id="app-main-content" class="flex-1 overflow-y-auto p-8">
-            <!-- Renderizado dinámico del submódulo activo -->
+            <!-- Acceso a Ruta Especial de Funcionarios -->
+            <a href="admin.html" 
+               class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs rounded-xl border border-slate-700 transition flex items-center gap-2 shadow">
+                <i class="fas fa-user-shield text-sky-400"></i>
+                <span class="hidden md:inline">Acceso Funcionarios</span>
+                <span class="md:hidden">ERP</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Contenido Dinámico del Portal del Comercio -->
+    <main class="flex-1 overflow-y-auto px-4 sm:px-8 py-6">
+        <div id="portal-main-content">
+            <!-- Renderizado dinámico del módulo PortalComercio -->
         </div>
     </main>
+
+    <!-- Pie de Página Institucional -->
+    <footer class="bg-slate-900 border-t border-slate-800 py-6 px-6 sm:px-12 text-center text-xs text-slate-500">
+        <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div>
+                Alcaldía Municipal · Dirección de Hacienda y Administración Tributaria
+            </div>
+            <div class="font-mono text-[11px] text-slate-400">
+                Cumplimiento Ley LOCAT · Motor SGB 0ms Offline-First
+            </div>
+        </div>
+    </footer>
 
     <!-- Scripts de la Aplicación -->
     <script src="js/config.js"></script>
     <script>
-        // Inicializar cliente Supabase si las credenciales están configuradas
         if (typeof supabase !== 'undefined' && window.HACIENDA_CONFIG && window.HACIENDA_CONFIG.SUPABASE_URL) {
             try {
                 window.supabaseClient = supabase.createClient(
                     window.HACIENDA_CONFIG.SUPABASE_URL,
                     window.HACIENDA_CONFIG.SUPABASE_ANON_KEY
                 );
-                console.log("[Hacienda] Supabase Client inicializado correctamente");
             } catch (err) {
                 console.warn("[Hacienda] Error inicializando Supabase:", err);
             }
         }
     </script>
-    <script src="libs/pdfjs/pdf.min.js"></script>
     <script src="js/core/store.js"></script>
     <script src="js/core/auth.js"></script>
-    <script src="js/core/uploader.js"></script>
     <script src="js/modules/patentes/catalogo-locat.js"></script>
-    <script src="js/modules/contribuyentes/registro.js"></script>
-    <script src="js/modules/patentes/comercial.js"></script>
-    <script src="js/modules/declaraciones/formulario.js"></script>
-    <script src="js/modules/caja/taquilla.js"></script>
-    <script src="js/modules/conciliacion/parsers.js"></script>
-    <script src="js/modules/conciliacion/smart-ledger.js"></script>
-    <script src="js/modules/conciliacion.js"></script>
-    <script src="js/modules/solvencias/emisor.js"></script>
+    <script src="js/modules/portal-comercio.js"></script>
 
-    <!-- Orquestador Principal -->
+    <!-- Inicializador del Portal del Contribuyente -->
     <script>
-        window.App = {
-            currentTab: 'contribuyentes',
-
-            init: async function() {
-                console.log("[Hacienda SGB V3] Inicializando sistema modular...");
-                if (typeof pdfjsLib !== 'undefined') {
-                    pdfjsLib.GlobalWorkerOptions.workerSrc = 'libs/pdfjs/pdf.worker.min.js';
-                }
-                if (window.HaciendaStore) {
-                    await window.HaciendaStore.init();
-                }
-                if (window.HaciendaAuth) {
-                    window.HaciendaAuth.init();
-                }
-
-                // Renderizar tab inicial
-                this.switchTab('contribuyentes');
-
-                // Escuchar reactividad a 0ms
-                window.addEventListener('hacienda-db-updated', () => {
-                    this.renderCurrentTab();
-                });
-            },
-
-            switchTab: function(tabId) {
-                this.currentTab = tabId;
-                
-                // Actualizar estilos de navegación
-                document.querySelectorAll('.nav-link').forEach(btn => {
-                    btn.classList.remove('bg-sky-600/20', 'text-sky-400', 'border', 'border-sky-500/30');
-                    btn.classList.add('text-slate-400');
-                });
-                const activeBtn = document.getElementById('nav-' + tabId);
-                if (activeBtn) {
-                    activeBtn.classList.remove('text-slate-400');
-                    activeBtn.classList.add('bg-sky-600/20', 'text-sky-400', 'border', 'border-sky-500/30');
-                }
-
-                // Actualizar título
-                const titulos = {
-                    'contribuyentes': 'Padrón de Contribuyentes (RUC)',
-                    'patentes': 'Licencias y Patentes Municipales (LOCAT)',
-                    'declaraciones': 'Autoliquidaciones de Actividades Económicas',
-                    'caja': 'Taquilla de Recaudación y Caja',
-                    'conciliacion': 'Conciliación Bancaria y Smart Ledger',
-                    'solvencias': 'Solvencias Municipales Automatizadas'
-                };
-                const tituloEl = document.getElementById('seccion-titulo');
-                if (tituloEl) tituloEl.innerText = titulos[tabId] || 'Hacienda Municipal';
-
-                this.renderCurrentTab();
-            },
-
-            renderCurrentTab: function() {
-                const container = document.getElementById('app-main-content');
-                if (!container) return;
-
-                if (this.currentTab === 'contribuyentes' && window.ContribuyentesModule) {
-                    window.ContribuyentesModule.render(container);
-                } else if (this.currentTab === 'patentes' && window.PatentesModule) {
-                    window.PatentesModule.render(container);
-                } else if (this.currentTab === 'declaraciones' && window.DeclaracionesModule) {
-                    window.DeclaracionesModule.render(container);
-                } else if (this.currentTab === 'caja' && window.CajaModule) {
-                    window.CajaModule.render(container);
-                } else if (this.currentTab === 'conciliacion' && window.HaciendaConciliacion) {
-                    window.HaciendaConciliacion.render(container);
-                } else if (this.currentTab === 'solvencias' && window.SolvenciasModule) {
-                    window.SolvenciasModule.render(container);
-                }
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log("[Portal Contribuyente] Inicializando a 0ms...");
+            if (window.HaciendaStore) {
+                await window.HaciendaStore.init();
             }
-        };
 
-        document.addEventListener('DOMContentLoaded', () => {
-            window.App.init();
+            const container = document.getElementById('portal-main-content');
+            if (container && window.PortalComercio) {
+                window.PortalComercio.render(container);
+            }
+
+            // Reactividad a 0ms
+            window.addEventListener('hacienda-db-updated', () => {
+                if (container && window.PortalComercio) {
+                    window.PortalComercio.render(container);
+                }
+            });
         });
     </script>
 </body>

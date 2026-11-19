@@ -4,6 +4,26 @@ Sistema integral de recaudacion municipal, administracion tributaria, padron de 
 
 ---
 
+## Estructura de Rutas y Separacion de Interfaces
+
+Para garantizar la privacidad institucional y facilitar la experiencia del usuario, el sistema divide la plataforma en dos entornos diferenciados:
+
+1. **Portal del Contribuyente / Comercio (`index.html`):**
+   - URL publica principal para compartir directamente a comerciantes y empresas.
+   - Consulta instantanea por RIF o seleccion de comercio.
+   - Semaforo fiscal de morosidad y descarga de Solvencia Municipal con QR si esta solvente.
+   - Formulario de autoliquidacion de ingresos brutos mensual segun catalogo armonizado LOCAT.
+   - Reporte de transferencias o pagos moviles a cuentas bancarias municipales.
+   - Solicitud de censo comercial para nuevos establecimientos sin RUC.
+   - Enlace discreto a "Acceso Funcionarios" en la barra superior.
+
+2. **ERP de Hacienda Municipal (`admin.html`):**
+   - Ruta especial interna para administradores, fiscales y personal de taquilla/tesoreria.
+   - Pantalla de inicio de sesion seguro por usuario y clave de funcionario (`admin`, `cajero`).
+   - Acceso a los 6 modulos completos de gestion tributaria, auditoria y conciliacion bancaria.
+
+---
+
 ## Arquitectura y Stack Tecnologico
 
 - **Frontend:** Single Page Application (SPA) pura con Vanilla JavaScript (ES6+), modularizada por dominios funcionales.
@@ -16,7 +36,7 @@ Sistema integral de recaudacion municipal, administracion tributaria, padron de 
 
 ---
 
-## Modulos del Sistema
+## Modulos del ERP Interno (`admin.html`)
 
 ### 1. Padron de Contribuyentes (RUC)
 - Registro y censo de personas naturales y juridicas del Municipio.
@@ -64,8 +84,9 @@ Sistema integral de recaudacion municipal, administracion tributaria, padron de 
 ### 1. Ejecucion Local (Offline-First 100%)
 No requiere configuracion de servidores ni dependencias externas:
 1. Clonar el repositorio.
-2. Abrir `index.html` directamente en cualquier navegador web o servir mediante cualquier servidor local estatico (Live Server, http-server, nginx).
-3. Todas las cuentas, catalogos y operaciones se persisten de inmediato en el navegador a traves de LocalForage a 0ms.
+2. Para comerciantes: abrir `index.html`.
+3. Para administradores y fiscales: abrir `admin.html` (credenciales: `admin` / `hacienda2026` o `cajero` / `caja2026`).
+4. Todas las cuentas, catalogos y operaciones se persisten de inmediato en el navegador a traves de LocalForage a 0ms.
 
 ### 2. Sincronizacion con Supabase (Opcional)
 Para sincronizar entre multiples dispositivos o usuarios concurrentes:
@@ -82,6 +103,12 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 ---
 
 ## Bitacora de Decisiones y Cambios
+
+### Version 3.2.0 — 19/11/2026
+- **Bifurcacion de Interfaces (Portal del Comerciante vs ERP Municipal):**
+  - Creacion del portal publico `index.html` con modulo `js/modules/portal-comercio.js` para autogestion de comercios (consulta RIF, estado fiscal, declaracion LOCAT en vivo, reporte de pagos y solvencias QR).
+  - Creacion de `admin.html` como ruta especial para funcionarios de Hacienda con autenticacion por rol (`admin`, `cajero`).
+  - Siembra de comercios y patentes de demostracion en `js/core/store.js` para acceso rapido con 1 clic.
 
 ### Version 3.1.0 — 19/11/2026
 - **Integracion de Conciliacion Bancaria y Smart Ledger V8:**
