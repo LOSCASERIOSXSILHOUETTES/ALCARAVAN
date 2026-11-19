@@ -45,6 +45,7 @@ El desarrollo de Alcaravan / Guiriri SGB V3 avanza de manera progresiva bajo las
   - Cada contribuyente y comercio se crea con un identificador unico inmutable (`crypto.randomUUID()`) generado en el momento del registro.
   - La arquitectura desacopla el expediente del RIF y de la Razon Social, garantizando que cambios de firma mercantil, correcciones tipograficas o traspasos no rompan enlaces ni huerfanen documentos.
 - **Expediente Digital en la Nube (Google Apps Script + Google Drive):**
+  - Cuenta de Google dedicada: `systemsatrimg` (`systemsatrimg@gmail.com`) para despliegue de Apps Script y almacenamiento de expedientes.
   - Almacenamiento institucional en cuenta de Google dedicada sin costo de servidores ni bases de datos de pago.
   - Generacion automatica de carpetas jerarquicas por UUID del contribuyente con subcarpetas tematicas:
     - `01_Expediente_Legal/` (Acta Constitutiva en PDF, RIF digitalizado, Poderes de Representacion).
@@ -142,7 +143,7 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 ### Version 3.4.4 — 19/11/2026
 - **Estandarizacion de Identificadores Maestros Inmutables (UUIDv4) y Hoja de Ruta:**
   - Migracion del generador de ID cliente a UUIDv4 (`crypto.randomUUID()`) en `store.js` y `portal-comercio.js` para desacoplar expedientes de datos mutables (RIF y Razon Social).
-  - Documentacion exhaustiva de la Hoja de Ruta (Roadmap) y diseno del arbol documental en Google Drive / Google Apps Script.
+  - Documentacion exhaustiva de la Hoja de Ruta (Roadmap) y diseno del arbol documental en Google Drive / Google Apps Script con cuenta dedicada `systemsatrimg` (`systemsatrimg@gmail.com`).
   - Dimensionamiento de infraestructura y cuotas gratuitas validado para municipios tipo San Jose de Guaribe.
   - Bump de Service Worker a `alcaravan-v3-cache-v3.5.1`.
 
