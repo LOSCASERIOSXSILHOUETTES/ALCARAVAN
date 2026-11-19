@@ -22,7 +22,8 @@
         'hacienda_ramos_ingreso',
         'hacienda_inmuebles',
         'hacienda_vehiculos',
-        'hacienda_publicidad'
+        'hacienda_publicidad',
+        'hacienda_popups'
     ]);
 
     function queueTableRefresh(table) {

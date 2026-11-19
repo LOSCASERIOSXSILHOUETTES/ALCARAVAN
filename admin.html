@@ -69,6 +69,10 @@
                         <i class="fas fa-stamp text-sky-400 text-sm"></i>
                         <span>Solvencias con QR</span>
                     </button>
+                    <button onclick="window.App.switchTab('popups')" id="nav-popups" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
+                        <i class="fas fa-bullhorn text-pink-400 text-sm"></i>
+                        <span>Popups y Avisos</span>
+                    </button>
                 </nav>
             </div>
 
@@ -192,6 +196,7 @@
     <script src="js/modules/conciliacion/smart-ledger.js"></script>
     <script src="js/modules/conciliacion.js"></script>
     <script src="js/modules/solvencias/emisor.js"></script>
+    <script src="js/modules/comunicacion/popups.js"></script>
 
     <!-- Orquestador del ERP Interno -->
     <script>
@@ -277,10 +282,11 @@
                     'declaraciones': 'Autoliquidaciones de Actividades Económicas',
                     'caja': 'Taquilla de Recaudación y Caja',
                     'conciliacion': 'Conciliación Bancaria y Smart Ledger',
-                    'solvencias': 'Solvencias Municipales Automatizadas'
+                    'solvencias': 'Solvencias Municipales Automatizadas',
+                    'popups': 'Gestión de Popups y Comunicados Oficiales'
                 };
                 const tituloEl = document.getElementById('seccion-titulo');
-                if (tituloEl) tituloEl.innerText = titulos[tabId] || 'Hacienda Municipal';
+                if (tituloEl) tituloEl.innerText = titulos[tabId] || 'Administración Tributaria';
 
                 this.renderCurrentTab();
             },
@@ -301,6 +307,8 @@
                     window.HaciendaConciliacion.render(container);
                 } else if (this.currentTab === 'solvencias' && window.SolvenciasModule) {
                     window.SolvenciasModule.render(container);
+                } else if (this.currentTab === 'popups' && window.PopupsModule) {
+                    window.PopupsModule.render(container);
                 }
             }
         };

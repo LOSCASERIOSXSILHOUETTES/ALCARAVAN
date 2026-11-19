@@ -1,5 +1,5 @@
 // ALCARAVAN — Service Worker Offline-First Cache Engine (SGB Silhouettes V3)
-const CACHE_NAME = 'alcaravan-v3-cache-v3.7.0';
+const CACHE_NAME = 'alcaravan-v3-cache-v3.7.1';
 
 const STATIC_ASSETS = [
     './',
@@ -21,6 +21,7 @@ const STATIC_ASSETS = [
     './js/modules/conciliacion/smart-ledger.js',
     './js/modules/conciliacion.js',
     './js/modules/solvencias/emisor.js',
+    './js/modules/comunicacion/popups.js',
     './js/modules/portal-comercio.js',
     './libs/localforage.min.js',
     './libs/sweetalert2/sweetalert2.all.min.js',

@@ -187,6 +187,23 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
   - Cache local persistente para funcionamiento offline continuo si se pierde la conexion.
   - Bump de Service Worker a `alcaravan-v3-cache-v3.5.0`.
 
+### Version 3.7.1 — 19/11/2026
+- **Gestion Dinamica de Popups Oficiales desde el ERP (`admin.html`):**
+  - Implementacion del modulo administrativo `js/modules/comunicacion/popups.js` (`PopupsModule`) en el panel ERP de funcionarios.
+  - Capacidad de crear, editar, pausar/activar con switch reactivo y eliminar comunicados y popups oficiales para el portal.
+  - Soporte de tipos de anuncio: solo texto, imagen con texto (mixto) y banners graficos completos, con enlaces externos o vinculacion a ordenanzas.
+  - Registro de la 14ta tabla `hacienda_popups` en `store.js` (`TABLE_SCHEMAS`), `realtime-sync.js` (`SYNCABLE_TABLES`) y `sql/schema_hacienda.sql`.
+  - Consumo dinamico en `js/modules/portal-comercio.js`: lectura directa a 0ms desde LocalForage con filtrado por destino (`portal`, `ambos`) y control de visualizacion diaria (`localStorage`).
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.7.1`.
+
+### Version 3.7.0 — 19/11/2026
+- **Modernizacion Institucional del Portal (`index.html`) y Reemplazo de Terminologia:**
+  - Sustitucion del termino colonial "Hacienda" por la denominacion legal moderna: **"Administracion Tributaria"** / **"SATRIMG"**.
+  - Incorporacion de barra institucional superior con reloj y fecha oficial venezolana en vivo (`actualizarReloj()`) y widget de clima local para San Jose de Guaribe.
+  - Hero Carrusel de Avisos y Campanas Oficiales con transicion automatica e interactiva (Jornada LOCAT 2026, Calendario de Declaraciones y Solvencias QR).
+  - Centro Oficial de Descarga de Gacetas y Ordenanzas Municipales con visor de articulos clave y generador instantaneo de PDF institucional al vuelo con jsPDF.
+  - Normalizador universal de RIF (`window.HaciendaRIF`) con sanitizacion numerica estricta (`0-9`), selector de tipo (`V`, `J`, `G`, `E`, `C`, `P`) y busqueda tolerante multi-formato.
+
 ### Version 3.4.2 — 19/11/2026
 - **Carrusel / Ticker Tape Financiero de Divisas BCV y Pulido Visual Apple Fintech:**
   - Implementacion de carrusel ticker horizontal infinito en la cabecera con animacion continua fluida y pausa al hover (Dolar USD, Euro EUR, Yuan CNY, Yen JPY, Rublo RUB, Lira Turca TRY, Petro PTR y Moneda de Mayor Valor TCMMV - Art. 30 LOCAT).

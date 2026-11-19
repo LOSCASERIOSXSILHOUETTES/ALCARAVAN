@@ -207,6 +207,20 @@ CREATE TABLE IF NOT EXISTS "public"."hacienda_publicidad" (
     "updated_at" TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- 14. TABLA: hacienda_popups (Gestor de Comunicados y Popups Emergentes desde ERP)
+CREATE TABLE IF NOT EXISTS "public"."hacienda_popups" (
+    "id" TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    "titulo" TEXT NOT NULL,
+    "mensaje" TEXT,
+    "tipo" TEXT DEFAULT 'mixto', -- 'imagen', 'texto', 'mixto'
+    "imagen_url" TEXT,
+    "enlace_url" TEXT,
+    "destino" TEXT DEFAULT 'portal', -- 'portal', 'admin', 'ambos'
+    "activo" BOOLEAN DEFAULT true,
+    "created_at" TIMESTAMPTZ DEFAULT NOW(),
+    "updated_at" TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- ============================================================================
 -- ACTIVACION DE ROW LEVEL SECURITY (RLS) EN LAS 13 TABLAS
 -- ============================================================================
@@ -224,6 +238,7 @@ ALTER TABLE "public"."hacienda_conciliacion_desglose" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."hacienda_inmuebles" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."hacienda_vehiculos" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."hacienda_publicidad" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."hacienda_popups" ENABLE ROW LEVEL SECURITY;
 
 -- ============================================================================
 -- POLITICAS PERMISIVAS (ARQUITECTURA SGB 0MS OFFLINE-FIRST)
@@ -268,6 +283,9 @@ CREATE POLICY "Permisivo hacienda_vehiculos" ON "public"."hacienda_vehiculos" FO
 DROP POLICY IF EXISTS "Permisivo hacienda_publicidad" ON "public"."hacienda_publicidad";
 CREATE POLICY "Permisivo hacienda_publicidad" ON "public"."hacienda_publicidad" FOR ALL USING (true) WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Permisivo hacienda_popups" ON "public"."hacienda_popups";
+CREATE POLICY "Permisivo hacienda_popups" ON "public"."hacienda_popups" FOR ALL USING (true) WITH CHECK (true);
+
 -- ============================================================================
 -- OTORGAR PRIVILEGIOS COMPLETOS A LOS ROLES DE SUPABASE
 -- ============================================================================
@@ -285,6 +303,7 @@ GRANT ALL ON "public"."hacienda_conciliacion_desglose" TO "anon", "authenticated
 GRANT ALL ON "public"."hacienda_inmuebles" TO "anon", "authenticated", "service_role";
 GRANT ALL ON "public"."hacienda_vehiculos" TO "anon", "authenticated", "service_role";
 GRANT ALL ON "public"."hacienda_publicidad" TO "anon", "authenticated", "service_role";
+GRANT ALL ON "public"."hacienda_popups" TO "anon", "authenticated", "service_role";
 
 -- ============================================================================
 -- PUBLICACION PARA SUPABASE REALTIME (POSTGRES CHANGES)
@@ -305,7 +324,8 @@ BEGIN
             "public"."hacienda_conciliacion_desglose",
             "public"."hacienda_inmuebles",
             "public"."hacienda_vehiculos",
-            "public"."hacienda_publicidad";
+            "public"."hacienda_publicidad",
+            "public"."hacienda_popups";
     EXCEPTION WHEN duplicate_object THEN
         -- Ya estaban agregadas a la publicacion
     END;

@@ -26,7 +26,8 @@
         'hacienda_ramos_ingreso',
         'hacienda_inmuebles',
         'hacienda_vehiculos',
-        'hacienda_publicidad'
+        'hacienda_publicidad',
+        'hacienda_popups'
     ];
 
     const TABLE_SCHEMAS = {
@@ -83,6 +84,9 @@
         ],
         'hacienda_publicidad': [
             'id', 'contribuyente_id', 'tipo', 'ubicacion', 'metros_cuadrados', 'texto_aviso', 'estado', 'created_at', 'updated_at'
+        ],
+        'hacienda_popups': [
+            'id', 'titulo', 'mensaje', 'tipo', 'imagen_url', 'enlace_url', 'destino', 'activo', 'created_at', 'updated_at'
         ]
     };
 
@@ -237,6 +241,28 @@
                 this._cache['hacienda_ramos_ingreso'] = ramosIniciales;
                 if (this._localStore) {
                     await this._localStore.setItem('tbl_hacienda_ramos_ingreso', ramosIniciales);
+                }
+            }
+
+            // Sembrar popup oficial inicial si está vacío
+            if (!this._cache['hacienda_popups'] || this._cache['hacienda_popups'].length === 0) {
+                const popupsIniciales = [
+                    {
+                        id: 'pop_guaribe_locat_01',
+                        titulo: 'Censo y Empadronamiento Tributario LOCAT 2026',
+                        mensaje: 'La Alcaldía del Municipio San José de Guaribe y la Administración Tributaria Municipal informan que se encuentra abierta la jornada especial de censo y adecuación de licencias comerciales. Ponte al día con tu municipio sin sanciones.',
+                        tipo: 'mixto',
+                        imagen_url: '',
+                        enlace_url: '#seccion-ordenanzas',
+                        destino: 'portal',
+                        activo: true,
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString()
+                    }
+                ];
+                this._cache['hacienda_popups'] = popupsIniciales;
+                if (this._localStore) {
+                    await this._localStore.setItem('tbl_hacienda_popups', popupsIniciales);
                 }
             }
 

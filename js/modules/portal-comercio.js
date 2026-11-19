@@ -583,41 +583,78 @@
             doc.save(ord.archivo_nombre || `${ord.id}.pdf`);
         },
 
+        getPopupActivo: function() {
+            const store = global.HaciendaStore;
+            if (store) {
+                const popups = store.get('hacienda_popups') || [];
+                const activo = popups.find(p => p.activo && (p.destino === 'portal' || p.destino === 'ambos'));
+                if (activo) return activo;
+            }
+            return POPUP_ACTIVO;
+        },
+
         renderPopupOficial: function() {
-            const popup = POPUP_ACTIVO;
+            const popup = this.getPopupActivo();
             if (!popup || !popup.activo) return '';
 
+            const esSoloImagen = popup.tipo === 'imagen' && popup.imagen_url;
+            const tieneImagen = !!popup.imagen_url;
+
             return `
-                <div id="modal-popup-oficial" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
-                    <div class="bg-[#141418] border border-white/10 rounded-3xl w-full max-w-lg p-6 sm:p-8 shadow-2xl space-y-6 text-center relative overflow-hidden animate-fade-in">
+                <div id="modal-popup-oficial" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+                    <div class="bg-[#141418] border border-white/10 rounded-3xl w-full max-w-lg p-6 sm:p-8 shadow-2xl space-y-5 text-center relative overflow-hidden animate-fade-in">
                         <button onclick="window.PortalComercio.cerrarPopupOficial(false)" 
-                                class="absolute top-4 right-4 text-neutral-400 hover:text-white p-2">
+                                class="absolute top-4 right-4 text-neutral-400 hover:text-white p-2 z-10 transition">
                             <i class="fas fa-times text-sm"></i>
                         </button>
 
-                        <div class="space-y-3">
-                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-sky-500/20 to-indigo-500/20 border border-sky-500/30 flex items-center justify-center text-sky-400 text-xl mx-auto shadow-lg">
-                                <i class="fas fa-bullhorn"></i>
+                        ${tieneImagen ? `
+                            <div class="rounded-2xl overflow-hidden border border-white/10 max-h-56 w-full bg-black/40">
+                                <img src="${popup.imagen_url}" alt="Comunicado" class="w-full h-full object-cover">
                             </div>
-                            <span class="inline-block px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider uppercase bg-sky-500/10 text-sky-400 border border-sky-500/25">
-                                ${popup.badge}
-                            </span>
-                            <h3 class="text-xl sm:text-2xl font-black text-white tracking-tight leading-snug">
-                                ${popup.titulo}
-                            </h3>
-                            <p class="text-xs sm:text-sm text-neutral-300 leading-relaxed font-normal">
-                                ${popup.mensaje}
-                            </p>
-                        </div>
+                        ` : ''}
+
+                        ${!esSoloImagen ? `
+                            <div class="space-y-3">
+                                ${!tieneImagen ? `
+                                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-sky-500/20 to-indigo-500/20 border border-sky-500/30 flex items-center justify-center text-sky-400 text-xl mx-auto shadow-lg">
+                                        <i class="fas fa-bullhorn"></i>
+                                    </div>
+                                ` : ''}
+                                <span class="inline-block px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider uppercase bg-sky-500/10 text-sky-400 border border-sky-500/25">
+                                    ${popup.badge || 'COMUNICADO OFICIAL · ALCALDÍA'}
+                                </span>
+                                <h3 class="text-xl sm:text-2xl font-black text-white tracking-tight leading-snug">
+                                    ${popup.titulo}
+                                </h3>
+                                ${popup.mensaje ? `
+                                    <p class="text-xs sm:text-sm text-neutral-300 leading-relaxed font-normal">
+                                        ${popup.mensaje}
+                                    </p>
+                                ` : ''}
+                            </div>
+                        ` : `
+                            <div class="space-y-1">
+                                <h3 class="text-lg font-bold text-white tracking-tight">${popup.titulo}</h3>
+                            </div>
+                        `}
 
                         <div class="space-y-3 pt-2">
-                            <button onclick="window.PortalComercio.descargarOrdenanzaPDF('${popup.ordenanza_id}'); window.PortalComercio.cerrarPopupOficial(false)"
-                                    class="w-full py-3 px-6 rounded-full bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-semibold text-xs transition shadow-lg flex items-center justify-center gap-2">
-                                <i class="fas fa-file-pdf"></i>
-                                <span>${popup.enlace_texto}</span>
-                            </button>
+                            ${popup.ordenanza_id ? `
+                                <button onclick="window.PortalComercio.descargarOrdenanzaPDF('${popup.ordenanza_id}'); window.PortalComercio.cerrarPopupOficial(false)"
+                                        class="w-full py-3 px-6 rounded-full bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-semibold text-xs transition shadow-lg flex items-center justify-center gap-2">
+                                    <i class="fas fa-file-pdf"></i>
+                                    <span>${popup.enlace_texto || 'Descargar Ordenanza en PDF'}</span>
+                                </button>
+                            ` : (popup.enlace_url ? `
+                                <a href="${popup.enlace_url}" target="_blank" onclick="window.PortalComercio.cerrarPopupOficial(false)"
+                                   class="w-full py-3 px-6 rounded-full bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-semibold text-xs transition shadow-lg flex items-center justify-center gap-2 inline-block">
+                                    <i class="fas fa-external-link-alt"></i>
+                                    <span>Más Información / Enlace Oficial</span>
+                                </a>
+                            ` : '')}
                             <button onclick="window.PortalComercio.cerrarPopupOficial(true)"
-                                    class="text-[11px] text-neutral-400 hover:text-white transition">
+                                    class="text-[11px] text-neutral-400 hover:text-white transition block mx-auto">
                                 Entendido, no volver a mostrar hoy
                             </button>
                         </div>
@@ -629,15 +666,18 @@
         cerrarPopupOficial: function(noMostrarHoy) {
             const modal = document.getElementById('modal-popup-oficial');
             if (modal) modal.classList.add('hidden');
-            if (noMostrarHoy) {
+            const popup = this.getPopupActivo();
+            if (noMostrarHoy && popup && popup.id) {
                 const hoy = new Date().toISOString().split('T')[0];
-                localStorage.setItem(`alcaravan_popup_${POPUP_ACTIVO.id}_visto`, hoy);
+                localStorage.setItem(`alcaravan_popup_${popup.id}_visto`, hoy);
             }
         },
 
         verificarPopup: function() {
+            const popup = this.getPopupActivo();
+            if (!popup || !popup.activo) return;
             const hoy = new Date().toISOString().split('T')[0];
-            const visto = localStorage.getItem(`alcaravan_popup_${POPUP_ACTIVO.id}_visto`);
+            const visto = localStorage.getItem(`alcaravan_popup_${popup.id}_visto`);
             if (visto !== hoy) {
                 setTimeout(() => {
                     const modal = document.getElementById('modal-popup-oficial');
