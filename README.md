@@ -140,6 +140,15 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.6.1 — 19/11/2026
+- **Normalizacion Estricta de RIF y Entradas Numericas Puras:**
+  - **Selector Oficial de Prefijo:** Despliegue de los 6 tipos de RIF formales de Venezuela: `V` (Natural Venezolano), `J` (Juridico / Comercial), `G` (Gubernamental), `E` (Natural Extranjero), `C` (Consejo Comunal / Comuna) y `P` (Pasaporte).
+  - **Input Numerico Exclusivo:** El campo de texto de RIF solo acepta digitos numericos (`0-9`), sanitizando en tiempo real cualquier guion, espacio o letra (`replace(/\D/g, '')`).
+  - **Auto-Deteccion Inteligente al Pegar:** Si el usuario copia y pega un RIF completo (ej. `J-40862362-5`), el sistema detecta automaticamente la letra para setear el `<select>` y coloca exclusivamente los numeros en el input.
+  - **Motor Global `window.HaciendaRIF`:** Utilidad centralizada en `js/core/store.js` para parseo, formateo canonico (`J-123456789`) y busqueda tolerante tanto por coincidencia exacta como por numero puro.
+  - **Integracion Completa:** Aplicado en Portal del Comercio (Hero y Modal de Censo/Inscripcion), Panel Administrativo (Modal de Registro y Filtro de Busqueda en tiempo real) y Autenticacion (`loginContribuyente`).
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.6.1`.
+
 ### Version 3.6.0 — 19/11/2026
 - **Porte de Supabase Utils, Realtime Multi-Dispositivo y Bi-Sync Paginado (SACCFAG V3):**
   - **Instancia Supabase Activa:** Vinculacion al nuevo proyecto `https://jsfxdyeridowlgmhnlrv.supabase.co` con clave publicable `sb_publishable_k2qo91SV56OwCUc3uS-08A_YfOWPD67`.

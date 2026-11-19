@@ -37,14 +37,15 @@
             return this._user && this._user.rol === 'contribuyente';
         },
 
-        // Login de Contribuyente (por RIF)
+        // Login de Contribuyente (por RIF con normalización tolerante)
         loginContribuyente: function(rif) {
-            const cleanRif = String(rif).trim().toUpperCase();
             const contribuyentes = global.HaciendaStore ? global.HaciendaStore.get('hacienda_contribuyentes') : [];
-            const match = contribuyentes.find(c => c.rif.toUpperCase() === cleanRif);
+            const rifHelper = global.HaciendaRIF;
+            const parsed = rifHelper ? rifHelper.parse(rif) : { tipo: 'J', numero: String(rif).replace(/\D/g, ''), full: String(rif) };
+            const match = rifHelper ? rifHelper.findMatch(contribuyentes, parsed.tipo, parsed.numero) : contribuyentes.find(c => c.rif === parsed.full);
 
             if (!match) {
-                return { success: false, message: 'Contribuyente no registrado con este RIF.' };
+                return { success: false, message: 'Contribuyente no registrado con el RIF ' + (parsed.full || rif) + '.' };
             }
 
             this._user = {

@@ -83,12 +83,16 @@
                             <div class="absolute -inset-1 rounded-full bg-gradient-to-r from-sky-500/30 via-indigo-500/20 to-emerald-500/30 blur-xl opacity-60 group-hover:opacity-100 transition duration-500"></div>
                             <div class="relative flex items-center bg-[#131316] border border-white/10 hover:border-white/25 focus-within:border-sky-400/50 rounded-full p-1.5 shadow-2xl transition duration-200">
                                 <select id="pc-rif-tipo" class="bg-transparent text-white font-medium text-xs px-3.5 py-2.5 outline-none border-r border-white/10 cursor-pointer">
-                                    <option value="J" class="bg-[#1c1c1e] text-white">J</option>
-                                    <option value="V" class="bg-[#1c1c1e] text-white">V</option>
-                                    <option value="G" class="bg-[#1c1c1e] text-white">G</option>
-                                    <option value="E" class="bg-[#1c1c1e] text-white">E</option>
+                                    <option value="J" class="bg-[#1c1c1e] text-white">J (Jurídico)</option>
+                                    <option value="V" class="bg-[#1c1c1e] text-white">V (Natural)</option>
+                                    <option value="G" class="bg-[#1c1c1e] text-white">G (Gobierno)</option>
+                                    <option value="E" class="bg-[#1c1c1e] text-white">E (Extranjero)</option>
+                                    <option value="C" class="bg-[#1c1c1e] text-white">C (Comuna)</option>
+                                    <option value="P" class="bg-[#1c1c1e] text-white">P (Pasaporte)</option>
                                 </select>
-                                <input type="text" id="pc-rif-numero" placeholder="RIF (ej. 30123456-7)" 
+                                <input type="text" id="pc-rif-numero" placeholder="Solo números (ej: 123456789)" 
+                                       inputmode="numeric" pattern="[0-9]*" maxlength="10"
+                                       oninput="if(window.HaciendaRIF) window.HaciendaRIF.handleInput(this, 'pc-rif-tipo')"
                                        onkeydown="if(event.key==='Enter') window.PortalComercio.ejecutarConsultaRif()"
                                        class="w-full bg-transparent text-white text-xs sm:text-sm font-mono px-3.5 py-2 outline-none placeholder:text-neutral-600">
                                 <button onclick="window.PortalComercio.ejecutarConsultaRif()" 
@@ -1002,41 +1006,43 @@
         },
 
         ejecutarConsultaRif: function() {
-            const tipo = document.getElementById('pc-rif-tipo').value;
-            const numero = (document.getElementById('pc-rif-numero').value || '').trim().toUpperCase();
+            const tipo = document.getElementById('pc-rif-tipo') ? document.getElementById('pc-rif-tipo').value : 'J';
+            const rawNum = document.getElementById('pc-rif-numero') ? document.getElementById('pc-rif-numero').value : '';
+            const rifHelper = global.HaciendaRIF;
+            const parsed = rifHelper ? rifHelper.parse((tipo ? (tipo + '-') : '') + rawNum) : { tipo: tipo || 'J', numero: rawNum.replace(/\D/g, ''), full: (tipo || 'J') + '-' + rawNum.replace(/\D/g, '') };
 
-            if (!numero) {
+            if (!parsed.numero) {
                 if (typeof Swal !== 'undefined') {
-                    Swal.fire({ icon: 'warning', title: 'RIF Requerido', text: 'Ingresa el número de RIF del contribuyente.', confirmButtonColor: '#000000' });
+                    Swal.fire({ icon: 'warning', title: 'RIF Requerido', text: 'Ingresa el número de RIF del contribuyente (solo números).', confirmButtonColor: '#000000' });
                 }
                 return;
             }
 
-            const rifCompleto = tipo + '-' + numero.replace(/^[JVGE]-?/i, '');
-            this.seleccionarRif(rifCompleto);
+            this.seleccionarRif(parsed.full);
         },
 
         seleccionarRif: function(rif) {
             const store = global.HaciendaStore;
             if (!store) return;
 
-            const cleanRif = String(rif).trim().toUpperCase();
+            const rifHelper = global.HaciendaRIF;
+            const parsed = rifHelper ? rifHelper.parse(rif) : { tipo: 'J', numero: String(rif).replace(/\D/g, ''), full: String(rif) };
             const contribuyentes = store.get('hacienda_contribuyentes') || [];
-            const match = contribuyentes.find(c => c.rif.toUpperCase() === cleanRif);
+            const match = rifHelper ? rifHelper.findMatch(contribuyentes, parsed.tipo, parsed.numero) : contribuyentes.find(c => c.rif === parsed.full);
 
             if (!match) {
                 if (typeof Swal !== 'undefined') {
                     Swal.fire({
                         icon: 'info',
                         title: 'Comercio no Registrado',
-                        text: `El RIF ${cleanRif} no se encuentra registrado en el Padrón Municipal. ¿Deseas solicitar la inscripción?`,
+                        text: `El RIF ${parsed.full} no se encuentra registrado en el Padrón Municipal. ¿Deseas solicitar la inscripción?`,
                         showCancelButton: true,
                         confirmButtonText: 'Inscribir Comercio',
                         cancelButtonText: 'Cancelar',
                         confirmButtonColor: '#000000'
                     }).then(res => {
                         if (res.isConfirmed) {
-                            this.abrirModalInscripcion(cleanRif);
+                            this.abrirModalInscripcion(parsed.full);
                         }
                     });
                 }
@@ -1184,13 +1190,12 @@
             if (modal) {
                 modal.classList.remove('hidden');
                 if (rifInicial) {
-                    const partes = rifInicial.split('-');
-                    if (partes.length >= 2) {
-                        const sel = document.getElementById('ins-rif-tipo');
-                        const inp = document.getElementById('ins-rif-numero');
-                        if (sel) sel.value = partes[0];
-                        if (inp) inp.value = partes.slice(1).join('-');
-                    }
+                    const rifHelper = global.HaciendaRIF;
+                    const parsed = rifHelper ? rifHelper.parse(rifInicial) : { tipo: 'J', numero: String(rifInicial).replace(/\D/g, '') };
+                    const sel = document.getElementById('ins-rif-tipo');
+                    const inp = document.getElementById('ins-rif-numero');
+                    if (sel && parsed.tipo) sel.value = parsed.tipo;
+                    if (inp) inp.value = parsed.numero;
                 }
             }
         },
@@ -1205,18 +1210,20 @@
             if (!store) return;
 
             const tipo = document.getElementById('ins-rif-tipo').value;
-            const numero = document.getElementById('ins-rif-numero').value.trim();
+            const rawNum = document.getElementById('ins-rif-numero').value;
+            const rifHelper = global.HaciendaRIF;
+            const parsed = rifHelper ? rifHelper.parse((tipo ? (tipo + '-') : '') + rawNum) : { tipo, numero: rawNum.replace(/\D/g, ''), full: tipo + '-' + rawNum.replace(/\D/g, '') };
             const razon = document.getElementById('ins-razon').value.trim();
             const codigoActividad = document.getElementById('ins-actividad').value;
             const telefono = document.getElementById('ins-telefono').value.trim();
             const correo = document.getElementById('ins-correo').value.trim();
 
-            if (!numero || !razon) {
-                if (typeof Swal !== 'undefined') Swal.fire({ icon: 'warning', title: 'Datos requeridos', text: 'Indica RIF y Razón Social.', confirmButtonColor: '#000000' });
+            if (!parsed.numero || !razon) {
+                if (typeof Swal !== 'undefined') Swal.fire({ icon: 'warning', title: 'Datos requeridos', text: 'Indica el número de RIF (solo números) y la Razón Social.', confirmButtonColor: '#000000' });
                 return;
             }
 
-            const rifCompleto = tipo + '-' + numero.replace(/^[JVGE]-?/i, '');
+            const rifCompleto = parsed.full;
             const contribuyenteId = (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function')
                 ? crypto.randomUUID()
                 : ('usr_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8));
@@ -1279,15 +1286,20 @@
                                 <div>
                                     <label class="text-[11px] font-medium text-neutral-400 uppercase block mb-1">Tipo</label>
                                     <select id="ins-rif-tipo" class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none focus:border-white/30">
-                                        <option value="J">J</option>
-                                        <option value="V">V</option>
-                                        <option value="G">G</option>
-                                        <option value="E">E</option>
+                                        <option value="J">J (Jurídico)</option>
+                                        <option value="V">V (Natural)</option>
+                                        <option value="G">G (Gobierno)</option>
+                                        <option value="E">E (Extranjero)</option>
+                                        <option value="C">C (Comuna)</option>
+                                        <option value="P">P (Pasaporte)</option>
                                     </select>
                                 </div>
                                 <div class="col-span-2">
-                                    <label class="text-[11px] font-medium text-neutral-400 uppercase block mb-1">Número de RIF</label>
-                                    <input type="text" id="ins-rif-numero" placeholder="Ej: 30123456-7" class="w-full bg-[#18181b] border border-white/10 text-white font-mono rounded-xl px-3 py-2.5 outline-none focus:border-white/30">
+                                    <label class="text-[11px] font-medium text-neutral-400 uppercase block mb-1">Número de RIF (Solo Números)</label>
+                                    <input type="text" id="ins-rif-numero" placeholder="Ej: 301234567" 
+                                           inputmode="numeric" pattern="[0-9]*" maxlength="10"
+                                           oninput="if(window.HaciendaRIF) window.HaciendaRIF.handleInput(this, 'ins-rif-tipo')"
+                                           class="w-full bg-[#18181b] border border-white/10 text-white font-mono rounded-xl px-3 py-2.5 outline-none focus:border-white/30">
                                 </div>
                             </div>
 

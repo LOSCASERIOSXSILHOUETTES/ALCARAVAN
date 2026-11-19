@@ -72,8 +72,21 @@
                         <form id="form-contribuyente" onsubmit="window.ContribuyentesModule.guardar(event)" class="p-6 space-y-4">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-400 mb-1">RIF (Ej: J-40862362-5)</label>
-                                    <input type="text" id="c-rif" required placeholder="J-12345678-9" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 text-xs outline-none focus:border-sky-500 uppercase">
+                                    <label class="block text-xs font-bold text-slate-400 mb-1">RIF Fiscal</label>
+                                    <div class="grid grid-cols-3 gap-2">
+                                        <select id="c-rif-tipo" class="bg-slate-950 border border-slate-800 rounded-xl px-2 py-2 text-slate-100 text-xs outline-none focus:border-sky-500">
+                                            <option value="J">J (Jurídico)</option>
+                                            <option value="V">V (Natural)</option>
+                                            <option value="G">G (Gobierno)</option>
+                                            <option value="E">E (Extranjero)</option>
+                                            <option value="C">C (Comuna)</option>
+                                            <option value="P">P (Pasaporte)</option>
+                                        </select>
+                                        <input type="text" id="c-rif-numero" required placeholder="Solo números (ej: 123456789)" 
+                                               inputmode="numeric" pattern="[0-9]*" maxlength="10"
+                                               oninput="if(window.HaciendaRIF) window.HaciendaRIF.handleInput(this, 'c-rif-tipo')"
+                                               class="col-span-2 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 text-xs font-mono outline-none focus:border-sky-500">
+                                    </div>
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-slate-400 mb-1">Tipo de Persona</label>
@@ -164,13 +177,20 @@
         },
 
         filtrarTabla: function() {
-            const query = (document.getElementById('busqueda-contribuyente')?.value || '').toLowerCase();
+            const rawQuery = (document.getElementById('busqueda-contribuyente')?.value || '').toLowerCase().trim();
+            const queryDigits = rawQuery.replace(/\D/g, '');
             const contribuyentes = global.HaciendaStore ? global.HaciendaStore.get('hacienda_contribuyentes') : [];
-            const filtrados = contribuyentes.filter(c => 
-                (c.rif && c.rif.toLowerCase().includes(query)) ||
-                (c.razon_social && c.razon_social.toLowerCase().includes(query)) ||
-                (c.denominacion_comercial && c.denominacion_comercial.toLowerCase().includes(query))
-            );
+            const filtrados = contribuyentes.filter(c => {
+                if (!c) return false;
+                const cRif = (c.rif || '').toLowerCase();
+                const cDigits = cRif.replace(/\D/g, '');
+                const cRazon = (c.razon_social || '').toLowerCase();
+                const cFantasia = (c.denominacion_comercial || '').toLowerCase();
+
+                const matchRif = cRif.includes(rawQuery) || (queryDigits && cDigits.includes(queryDigits));
+                const matchTexto = cRazon.includes(rawQuery) || cFantasia.includes(rawQuery);
+                return matchRif || matchTexto;
+            });
             const tbody = document.getElementById('tabla-contribuyentes-body');
             if (tbody) tbody.innerHTML = this.generarFilasTabla(filtrados);
         },
@@ -196,8 +216,17 @@
                     fotoUrl = await global.HaciendaUploader.subirAImgBB(fileInput.files[0]);
                 }
 
+                const tipoRif = document.getElementById('c-rif-tipo')?.value || 'J';
+                const numRif = document.getElementById('c-rif-numero')?.value || '';
+                const rifHelper = global.HaciendaRIF;
+                const parsedRif = rifHelper ? rifHelper.parse((tipoRif ? (tipoRif + '-') : '') + numRif) : { tipo: tipoRif, numero: numRif.replace(/\D/g, ''), full: tipoRif + '-' + numRif.replace(/\D/g, '') };
+
+                if (!parsedRif.numero) {
+                    throw new Error('El número de RIF es obligatorio y solo debe contener dígitos numéricos.');
+                }
+
                 const nuevo = {
-                    rif: document.getElementById('c-rif').value.trim().toUpperCase(),
+                    rif: parsedRif.full,
                     tipo_persona: document.getElementById('c-tipo').value,
                     razon_social: document.getElementById('c-razon').value.trim(),
                     denominacion_comercial: document.getElementById('c-fantasia').value.trim(),

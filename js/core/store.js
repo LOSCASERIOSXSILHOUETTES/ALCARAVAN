@@ -100,6 +100,90 @@
         });
     }
 
+    /**
+     * Motor Oficial de Normalización de RIF Venezolano (SGB Silhouettes)
+     * Soporta los 6 prefijos oficiales del SENIAT: V, J, G, E, C, P
+     * Normaliza la parte numérica a SOLO DÍGITOS (0-9)
+     */
+    const RIF_TIPOS = [
+        { code: 'V', label: 'V - Natural Venezolano' },
+        { code: 'J', label: 'J - Jurídico / Comercio' },
+        { code: 'G', label: 'G - Gubernamental / Estado' },
+        { code: 'E', label: 'E - Natural Extranjero' },
+        { code: 'C', label: 'C - Consejo Comunal / Comuna' },
+        { code: 'P', label: 'P - Pasaporte' }
+    ];
+
+    const RIFUtils = {
+        TIPOS: RIF_TIPOS,
+
+        // Parsea y extrae { tipo, numero, full }
+        parse: function(input) {
+            if (!input) return { tipo: 'J', numero: '', full: '' };
+            let str = String(input).trim().toUpperCase();
+            let tipo = 'J';
+
+            const m = str.match(/^([VJGE CP])[-_\s]*(.*)$/i);
+            if (m) {
+                tipo = m[1].toUpperCase();
+                str = m[2];
+            }
+            const numero = str.replace(/\D/g, '');
+            const validTipo = ['V', 'J', 'G', 'E', 'C', 'P'].includes(tipo) ? tipo : 'J';
+            return {
+                tipo: validTipo,
+                numero: numero,
+                full: numero ? `${validTipo}-${numero}` : ''
+            };
+        },
+
+        // Genera RIF canónico (ej: J-123456780)
+        format: function(tipo, numero) {
+            const parsed = this.parse((tipo ? (tipo + '-') : '') + (numero || ''));
+            return parsed.full;
+        },
+
+        // Handler en vivo para inputs numéricos: limpia caracteres y detecta letras pegadas
+        handleInput: function(inputEl, selectElId) {
+            if (!inputEl) return;
+            const rawVal = inputEl.value;
+            const parsed = this.parse(rawVal);
+
+            if (selectElId) {
+                const sel = typeof selectElId === 'string' ? document.getElementById(selectElId) : selectElId;
+                if (sel && /^[VJGE CP]/i.test(rawVal.trim())) {
+                    sel.value = parsed.tipo;
+                }
+            }
+            inputEl.value = parsed.numero;
+        },
+
+        // Búsqueda tolerante en colección de contribuyentes
+        findMatch: function(contribuyentes, tipo, numero) {
+            if (!Array.isArray(contribuyentes)) return null;
+            const nBuscado = String(numero || '').replace(/\D/g, '');
+            if (!nBuscado) return null;
+            const tBuscado = String(tipo || '').toUpperCase().trim();
+
+            // 1. Coincidencia exacta de tipo y número
+            const exacto = contribuyentes.find(c => {
+                if (!c || !c.rif) return false;
+                const p = this.parse(c.rif);
+                return p.tipo === tBuscado && p.numero === nBuscado;
+            });
+            if (exacto) return exacto;
+
+            // 2. Coincidencia por número puro
+            return contribuyentes.find(c => {
+                if (!c || !c.rif) return false;
+                const cNum = String(c.rif).replace(/\D/g, '');
+                return cNum === nBuscado;
+            });
+        }
+    };
+
+    global.HaciendaRIF = RIFUtils;
+
     const Store = {
         _localStore: null,
         _cache: {},
