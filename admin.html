@@ -146,12 +146,14 @@
             <div class="space-y-4">
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase block mb-1">Usuario:</label>
-                    <input type="text" id="admin-login-usuario" placeholder="admin o cajero" 
+                    <input type="text" id="admin-login-usuario" placeholder="admin o satrimg" 
+                           onkeydown="if(event.key === 'Enter') window.App.ejecutarLoginFuncionario()"
                            class="w-full bg-slate-800 border border-slate-700 text-slate-100 font-bold text-xs rounded-xl px-4 py-3 outline-none focus:border-sky-500">
                 </div>
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase block mb-1">Contraseña:</label>
                     <input type="password" id="admin-login-clave" placeholder="••••••••" 
+                           onkeydown="if(event.key === 'Enter') window.App.ejecutarLoginFuncionario()"
                            class="w-full bg-slate-800 border border-slate-700 text-slate-100 font-bold text-xs rounded-xl px-4 py-3 outline-none focus:border-sky-500">
                 </div>
                 <button onclick="window.App.ejecutarLoginFuncionario()" 
@@ -159,6 +161,15 @@
                     <i class="fas fa-lock-open"></i>
                     <span>Ingresar al Sistema ERP</span>
                 </button>
+
+                <div class="p-3 bg-slate-950/80 rounded-xl border border-slate-800 text-[11px] space-y-1 text-slate-400">
+                    <div class="text-[10px] font-mono uppercase text-slate-500 font-bold">Credenciales de Acceso:</div>
+                    <div class="flex items-center justify-between">
+                        <span>Admin: <strong class="text-sky-400 font-mono">admin</strong></span>
+                        <button type="button" onclick="document.getElementById('admin-login-usuario').value='admin'; document.getElementById('admin-login-clave').value='Venezuela28754133'; window.App.ejecutarLoginFuncionario();" 
+                                class="text-[10px] text-sky-400 hover:underline font-mono">Autocompletar</button>
+                    </div>
+                </div>
             </div>
 
             <div class="text-center pt-2">

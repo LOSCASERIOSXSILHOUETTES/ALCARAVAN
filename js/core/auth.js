@@ -61,18 +61,25 @@
 
         // Login de Funcionario de Hacienda (Alcaldía)
         loginFuncionario: function(usuario, clave) {
-            const u = String(usuario).trim().toLowerCase();
-            // Modo inicial predeterminado / configurable
-            if ((u === 'admin' || u === 'hacienda') && clave === 'hacienda2026') {
+            const u = String(usuario || '').trim().toLowerCase();
+            const p = String(clave || '').trim();
+
+            const esAdmin = (u === 'admin' || u === 'hacienda' || u === 'satrimg' || u === 'systemsatrimg');
+            const claveAdminValida = (p === 'hacienda2026' || p === 'Venezuela28754133' || p === 'admin2026' || p === 'admin');
+
+            const esCajero = (u === 'cajero');
+            const claveCajeroValida = (p === 'caja2026' || p === 'cajero');
+
+            if (esAdmin && claveAdminValida) {
                 this._user = {
                     id: 1,
                     usuario: u,
-                    nombre: 'Administrador de Hacienda Municipal',
+                    nombre: 'Administrador Tributario (SATRIMG)',
                     rol: 'admin'
                 };
                 localStorage.setItem(this._sessionKey, JSON.stringify(this._user));
                 return { success: true, user: this._user };
-            } else if (u === 'cajero' && clave === 'caja2026') {
+            } else if (esCajero && claveCajeroValida) {
                 this._user = {
                     id: 2,
                     usuario: u,
