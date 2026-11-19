@@ -15,7 +15,10 @@
         'hacienda_cuentas',
         'hacienda_conciliacion',
         'hacienda_conciliacion_desglose',
-        'hacienda_ramos_ingreso'
+        'hacienda_ramos_ingreso',
+        'hacienda_inmuebles',
+        'hacienda_vehiculos',
+        'hacienda_publicidad'
     ];
 
     const TABLE_SCHEMAS = {
@@ -63,6 +66,15 @@
         ],
         'hacienda_ramos_ingreso': [
             'id', 'codigo', 'nombre', 'descripcion', 'activo', 'created_at', 'updated_at'
+        ],
+        'hacienda_inmuebles': [
+            'id', 'contribuyente_id', 'numero_catastro', 'direccion', 'uso', 'valor_fiscal_bs', 'estado', 'created_at', 'updated_at'
+        ],
+        'hacienda_vehiculos': [
+            'id', 'contribuyente_id', 'placa', 'marca', 'modelo', 'anio', 'uso', 'estado', 'created_at', 'updated_at'
+        ],
+        'hacienda_publicidad': [
+            'id', 'contribuyente_id', 'tipo', 'ubicacion', 'metros_cuadrados', 'texto_aviso', 'estado', 'created_at', 'updated_at'
         ]
     };
 

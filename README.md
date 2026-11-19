@@ -104,6 +104,20 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.4.0 — 19/11/2026
+- **Suite Tributaria Apple Bento Grid para el Contribuyente (`index.html`):**
+  - Rediseño minimalista Obsidian Apple (#000000 puro, radial glow, SF Pro typography, tarjetas Bento y micro-interacciones a 0ms).
+  - Eliminacion total de datos semilla/mock: operacion 100% limpia para produccion real.
+  - Implementacion de la suite de 6 areas tributarias basada en la arquitectura SATGUAICA:
+    1. *Mis Empresas:* Autoliquidacion LOCAT en vivo, declaracion mensual, reporte de pago y Solvencia QR estilo Apple Wallet.
+    2. *Mis Inmuebles:* Consulta de catastro urbano y derecho de frente municipal con registro interactivo.
+    3. *Mis Vehiculos:* Control de patentes automotrices y liquidacion de trimestres con registro por placa.
+    4. *Mis Publicidades:* Fiscalizacion de vallas, avisos comerciales y toldos en fachada.
+    5. *Tasas y Multas:* Historial consolidado de comprobantes, recibos y sanciones.
+    6. *Cuentas Bancarias:* Tarjetas bancarias oficiales con copiado de datos bancarios en un toque.
+  - Nuevas tablas y esquemas registrados en `HaciendaStore`: `hacienda_inmuebles`, `hacienda_vehiculos` y `hacienda_publicidad`.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.2.0`.
+
 ### Version 3.3.0 — 19/11/2026
 - **Motor Service Worker PWA Offline-First y Manifest:**
   - Creacion del motor `sw.js` con cache versionada (`alcaravan-v3-cache-v3.1.0`), precaching de assets criticos (librerias, fuentes, modulos) y estrategia Stale-While-Revalidate / Network-First.
