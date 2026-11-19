@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hacienda Municipal — Panel de Administración y ERP SGB V3</title>
+    <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="libs/tailwind/tailwind.min.css">
     <link rel="stylesheet" href="libs/fontawesome/css/all.min.css">
     <script src="libs/localforage.min.js"></script>
@@ -297,6 +298,12 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             window.App.init();
+
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('[Alcaraván SW Admin] Activo:', reg.scope))
+                    .catch(err => console.warn('[Alcaraván SW Admin] Error:', err));
+            }
         });
     </script>
 </body>

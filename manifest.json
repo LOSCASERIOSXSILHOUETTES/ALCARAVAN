@@ -1,0 +1,17 @@
+{
+  "name": "Alcaraván — Sistema Tributario Municipal",
+  "short_name": "Alcaraván",
+  "description": "Sistema de Gestión Tributaria Municipal y Portal del Contribuyente LOCAT",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "libs/fontawesome/webfonts/fa-solid-900.woff2",
+      "sizes": "192x192",
+      "type": "font/woff2"
+    }
+  ]
+}

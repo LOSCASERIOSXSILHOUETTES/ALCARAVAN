@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alcaraván — Portal del Contribuyente</title>
+    <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="libs/tailwind/tailwind.min.css">
     <link rel="stylesheet" href="libs/fontawesome/css/all.min.css">
     <script src="libs/localforage.min.js"></script>
@@ -109,6 +110,13 @@
                     window.PortalComercio.render(container);
                 }
             });
+
+            // Registro de Service Worker PWA Offline-First
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('[Alcaraván SW] Activo a 0ms:', reg.scope))
+                    .catch(err => console.warn('[Alcaraván SW] Error:', err));
+            }
         });
     </script>
 </body>

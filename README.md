@@ -104,6 +104,12 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.3.0 — 19/11/2026
+- **Motor Service Worker PWA Offline-First y Manifest:**
+  - Creacion del motor `sw.js` con cache versionada (`alcaravan-v3-cache-v3.1.0`), precaching de assets criticos (librerias, fuentes, modulos) y estrategia Stale-While-Revalidate / Network-First.
+  - Creacion de `manifest.json` para instalacion como aplicacion PWA nativa en dispositivos moviles y de escritorio.
+  - Registro de Service Worker en `index.html` y `admin.html`.
+
 ### Version 3.2.0 — 19/11/2026
 - **Bifurcacion de Interfaces (Portal del Comerciante vs ERP Municipal):**
   - Creacion del portal publico `index.html` con modulo `js/modules/portal-comercio.js` para autogestion de comercios (consulta RIF, estado fiscal, declaracion LOCAT en vivo, reporte de pagos y solvencias QR).
