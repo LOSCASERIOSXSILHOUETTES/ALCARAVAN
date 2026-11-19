@@ -44,34 +44,38 @@
                 </div>
 
                 <!-- Menú de Navegación -->
-                <nav class="p-4 space-y-1.5">
-                    <button onclick="window.App.switchTab('contribuyentes')" id="nav-contribuyentes" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
+                <nav class="p-4 space-y-1.5" id="sidebar-nav-container">
+                    <button onclick="window.App.switchTab('contribuyentes')" id="nav-contribuyentes" data-perm="contribuyentes_ver" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
                         <i class="fas fa-id-card text-sky-400 text-sm"></i>
                         <span>Contribuyentes (RUC)</span>
                     </button>
-                    <button onclick="window.App.switchTab('patentes')" id="nav-patentes" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
+                    <button onclick="window.App.switchTab('patentes')" id="nav-patentes" data-perm="patentes_ver" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
                         <i class="fas fa-certificate text-indigo-400 text-sm"></i>
                         <span>Licencias y Patentes</span>
                     </button>
-                    <button onclick="window.App.switchTab('declaraciones')" id="nav-declaraciones" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
+                    <button onclick="window.App.switchTab('declaraciones')" id="nav-declaraciones" data-perm="declaraciones_ver" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
                         <i class="fas fa-file-invoice-dollar text-emerald-400 text-sm"></i>
                         <span>Declaraciones Juradas</span>
                     </button>
-                    <button onclick="window.App.switchTab('caja')" id="nav-caja" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
+                    <button onclick="window.App.switchTab('caja')" id="nav-caja" data-perm="caja_ver" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
                         <i class="fas fa-cash-register text-amber-400 text-sm"></i>
                         <span>Caja y Recaudación</span>
                     </button>
-                    <button onclick="window.App.switchTab('conciliacion')" id="nav-conciliacion" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
+                    <button onclick="window.App.switchTab('conciliacion')" id="nav-conciliacion" data-perm="conciliacion_ver" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
                         <i class="fas fa-balance-scale text-teal-400 text-sm"></i>
                         <span>Conciliación Bancaria</span>
                     </button>
-                    <button onclick="window.App.switchTab('solvencias')" id="nav-solvencias" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
+                    <button onclick="window.App.switchTab('solvencias')" id="nav-solvencias" data-perm="solvencias_ver" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
                         <i class="fas fa-stamp text-sky-400 text-sm"></i>
                         <span>Solvencias con QR</span>
                     </button>
-                    <button onclick="window.App.switchTab('comunicacion')" id="nav-comunicacion" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
+                    <button onclick="window.App.switchTab('comunicacion')" id="nav-comunicacion" data-perm="comunicacion_ver" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
                         <i class="fas fa-bullhorn text-pink-400 text-sm"></i>
                         <span>Comunicación & Portada</span>
+                    </button>
+                    <button onclick="window.App.switchTab('usuarios')" id="nav-usuarios" data-perm="admin_usuarios" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
+                        <i class="fas fa-user-shield text-amber-400 text-sm"></i>
+                        <span>Usuarios & Permisos ACL</span>
                     </button>
                 </nav>
             </div>
@@ -132,49 +136,89 @@
         </main>
     </div>
 
-    <!-- Pantalla de Login de Funcionarios (Si no hay sesión de admin) -->
-    <div id="erp-login-modal" class="fixed inset-0 z-50 bg-slate-950 hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md p-8 shadow-2xl space-y-6">
+    <!-- Pantalla de Login / Registro de Funcionarios (Estilo SGB Silhouettes V3) -->
+    <div id="erp-login-modal" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md p-8 shadow-2xl space-y-6 my-auto">
+            <!-- Header Modal -->
             <div class="text-center space-y-2">
-                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center text-white text-3xl font-black shadow-lg mx-auto">
-                    <i class="fas fa-shield-alt"></i>
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center text-white text-3xl font-black shadow-lg mx-auto shadow-sky-500/20">
+                    <i class="fas fa-landmark"></i>
                 </div>
-                <h2 class="text-xl font-black text-slate-100">Acceso a la Administración Tributaria</h2>
-                <p class="text-xs text-slate-400">Panel administrativo interno para recaudadores, fiscales y auditoría municipal.</p>
+                <h2 id="erp-auth-title" class="text-xl font-black text-slate-100">Administración Tributaria</h2>
+                <p id="erp-auth-subtitle" class="text-xs text-slate-400">Control y Gestión Fiscal Municipal · LOCAT</p>
             </div>
 
-            <div class="space-y-4">
-                <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase block mb-1">Usuario:</label>
-                    <input type="text" id="admin-login-usuario" placeholder="admin o satrimg" 
-                           onkeydown="if(event.key === 'Enter') window.App.ejecutarLoginFuncionario()"
-                           class="w-full bg-slate-800 border border-slate-700 text-slate-100 font-bold text-xs rounded-xl px-4 py-3 outline-none focus:border-sky-500">
-                </div>
-                <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase block mb-1">Contraseña:</label>
-                    <input type="password" id="admin-login-clave" placeholder="••••••••" 
-                           onkeydown="if(event.key === 'Enter') window.App.ejecutarLoginFuncionario()"
-                           class="w-full bg-slate-800 border border-slate-700 text-slate-100 font-bold text-xs rounded-xl px-4 py-3 outline-none focus:border-sky-500">
-                </div>
-                <button onclick="window.App.ejecutarLoginFuncionario()" 
-                        class="w-full py-3 bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-sky-900/30 transition flex items-center justify-center gap-2">
-                    <i class="fas fa-lock-open"></i>
-                    <span>Ingresar al Sistema ERP</span>
-                </button>
+            <!-- Banner de Error -->
+            <div id="erp-auth-error" class="hidden text-xs text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-xl px-4 py-2.5 text-center font-medium"></div>
 
-                <div class="p-3 bg-slate-950/80 rounded-xl border border-slate-800 text-[11px] space-y-1 text-slate-400">
-                    <div class="text-[10px] font-mono uppercase text-slate-500 font-bold">Credenciales de Acceso:</div>
-                    <div class="flex items-center justify-between">
-                        <span>Admin: <strong class="text-sky-400 font-mono">admin</strong></span>
-                        <button type="button" onclick="document.getElementById('admin-login-usuario').value='admin'; document.getElementById('admin-login-clave').value='Venezuela28754133'; window.App.ejecutarLoginFuncionario();" 
-                                class="text-[10px] text-sky-400 hover:underline font-mono">Autocompletar</button>
+            <!-- Formulario de Autenticación -->
+            <form id="erp-auth-form" onsubmit="window.handleAuthSubmit(event); return false;" class="space-y-4 text-left">
+                <!-- Campos Adicionales para Registro (Ocultos por defecto en Login) -->
+                <div id="erp-auth-register-fields" class="space-y-3.5 hidden">
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Nombre Completo</label>
+                        <input type="text" id="erp-auth-nombre" placeholder="Lcdo. Juan Pérez" 
+                               class="w-full bg-slate-950 border border-slate-700 text-slate-100 font-bold text-xs rounded-xl px-4 py-3 outline-none focus:border-sky-500 transition">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Cargo o Dependencia</label>
+                        <input type="text" id="erp-auth-cargo" placeholder="Ej: Fiscal / Auditor / Recaudador de Taquilla" 
+                               class="w-full bg-slate-950 border border-slate-700 text-slate-100 font-bold text-xs rounded-xl px-4 py-3 outline-none focus:border-sky-500 transition">
+                    </div>
+                    <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 text-[11px] text-slate-400 flex items-start gap-2.5">
+                        <i class="fas fa-shield-alt text-amber-400 text-xs mt-0.5 shrink-0"></i>
+                        <span>Las cuentas nuevas se registran sin permisos. Un Administrador debe habilitar tus accesos en el módulo de Usuarios.</span>
                     </div>
                 </div>
+
+                <!-- Credenciales Core -->
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Correo Electrónico Institucional</label>
+                    <input type="text" id="erp-auth-email" required placeholder="admin o funcionario@alcaldia.gob.ve" autocomplete="username"
+                           class="w-full bg-slate-950 border border-slate-700 text-slate-100 font-bold text-xs rounded-xl px-4 py-3 outline-none focus:border-sky-500 transition">
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Contraseña</label>
+                    <div class="relative">
+                        <input type="password" id="erp-auth-password" required placeholder="••••••••" autocomplete="current-password"
+                               class="w-full bg-slate-950 border border-slate-700 text-slate-100 font-bold text-xs rounded-xl pl-4 pr-11 py-3 outline-none focus:border-sky-500 transition">
+                        <button type="button" onclick="window.toggleAuthPasswordVisibility()" 
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition p-1">
+                            <i id="erp-auth-eye-icon" class="fas fa-eye text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" id="erp-auth-submit-btn" 
+                        class="w-full py-3 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-sky-900/30 transition flex items-center justify-center gap-2">
+                    <i class="fas fa-lock-open"></i>
+                    <span id="erp-auth-submit-text">Iniciar Sesión</span>
+                </button>
+            </form>
+
+            <!-- Acceso Rápido Maestro (Demo / Contingencia) -->
+            <div id="erp-auth-demo-box" class="p-3 bg-slate-950 rounded-xl border border-slate-800 text-[11px] space-y-1 text-slate-400">
+                <div class="text-[10px] font-mono uppercase text-slate-500 font-bold">Credenciales Maestras de Inicio:</div>
+                <div class="flex items-center justify-between">
+                    <span>Admin: <strong class="text-sky-400 font-mono">admin</strong></span>
+                    <button type="button" onclick="window.autocompletarAdmin()" 
+                            class="text-[10px] text-sky-400 hover:underline font-mono">Autocompletar</button>
+                </div>
             </div>
 
-            <div class="text-center pt-2">
-                <a href="index.html" class="text-xs text-sky-400 hover:text-sky-300 font-bold transition">
-                    ← Volver al Portal del Contribuyente
+            <!-- Toggle entre Iniciar Sesión y Registro -->
+            <div class="pt-2 border-t border-slate-800 text-center text-xs text-slate-400">
+                <span id="erp-auth-toggle-prompt">¿No tienes cuenta registrada?</span>
+                <button type="button" id="erp-auth-toggle-btn" data-mode="register" onclick="window.toggleAuthMode(this.getAttribute('data-mode'))" 
+                        class="ml-1 text-sky-400 hover:text-sky-300 font-bold underline transition-colors">
+                    Registrarse
+                </button>
+            </div>
+
+            <div class="text-center pt-1">
+                <a href="index.html" class="text-xs text-slate-400 hover:text-sky-400 font-bold transition">
+                    &larr; Volver al Portal del Contribuyente
                 </a>
             </div>
         </div>
@@ -209,9 +253,168 @@
     <script src="js/modules/solvencias/emisor.js"></script>
     <script src="js/modules/comunicacion/comunicacion.js"></script>
     <script src="js/modules/comunicacion/popups.js"></script>
+    <script src="js/modules/usuarios/gestion.js"></script>
 
     <!-- Orquestador del ERP Interno -->
     <script>
+        let currentAuthMode = 'login';
+
+        window.toggleAuthMode = function(mode) {
+            currentAuthMode = (mode === 'register') ? 'register' : 'login';
+            const isReg = (currentAuthMode === 'register');
+
+            const titleEl = document.getElementById('erp-auth-title');
+            const subEl = document.getElementById('erp-auth-subtitle');
+            const regFields = document.getElementById('erp-auth-register-fields');
+            const submitText = document.getElementById('erp-auth-submit-text');
+            const togglePrompt = document.getElementById('erp-auth-toggle-prompt');
+            const toggleBtn = document.getElementById('erp-auth-toggle-btn');
+            const errorEl = document.getElementById('erp-auth-error');
+            const demoBox = document.getElementById('erp-auth-demo-box');
+
+            if (errorEl) {
+                errorEl.textContent = '';
+                errorEl.classList.add('hidden');
+            }
+
+            if (isReg) {
+                if (titleEl) titleEl.textContent = 'Registro de Funcionario';
+                if (subEl) subEl.textContent = 'Crea tu usuario institucional en la plataforma tributaria';
+                if (regFields) regFields.classList.remove('hidden');
+                if (submitText) submitText.textContent = 'Registrar Cuenta';
+                if (togglePrompt) togglePrompt.textContent = '¿Ya tienes una cuenta?';
+                if (demoBox) demoBox.classList.add('hidden');
+                if (toggleBtn) {
+                    toggleBtn.textContent = 'Iniciar Sesión';
+                    toggleBtn.setAttribute('data-mode', 'login');
+                }
+            } else {
+                if (titleEl) titleEl.textContent = 'Administración Tributaria';
+                if (subEl) subEl.textContent = 'Control y Gestión Fiscal Municipal · LOCAT';
+                if (regFields) regFields.classList.add('hidden');
+                if (submitText) submitText.textContent = 'Iniciar Sesión';
+                if (togglePrompt) togglePrompt.textContent = '¿No tienes cuenta registrada?';
+                if (demoBox) demoBox.classList.remove('hidden');
+                if (toggleBtn) {
+                    toggleBtn.textContent = 'Registrarse';
+                    toggleBtn.setAttribute('data-mode', 'register');
+                }
+            }
+        };
+
+        window.toggleAuthPasswordVisibility = function() {
+            const passInput = document.getElementById('erp-auth-password');
+            const eyeIcon = document.getElementById('erp-auth-eye-icon');
+            if (!passInput) return;
+            if (passInput.type === 'password') {
+                passInput.type = 'text';
+                if (eyeIcon) {
+                    eyeIcon.classList.remove('fa-eye');
+                    eyeIcon.classList.add('fa-eye-slash');
+                }
+            } else {
+                passInput.type = 'password';
+                if (eyeIcon) {
+                    eyeIcon.classList.remove('fa-eye-slash');
+                    eyeIcon.classList.add('fa-eye');
+                }
+            }
+        };
+
+        window.autocompletarAdmin = function() {
+            const emailInput = document.getElementById('erp-auth-email');
+            const passInput = document.getElementById('erp-auth-password');
+            if (emailInput) emailInput.value = 'admin';
+            if (passInput) passInput.value = 'Venezuela28754133';
+            window.handleAuthSubmit(new Event('submit'));
+        };
+
+        window.handleAuthSubmit = async function(event) {
+            if (event && event.preventDefault) event.preventDefault();
+
+            const emailInput = document.getElementById('erp-auth-email');
+            const passInput = document.getElementById('erp-auth-password');
+            const nombreInput = document.getElementById('erp-auth-nombre');
+            const cargoInput = document.getElementById('erp-auth-cargo');
+            const errorEl = document.getElementById('erp-auth-error');
+            const submitBtn = document.getElementById('erp-auth-submit-btn');
+
+            const email = emailInput ? emailInput.value.trim() : '';
+            const password = passInput ? passInput.value : '';
+
+            if (errorEl) {
+                errorEl.textContent = '';
+                errorEl.classList.add('hidden');
+            }
+
+            if (!email || !password) {
+                if (errorEl) {
+                    errorEl.textContent = 'Ingresa usuario/correo y contraseña.';
+                    errorEl.classList.remove('hidden');
+                }
+                return;
+            }
+
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.classList.add('opacity-70');
+            }
+
+            try {
+                if (currentAuthMode === 'register') {
+                    const nombre = nombreInput ? nombreInput.value.trim() : '';
+                    const cargo = cargoInput ? cargoInput.value.trim() : 'Funcionario';
+
+                    if (!nombre) {
+                        throw new Error('Por favor ingresa tu nombre completo.');
+                    }
+
+                    const res = await window.HaciendaAuth.registrarFuncionario(email, password, {
+                        nombre: nombre,
+                        cargo: cargo,
+                        rol: 'Sin Asignar',
+                        permisos: {}
+                    });
+
+                    if (!res.success) {
+                        throw new Error(res.message || 'Error al registrar usuario.');
+                    }
+
+                    if (typeof Swal !== 'undefined') {
+                        await Swal.fire({
+                            icon: 'success',
+                            title: '¡Registro Exitoso!',
+                            html: `Bienvenido <b>${nombre}</b>.<br><br><span class="text-xs text-slate-400">Tu cuenta fue registrada en el sistema. Un Administrador debe habilitar tu rol y permisos de acceso.</span>`,
+                            confirmButtonColor: '#0284c7'
+                        });
+                    }
+
+                    // Pasar a modo login
+                    window.toggleAuthMode('login');
+                    if (emailInput) emailInput.value = email;
+                    if (passInput) passInput.value = '';
+                } else {
+                    const res = await window.HaciendaAuth.loginFuncionario(email, password);
+                    if (!res.success) {
+                        throw new Error(res.message || 'Credenciales incorrectas.');
+                    }
+                    window.App.verificarAutenticacion();
+                }
+            } catch (err) {
+                if (errorEl) {
+                    errorEl.textContent = err.message || 'Error en la autenticación.';
+                    errorEl.classList.remove('hidden');
+                } else if (typeof Swal !== 'undefined') {
+                    Swal.fire({ icon: 'error', title: 'Error de Acceso', text: err.message, confirmButtonColor: '#0284c7' });
+                }
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('opacity-70');
+                }
+            }
+        };
+
         window.App = {
             currentTab: 'contribuyentes',
 
@@ -227,7 +430,7 @@
                     window.HaciendaRealtime.init();
                 }
                 if (window.HaciendaAuth) {
-                    window.HaciendaAuth.init();
+                    await window.HaciendaAuth.init();
                 }
 
                 // Verificar autenticación de funcionario
@@ -241,41 +444,79 @@
 
             verificarAutenticacion: function() {
                 const user = window.HaciendaAuth ? window.HaciendaAuth.getUser() : null;
-                const isFuncionario = window.HaciendaAuth && window.HaciendaAuth.isFuncionario();
+                const isLogged = window.HaciendaAuth && window.HaciendaAuth.isLoggedIn();
 
                 const loginModal = document.getElementById('erp-login-modal');
                 const appWrapper = document.getElementById('erp-app-wrapper');
 
-                if (!isFuncionario) {
+                if (!isLogged) {
                     if (loginModal) loginModal.classList.remove('hidden');
                     if (appWrapper) appWrapper.classList.add('hidden');
                 } else {
                     if (loginModal) loginModal.classList.add('hidden');
                     if (appWrapper) appWrapper.classList.remove('hidden');
 
+                    const profile = window.HaciendaAuth.getProfile() || {};
                     const elNombre = document.getElementById('erp-user-nombre');
                     const elRol = document.getElementById('erp-user-rol');
-                    if (elNombre) elNombre.innerText = user.nombre || 'Funcionario';
-                    if (elRol) elRol.innerText = user.rol || 'Administrador';
+                    if (elNombre) elNombre.innerText = profile.nombre || user.nombre || user.email || 'Funcionario';
+                    if (elRol) elRol.innerText = (profile.rol || 'Administrador').toUpperCase();
 
-                    this.switchTab('contribuyentes');
+                    // Aplicar ACL al Sidebar
+                    window.HaciendaAuth.actualizarUI();
+
+                    // Seleccionar primera pestaña disponible con permiso
+                    const tabInicial = this.obtenerPrimeraPestanaPermitida();
+                    this.switchTab(tabInicial);
                 }
             },
 
-            ejecutarLoginFuncionario: function() {
-                const u = document.getElementById('admin-login-usuario').value;
-                const p = document.getElementById('admin-login-clave').value;
-                const res = window.HaciendaAuth.loginFuncionario(u, p);
-                if (res.success) {
-                    this.verificarAutenticacion();
-                } else {
-                    if (typeof Swal !== 'undefined') {
-                        Swal.fire({ icon: 'error', title: 'Error de Acceso', text: res.message, confirmButtonColor: '#0284c7' });
+            obtenerPrimeraPestanaPermitida: function() {
+                const tabs = [
+                    { id: 'contribuyentes', perm: 'contribuyentes_ver' },
+                    { id: 'patentes', perm: 'patentes_ver' },
+                    { id: 'declaraciones', perm: 'declaraciones_ver' },
+                    { id: 'caja', perm: 'caja_ver' },
+                    { id: 'conciliacion', perm: 'conciliacion_ver' },
+                    { id: 'solvencias', perm: 'solvencias_ver' },
+                    { id: 'comunicacion', perm: 'comunicacion_ver' },
+                    { id: 'usuarios', perm: 'admin_usuarios' }
+                ];
+
+                for (let t of tabs) {
+                    if (window.HaciendaAuth.hasPermission(t.perm)) {
+                        return t.id;
                     }
                 }
+                return 'contribuyentes';
             },
 
             switchTab: function(tabId) {
+                // Verificar permiso antes de cambiar
+                const tabPermMap = {
+                    'contribuyentes': 'contribuyentes_ver',
+                    'patentes': 'patentes_ver',
+                    'declaraciones': 'declaraciones_ver',
+                    'caja': 'caja_ver',
+                    'conciliacion': 'conciliacion_ver',
+                    'solvencias': 'solvencias_ver',
+                    'comunicacion': 'comunicacion_ver',
+                    'usuarios': 'admin_usuarios'
+                };
+
+                const requiredPerm = tabPermMap[tabId];
+                if (requiredPerm && !window.HaciendaAuth.hasPermission(requiredPerm)) {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Acceso Restringido',
+                            text: 'No tienes permisos asignados para acceder a este módulo. Solicita acceso al Administrador.',
+                            confirmButtonColor: '#0284c7'
+                        });
+                    }
+                    return;
+                }
+
                 this.currentTab = tabId;
                 
                 document.querySelectorAll('.nav-link').forEach(btn => {
@@ -294,9 +535,9 @@
                     'declaraciones': 'Autoliquidaciones de Actividades Económicas',
                     'caja': 'Taquilla de Recaudación y Caja',
                     'conciliacion': 'Conciliación Bancaria y Smart Ledger',
-                    'solvencias': 'Solvencias Municipales Automatizadas',
+                    'solvencias': 'Solvencias Municipales Automatizadas con QR',
                     'comunicacion': 'Comunicación Oficial y Contenidos de Portada',
-                    'popups': 'Comunicación Oficial y Contenidos de Portada'
+                    'usuarios': 'Gestión de Usuarios y Control de Acceso (ACL)'
                 };
                 const tituloEl = document.getElementById('seccion-titulo');
                 if (tituloEl) tituloEl.innerText = titulos[tabId] || 'Administración Tributaria';
@@ -320,8 +561,10 @@
                     window.HaciendaConciliacion.render(container);
                 } else if (this.currentTab === 'solvencias' && window.SolvenciasModule) {
                     window.SolvenciasModule.render(container);
-                } else if ((this.currentTab === 'comunicacion' || this.currentTab === 'popups') && window.ComunicacionModule) {
+                } else if (this.currentTab === 'comunicacion' && window.ComunicacionModule) {
                     window.ComunicacionModule.render(container);
+                } else if (this.currentTab === 'usuarios' && window.UsuariosModule) {
+                    window.UsuariosModule.render(container);
                 }
             }
         };

@@ -24,7 +24,8 @@
         'hacienda_vehiculos',
         'hacienda_publicidad',
         'hacienda_popups',
-        'hacienda_carrusel'
+        'hacienda_carrusel',
+        'user_profiles'
     ]);
 
     function queueTableRefresh(table) {

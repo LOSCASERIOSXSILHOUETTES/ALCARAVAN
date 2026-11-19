@@ -178,6 +178,16 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
   - Dimensionamiento de infraestructura y cuotas gratuitas validado para municipios tipo San Jose de Guaribe.
   - Bump de Service Worker a `alcaravan-v3-cache-v3.5.1`.
 
+### Version 3.8.0 — 19/11/2026
+- **Sistema de Usuarios Registrados en Supabase y Control de Acceso Granular (ACL) estilo SACCFAG V3:**
+  - Registro de la 16ta tabla `user_profiles` en `js/core/store.js` (`TABLES`, `TABLE_SCHEMAS`, `TABLE_ON_CONFLICT`), `js/core/realtime-sync.js` (`SYNCABLE_TABLES`) y `sql/schema_hacienda.sql`.
+  - Capa de autenticacion de funcionarios dual (`js/core/auth.js`) sincronizada con Supabase Auth (`signInWithPassword`, `signUp`, `signOut`) y baul seguro offline SHA-256 (`hacienda_vault_users`) para acceso instantaneo a 0ms sin internet.
+  - Matriz de permisos granulares ACL (24 permisos agrupados en 8 areas clave: Padron RUC, Licencias LOCAT, Declaraciones, Caja, Conciliacion, Solvencias QR, Comunicacion/Portada y Administracion).
+  - Modulo administrativo completo `js/modules/usuarios/gestion.js` (`window.UsuariosModule`): alta de funcionarios, edicion de datos, activacion/pausa de cuentas y asignacion visual de permisos mediante checkboxes interactivos.
+  - Menu lateral del ERP reactivo con atributos `data-perm` en cada enlace de navegacion (`updateSidebarAcl()`), ocultando las secciones no autorizadas segun el perfil del funcionario activo.
+  - Modal unificado de Iniciar Sesion / Registro en `admin.html` con alternador de modos, revelado de contrasena con icono de ojo y boton de autocompletado maestro.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.8.0`.
+
 ### Version 3.4.3 — 19/11/2026
 - **Integracion en Vivo de Tasas Oficiales BCV (DolarApi / BCV API):**
   - Creacion del servicio modular cliente `js/services/tasas-bcv.js` (`window.TasasBCV`).

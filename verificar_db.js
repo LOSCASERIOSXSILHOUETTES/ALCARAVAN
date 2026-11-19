@@ -31,7 +31,8 @@ const TABLES = [
     'hacienda_vehiculos',
     'hacienda_publicidad',
     'hacienda_popups',
-    'hacienda_carrusel'
+    'hacienda_carrusel',
+    'user_profiles'
 ];
 
 async function verificarColumna(tabla, columna) {

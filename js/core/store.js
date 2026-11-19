@@ -28,7 +28,8 @@
         'hacienda_vehiculos',
         'hacienda_publicidad',
         'hacienda_popups',
-        'hacienda_carrusel'
+        'hacienda_carrusel',
+        'user_profiles'
     ];
 
     const TABLE_SCHEMAS = {
@@ -92,11 +93,15 @@
         'hacienda_carrusel': [
             'id', 'tag', 'titulo', 'descripcion', 'btn_texto', 'btn_icono', 'btn_enlace',
             'badge_bg', 'gradient', 'icon', 'imagen_url', 'activo', 'orden', 'created_at', 'updated_at'
+        ],
+        'user_profiles': [
+            'user_id', 'email', 'nombre', 'cargo', 'rol', 'permisos', 'activo', 'created_at', 'updated_at'
         ]
     };
 
     const TABLE_ON_CONFLICT = {
-        'hacienda_declaraciones': 'contribuyente_id,patente_id,anio,mes'
+        'hacienda_declaraciones': 'contribuyente_id,patente_id,anio,mes',
+        'user_profiles': 'user_id'
     };
 
     function generateUUID() {
@@ -271,6 +276,29 @@
                 }
             }
 
+            // Sembrar Superadmin inicial en user_profiles si está vacío
+            if (!this._cache['user_profiles'] || this._cache['user_profiles'].length === 0) {
+                const superAdmin = {
+                    user_id: 'usr_superadmin_satrimg_001',
+                    email: 'systemsatrimg@gmail.com',
+                    nombre: 'Administrador General SATRIMG',
+                    cargo: 'Superintendente Tributario Municipal',
+                    rol: 'admin',
+                    permisos: {
+                        admin: true,
+                        admin_todo: true,
+                        admin_usuarios: true
+                    },
+                    activo: true,
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                };
+                this._cache['user_profiles'] = [superAdmin];
+                if (this._localStore) {
+                    await this._localStore.setItem('tbl_user_profiles', [superAdmin]);
+                }
+            }
+
             console.log('[HaciendaStore] Inicializado a 0ms en LocalForage');
             this.syncPendingAll();
             return true;
@@ -281,22 +309,32 @@
             return this._cache[table] ? [...this._cache[table]] : [];
         },
 
+        getTableSync: function(table) {
+            return this.get(table);
+        },
+
         // Guardar o actualizar registro (Offline-First a 0ms)
         set: async function(table, record) {
             if (!TABLES.includes(table)) throw new Error('Tabla no autorizada: ' + table);
             if (!this._cache[table]) this._cache[table] = [];
 
-            if (!record.id) {
+            const pkCol = (table === 'user_profiles') ? 'user_id' : 'id';
+            if (table === 'user_profiles') {
+                if (!record.user_id && !record.id) record.user_id = generateUUID();
+                record.user_id = record.user_id || record.id;
+                record.id = record.user_id;
+            } else if (!record.id) {
                 record.id = generateUUID();
             }
 
-            const isUpdate = this._cache[table].some(r => String(r.id) === String(record.id));
+            const recId = record[pkCol] || record.id;
+            const isUpdate = this._cache[table].some(r => String(r[pkCol] || r.id) === String(recId));
             record._sync_pending = true;
             record.updated_at = new Date().toISOString();
             if (!record.created_at) record.created_at = record.updated_at;
 
             if (isUpdate) {
-                const idx = this._cache[table].findIndex(r => String(r.id) === String(record.id));
+                const idx = this._cache[table].findIndex(r => String(r[pkCol] || r.id) === String(recId));
                 this._cache[table][idx] = { ...this._cache[table][idx], ...record };
             } else {
                 this._cache[table].unshift(record);
@@ -313,6 +351,18 @@
             // Sincronizar en segundo plano si hay red
             this.syncRecord(table, record);
             return record;
+        },
+
+        upsert: function(table, record) {
+            return this.set(table, record);
+        },
+
+        insert: function(table, record) {
+            return this.set(table, record);
+        },
+
+        update: function(table, record) {
+            return this.set(table, record);
         },
 
         // Guardar lote de registros a 0ms
@@ -357,18 +407,19 @@
         // Eliminar registro
         remove: async function(table, id) {
             if (!this._cache[table]) return;
-            this._cache[table] = this._cache[table].filter(r => String(r.id) !== String(id));
+            const pkCol = (table === 'user_profiles') ? 'user_id' : 'id';
+            this._cache[table] = this._cache[table].filter(r => String(r[pkCol] || r.id) !== String(id));
 
             if (this._localStore) {
                 await this._localStore.setItem(`tbl_${table}`, this._cache[table]);
             }
-            this.notify(table, 'delete', { id });
+            this.notify(table, 'delete', { [pkCol]: id, id });
 
             if (global.supabaseClient && navigator.onLine) {
                 try {
-                    await global.supabaseClient.from(table).delete().eq('id', id);
+                    await global.supabaseClient.from(table).delete().eq(pkCol, id);
                     if (typeof global.broadcastMutation === 'function') {
-                        global.broadcastMutation(table, 'DELETE', { id });
+                        global.broadcastMutation(table, 'DELETE', { [pkCol]: id, id });
                     }
                 } catch (e) {
                     console.warn('[HaciendaStore] Error al borrar en Supabase:', e);
@@ -412,7 +463,9 @@
                     const { data, error } = await global.supabaseClient.from(table).upsert(cleanRecord, upsertOptions).select();
                     if (!error) {
                         const saved = (data && data[0]) ? data[0] : cleanRecord;
-                        const cached = this._cache[table].find(r => String(r.id) === String(record.id));
+                        const pkCol = (table === 'user_profiles') ? 'user_id' : 'id';
+                        const recId = record[pkCol] || record.id;
+                        const cached = this._cache[table].find(r => String(r[pkCol] || r.id) === String(recId));
                         if (cached) {
                             delete cached._sync_pending;
                             if (this._localStore) {
