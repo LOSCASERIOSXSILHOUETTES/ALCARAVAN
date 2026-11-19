@@ -125,7 +125,7 @@
                                     <label class="block text-xs font-bold text-slate-400 mb-1">Banco Destino (Alcaldía)</label>
                                     <select id="pago-banco-destino" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 text-xs outline-none">
                                         <option value="Banco de Venezuela - Cta Recaudadora">Banco de Venezuela (Cta. Recaudadora)</option>
-                                        <option value="Banesco - Cta Hacienda Municipal">Banesco (Hacienda Municipal)</option>
+                                        <option value="Banesco - Cta Administración Tributaria">Banesco (Cta. Administración Tributaria)</option>
                                         <option value="Banco Bicentenario - Rentas">Banco Bicentenario (Rentas)</option>
                                     </select>
                                 </div>

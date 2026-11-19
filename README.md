@@ -140,6 +140,17 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.7.0 — 19/11/2026
+- **Transicion a "Administracion Tributaria", Carrusel de Avisos, Centro de Ordenanzas Descargables y Popups Oficiales:**
+  - **Renombramiento Oficial:** Sustitucion formal del termino arcaico "Hacienda" por **"Administracion Tributaria"** (SATRIMG / Direccion de Administracion Tributaria Municipal) en toda la interfaz de usuario, headers, modales y panel administrativo.
+  - **Top Bar Institucional San Jose de Guaribe:** Barra superior con reloj y fecha oficial en vivo y widget de clima local (`29°C · Guaribe`).
+  - **Carrusel Oficial de Avisos y Campanas:** Banner interactivo deslizable con controles laterales, dots alargados estilo Apple y auto-play pausable con campanas de armonizacion LOCAT, cronograma fiscal y solvencias digitales QR.
+  - **Centro de Descargas de Ordenanzas y Gacetas Municipales:** Catalogo descargable en PDF de instrumentos legales de San Jose de Guaribe (Actividades Economicas LOCAT, Inmuebles Urbanos y Catastro, Tasas Administrativas, Patente de Vehiculos, Tabulador de Aseo Urbano y Calendario Fiscal 2026).
+  - **Generador de PDF Oficial a 0ms:** Renderizado cliente con jsPDF de gacetas y ordenanzas oficiales maquetadas con membrete institucional, exposicion de motivos, ficha tecnica y articulos clave.
+  - **Visor de Articulado:** Modal rapido para consultar en linea las disposiciones principales sin descargar el archivo.
+  - **Motor de Popups Oficiales:** Modal emergente para decretos y comunicados del Alcalde con persistencia en `localStorage` (control de no volver a mostrar en el dia).
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.7.0`.
+
 ### Version 3.6.1 — 19/11/2026
 - **Normalizacion Estricta de RIF y Entradas Numericas Puras:**
   - **Selector Oficial de Prefijo:** Despliegue de los 6 tipos de RIF formales de Venezuela: `V` (Natural Venezolano), `J` (Juridico / Comercial), `G` (Gubernamental), `E` (Natural Extranjero), `C` (Consejo Comunal / Comuna) y `P` (Pasaporte).

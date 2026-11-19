@@ -39,6 +39,158 @@
         'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
     ];
 
+    const AVISOS_CARRUSEL = [
+        {
+            id: 'slide_1',
+            tag: 'LOCAT 2026 · VIGENTE',
+            titulo: 'Armonización Tributaria en San José de Guaribe',
+            descripcion: 'Adecuación integral de licencias de actividades económicas y tabulador nacional de alícuotas. Autoliquidación en línea con 0ms de latencia.',
+            btn_texto: 'Consultar RIF',
+            btn_icono: 'fa-arrow-right',
+            badge_bg: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25',
+            gradient: 'from-sky-950/80 via-neutral-900/90 to-[#0e0e11]',
+            icon: 'fa-landmark'
+        },
+        {
+            id: 'slide_2',
+            tag: 'CRONOGRAMA FISCAL',
+            titulo: 'Declaración Mensual de Ingresos Brutos',
+            descripcion: 'Declara tus ingresos del mes dentro de los primeros 15 días continuos. Cálculo automatizado según la Tasa de Mayor Valor (TCMMV) del Banco Central de Venezuela.',
+            btn_texto: 'Ver Calendario Fiscal',
+            btn_icono: 'fa-calendar-alt',
+            badge_bg: 'bg-amber-500/10 text-amber-400 border-amber-500/25',
+            gradient: 'from-amber-950/80 via-neutral-900/90 to-[#0e0e11]',
+            icon: 'fa-calendar-check'
+        },
+        {
+            id: 'slide_3',
+            tag: 'SOLVENCIAS DIGITALES QR',
+            titulo: 'Certificados Tributarios al Instante',
+            descripcion: 'Emisión inmediata de Solvencias Municipales Únicas con verificación criptográfica QR de 30 días continuos para trámites comerciales y bancarios.',
+            btn_texto: 'Ver Normativa',
+            btn_icono: 'fa-file-download',
+            badge_bg: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/25',
+            gradient: 'from-indigo-950/80 via-neutral-900/90 to-[#0e0e11]',
+            icon: 'fa-qrcode'
+        }
+    ];
+
+    const ORDENANZAS_MUNICIPALES = [
+        {
+            id: 'ord_locat',
+            numero: 'Gaceta Municipal N° Extraordinario 04-2024',
+            titulo: 'Ordenanza sobre Actividades Económicas de Industria, Comercio y Servicios',
+            categoria: 'ordenanzas',
+            tipo_badge: 'LOCAT ARMONIZADA',
+            badge_color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+            fecha: 'Adecuación LOCAT 2026',
+            resumen: 'Regula el impuesto sobre ingresos brutos, clasificador único de actividades económicas, alícuotas armonizadas (0.5% al 3%) y mínimos tributables en TCMMV.',
+            paginas: '48 págs.',
+            archivo_nombre: 'Ordenanza_Actividades_Economicas_Guaribe_LOCAT.pdf',
+            articulos: [
+                'Art. 15: Autoliquidación mensual obligatoria dentro de los primeros quince (15) días de cada mes calendario.',
+                'Art. 22: Mínimo tributable expresado en la Moneda de Mayor Valor (TCMMV) fijada por el BCV.',
+                'Art. 38: Solvencia municipal anual requerida para contrataciones y funcionamiento comercial.'
+            ]
+        },
+        {
+            id: 'ord_inmuebles',
+            numero: 'Gaceta Municipal N° Ordinario 112',
+            titulo: 'Ordenanza del Impuesto sobre Inmuebles Urbanos y Catastro Municipal',
+            categoria: 'ordenanzas',
+            tipo_badge: 'CATASTRO FISCAL',
+            badge_color: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
+            fecha: 'Vigente 2026',
+            resumen: 'Establece las bases para la determinación del valor catastral del suelo y construcciones urbanas, alícuotas del Derecho de Frente y zonificación.',
+            paginas: '32 págs.',
+            archivo_nombre: 'Ordenanza_Inmuebles_Urbanos_Catastro_Guaribe.pdf',
+            articulos: [
+                'Art. 8: Obligación de inscripción en el Registro Catastral del Municipio.',
+                'Art. 19: Pago trimestral o anual con descuento del 10% por pronto pago en enero.',
+                'Art. 25: Tabulador de zonificación para Casco Central, sectores rurales y áreas comerciales.'
+            ]
+        },
+        {
+            id: 'ord_tasas',
+            numero: 'Gaceta Municipal N° Ordinario 118',
+            titulo: 'Ordenanza sobre Tasas Administrativas y Expedición de Certificaciones',
+            categoria: 'tasas',
+            tipo_badge: 'TRIBUTOS MENORES',
+            badge_color: 'bg-sky-500/10 text-sky-400 border-sky-500/20',
+            fecha: 'Vigente 2026',
+            resumen: 'Fija los costos por tramitación de solvencias, permisos de obras, copias certificadas, cartas de residencia fiscal y servicios de taquilla en TCMMV.',
+            paginas: '20 págs.',
+            archivo_nombre: 'Ordenanza_Tasas_Administrativas_Guaribe.pdf',
+            articulos: [
+                'Art. 5: Emisión de Solvencia Municipal Única a 0.10 TCMMV con validez reglamentaria de 30 días.',
+                'Art. 12: Permisologías de ingeniería y conformidad de uso comercial.',
+                'Art. 18: Exenciones para adultos mayores y personas en situación de vulnerabilidad.'
+            ]
+        },
+        {
+            id: 'ord_vehiculos',
+            numero: 'Gaceta Municipal N° Ordinario 120',
+            titulo: 'Ordenanza de Patente sobre Vehículos y Transporte Terrestre',
+            categoria: 'ordenanzas',
+            tipo_badge: 'PATENTE VEHICULAR',
+            badge_color: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20',
+            fecha: 'Vigente 2026',
+            resumen: 'Regula el tributo a vehículos particulares, transporte de carga comercial, mototaxis y maquinaria pesada domiciliada en el municipio.',
+            paginas: '24 págs.',
+            archivo_nombre: 'Ordenanza_Patente_Vehiculos_Guaribe.pdf',
+            articulos: [
+                'Art. 7: Calcomanía y carnet de circulación tributaria anual.',
+                'Art. 14: Escala de pago según capacidad de carga y uso comercial.',
+                'Art. 20: Descuento del 15% por liquidación anticipada anual.'
+            ]
+        },
+        {
+            id: 'ord_aseo',
+            numero: 'Gaceta Municipal N° Extraordinario 09',
+            titulo: 'Tabulador de Tarifas del Servicio de Aseo Urbano y Domiciliario',
+            categoria: 'tasas',
+            tipo_badge: 'SERVICIOS PUBLICOS',
+            badge_color: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+            fecha: 'Vigente 2026',
+            resumen: 'Estructura tarifaria para recolección y disposición final de desechos sólidos comerciales, industriales, residenciales e institucionales.',
+            paginas: '16 págs.',
+            archivo_nombre: 'Tabulador_Aseo_Urbano_Guaribe.pdf',
+            articulos: [
+                'Art. 4: Tarifa comercial estratificada por metros cuadrados del establecimiento.',
+                'Art. 9: Facturación conjunta en el entero mensual de actividades económicas.',
+                'Art. 15: Normas de reciclaje y disposición segura para grandes generadores.'
+            ]
+        },
+        {
+            id: 'cal_fiscal_2026',
+            numero: 'Resolución SATRIMG N° 001-2026',
+            titulo: 'Calendario Fiscal de Obligaciones Tributarias Municipales 2026',
+            categoria: 'calendario',
+            tipo_badge: 'CALENDARIO OFICIAL',
+            badge_color: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
+            fecha: 'Ejercicio Fiscal 2026',
+            resumen: 'Cronograma oficial de fechas límite de autoliquidación mensual, prórrogas reglamentarias y operativos especiales de recaudación parroquial.',
+            paginas: '4 págs.',
+            archivo_nombre: 'Calendario_Fiscal_Municipal_Guaribe_2026.pdf',
+            articulos: [
+                'Declaración Mensual: Del 1 al 15 de cada mes a través del portal 0ms.',
+                'Cierre de Ejercicio: Liquidación definitiva anual el 31 de enero.',
+                'Operativos Especiales: Segundo sábado de cada mes en plaza Bolívar de Guaribe.'
+            ]
+        }
+    ];
+
+    const POPUP_ACTIVO = {
+        id: 'popup_guaribe_locat_2026',
+        activo: true,
+        badge: 'COMUNICADO OFICIAL · ALCALDÍA',
+        titulo: 'Actualización y Empadronamiento Tributario LOCAT 2026',
+        mensaje: 'La Alcaldía del Municipio San José de Guaribe y la Administración Tributaria Municipal informan a todos los comerciantes y contribuyentes que está activa la jornada especial de censo y adecuación de licencias de actividades económicas conforme a la Ley Orgánica de Armonización Tributaria (LOCAT). Realiza tu consulta o registro directamente desde este portal.',
+        fecha: 'Ejercicio Fiscal 2026',
+        enlace_texto: 'Descargar Ordenanza LOCAT en PDF',
+        ordenanza_id: 'ord_locat'
+    };
+
     const Portal = {
         getActiveContribuyente: () => activeContribuyente,
 
@@ -56,15 +208,456 @@
             }
         },
 
+        _slideIndex: 0,
+        _slideTimer: null,
+        _categoriaOrdenanzas: 'todas',
+
+        moveSlide: function(dir) {
+            this._slideIndex = (this._slideIndex + dir + AVISOS_CARRUSEL.length) % AVISOS_CARRUSEL.length;
+            this.actualizarCarrusel();
+        },
+
+        goToSlide: function(idx) {
+            this._slideIndex = idx;
+            this.actualizarCarrusel();
+        },
+
+        actualizarCarrusel: function() {
+            const track = document.getElementById('avisos-carousel-track');
+            if (track) {
+                track.style.transform = `translateX(-${this._slideIndex * 100}%)`;
+            }
+            const dots = document.querySelectorAll('.aviso-dot');
+            dots.forEach((dot, idx) => {
+                if (idx === this._slideIndex) {
+                    dot.className = 'aviso-dot w-8 h-1.5 rounded-full bg-white transition-all duration-300';
+                } else {
+                    dot.className = 'aviso-dot w-2 h-1.5 rounded-full bg-white/30 hover:bg-white/60 transition-all duration-300';
+                }
+            });
+        },
+
+        iniciarCarrusel: function() {
+            if (this._slideTimer) clearInterval(this._slideTimer);
+            this._slideTimer = setInterval(() => {
+                this.moveSlide(1);
+            }, 6000);
+        },
+
+        renderCarruselAvisos: function() {
+            return `
+                <div class="relative w-full max-w-5xl mx-auto rounded-3xl overflow-hidden border border-white/[0.08] shadow-2xl group bg-[#0e0e11]"
+                     onmouseenter="if(window.PortalComercio._slideTimer) clearInterval(window.PortalComercio._slideTimer)"
+                     onmouseleave="window.PortalComercio.iniciarCarrusel()">
+                    <div id="avisos-carousel-track" class="flex transition-transform duration-700 ease-out" style="transform: translateX(0%);">
+                        ${AVISOS_CARRUSEL.map(slide => `
+                            <div class="w-full flex-shrink-0 p-8 sm:p-12 relative flex flex-col justify-between min-h-[260px] bg-gradient-to-r ${slide.gradient}">
+                                <div class="absolute -right-6 -bottom-6 w-52 h-52 rounded-full bg-white/[0.03] blur-2xl pointer-events-none"></div>
+                                <div class="space-y-4 max-w-2xl relative z-10 text-left">
+                                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider uppercase border ${slide.badge_bg}">
+                                        <i class="fas ${slide.icon} text-[10px]"></i>
+                                        <span>${slide.tag}</span>
+                                    </div>
+                                    <h2 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight leading-snug drop-shadow-md">
+                                        ${slide.titulo}
+                                    </h2>
+                                    <p class="text-xs sm:text-sm text-neutral-300 font-normal leading-relaxed">
+                                        ${slide.descripcion}
+                                    </p>
+                                </div>
+                                <div class="pt-6 relative z-10 text-left">
+                                    <button onclick="document.getElementById('pc-rif-numero')?.focus(); document.getElementById('pc-rif-numero')?.scrollIntoView({behavior: 'smooth'})"
+                                            class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-black text-xs font-semibold hover:bg-neutral-200 transition shadow-lg">
+                                        <span>${slide.btn_texto}</span>
+                                        <i class="fas ${slide.btn_icono} text-[10px]"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <!-- Controles Flechas -->
+                    <button onclick="window.PortalComercio.moveSlide(-1)" 
+                            class="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 hover:bg-black/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition backdrop-blur-sm border border-white/10 z-20">
+                        <i class="fas fa-chevron-left text-xs"></i>
+                    </button>
+                    <button onclick="window.PortalComercio.moveSlide(1)" 
+                            class="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 hover:bg-black/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition backdrop-blur-sm border border-white/10 z-20">
+                        <i class="fas fa-chevron-right text-xs"></i>
+                    </button>
+
+                    <!-- Puntos Indicadores -->
+                    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
+                        ${AVISOS_CARRUSEL.map((_, idx) => `
+                            <button onclick="window.PortalComercio.goToSlide(${idx})" 
+                                    class="aviso-dot ${idx === 0 ? 'w-8 bg-white' : 'w-2 bg-white/30'} h-1.5 rounded-full transition-all duration-300"></button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        },
+
+        filtrarOrdenanzas: function(cat) {
+            this._categoriaOrdenanzas = cat;
+            const container = document.getElementById('ordenanzas-grid-container');
+            if (container) {
+                container.innerHTML = this.generarTarjetasOrdenanzas();
+            }
+            const pills = document.querySelectorAll('.ord-filter-pill');
+            pills.forEach(p => {
+                const match = p.getAttribute('data-cat') === cat;
+                p.className = match
+                    ? 'ord-filter-pill px-4 py-1.5 rounded-full text-xs font-semibold bg-white text-black shadow-sm transition'
+                    : 'ord-filter-pill px-4 py-1.5 rounded-full text-xs font-medium text-neutral-400 hover:text-white hover:bg-white/[0.06] transition';
+            });
+        },
+
+        generarTarjetasOrdenanzas: function() {
+            const cat = this._categoriaOrdenanzas;
+            const list = cat === 'todas' ? ORDENANZAS_MUNICIPALES : ORDENANZAS_MUNICIPALES.filter(o => o.categoria === cat);
+
+            return list.map(ord => `
+                <div class="p-6 rounded-3xl bg-[#121216] border border-white/[0.08] hover:border-white/20 transition-all duration-300 flex flex-col justify-between space-y-4 group">
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[9px] font-mono font-bold px-2.5 py-0.5 rounded-full border ${ord.badge_color}">
+                                ${ord.tipo_badge}
+                            </span>
+                            <span class="text-[10px] font-mono text-neutral-500">${ord.paginas}</span>
+                        </div>
+                        <div class="space-y-1">
+                            <span class="text-[11px] font-mono text-sky-400 font-semibold block">${ord.numero}</span>
+                            <h3 class="text-sm font-bold text-white group-hover:text-sky-300 transition line-clamp-2 leading-snug">
+                                ${ord.titulo}
+                            </h3>
+                        </div>
+                        <p class="text-xs text-neutral-400 line-clamp-3 leading-relaxed">
+                            ${ord.resumen}
+                        </p>
+                    </div>
+
+                    <div class="pt-4 border-t border-white/5 flex items-center justify-between gap-2">
+                        <button onclick="window.PortalComercio.abrirArticulado('${ord.id}')"
+                                class="text-xs text-neutral-400 hover:text-white font-medium flex items-center gap-1.5 py-1.5 px-3 rounded-full hover:bg-white/5 transition">
+                            <i class="fas fa-list-ul text-[10px] text-sky-400"></i>
+                            <span>Artículos Clave</span>
+                        </button>
+                        <button onclick="window.PortalComercio.descargarOrdenanzaPDF('${ord.id}')"
+                                class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 border border-sky-500/20 text-xs font-semibold transition">
+                            <i class="fas fa-file-pdf text-[10px]"></i>
+                            <span>Descargar</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        },
+
+        renderCentroOrdenanzas: function() {
+            return `
+                <div id="seccion-ordenanzas" class="pt-12 space-y-8 text-left max-w-5xl mx-auto">
+                    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-white/[0.08] pb-6">
+                        <div>
+                            <div class="inline-flex items-center gap-2 text-sky-400 text-xs font-mono font-semibold uppercase tracking-wider mb-2">
+                                <i class="fas fa-balance-scale"></i>
+                                <span>Marco Jurídico Oficial · San José de Guaribe</span>
+                            </div>
+                            <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                                Gacetas y Ordenanzas Municipales
+                            </h2>
+                            <p class="text-xs sm:text-sm text-neutral-400 mt-1">
+                                Consulta y descarga los instrumentos legales que regulan los tributos, catastro y servicios del municipio.
+                            </p>
+                        </div>
+
+                        <!-- Filtros por Categoría -->
+                        <div class="flex items-center gap-1.5 bg-[#141418] p-1 rounded-full border border-white/10 shrink-0 self-start sm:self-auto">
+                            <button onclick="window.PortalComercio.filtrarOrdenanzas('todas')" data-cat="todas"
+                                    class="ord-filter-pill px-4 py-1.5 rounded-full text-xs font-semibold bg-white text-black shadow-sm transition">
+                                Todas
+                            </button>
+                            <button onclick="window.PortalComercio.filtrarOrdenanzas('ordenanzas')" data-cat="ordenanzas"
+                                    class="ord-filter-pill px-4 py-1.5 rounded-full text-xs font-medium text-neutral-400 hover:text-white hover:bg-white/[0.06] transition">
+                                Ordenanzas
+                            </button>
+                            <button onclick="window.PortalComercio.filtrarOrdenanzas('tasas')" data-cat="tasas"
+                                    class="ord-filter-pill px-4 py-1.5 rounded-full text-xs font-medium text-neutral-400 hover:text-white hover:bg-white/[0.06] transition">
+                                Tasas y Aseo
+                            </button>
+                            <button onclick="window.PortalComercio.filtrarOrdenanzas('calendario')" data-cat="calendario"
+                                    class="ord-filter-pill px-4 py-1.5 rounded-full text-xs font-medium text-neutral-400 hover:text-white hover:bg-white/[0.06] transition">
+                                Calendario
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Grid de Ordenanzas -->
+                    <div id="ordenanzas-grid-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        ${this.generarTarjetasOrdenanzas()}
+                    </div>
+                </div>
+            `;
+        },
+
+        renderModalArticulado: function() {
+            return `
+                <div id="modal-articulado-ordenanza" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+                    <div class="bg-[#141418] border border-white/10 rounded-3xl w-full max-w-2xl p-6 sm:p-8 shadow-2xl space-y-6 text-left relative overflow-hidden">
+                        <div class="flex items-start justify-between border-b border-white/10 pb-4">
+                            <div>
+                                <span id="modal-art-gaceta" class="text-[10px] font-mono text-sky-400 uppercase font-bold block mb-1">GACETA MUNICIPAL</span>
+                                <h3 id="modal-art-titulo" class="text-base sm:text-lg font-bold text-white tracking-tight leading-snug">Ordenanza Municipal</h3>
+                            </div>
+                            <button onclick="window.PortalComercio.cerrarModalArticulado()" class="text-neutral-400 hover:text-white p-2">
+                                <i class="fas fa-times text-sm"></i>
+                            </button>
+                        </div>
+
+                        <div class="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+                            <div>
+                                <h4 class="text-xs font-bold uppercase text-neutral-400 mb-1 font-mono">Exposición de Motivos</h4>
+                                <p id="modal-art-resumen" class="text-xs text-neutral-300 leading-relaxed"></p>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-bold uppercase text-neutral-400 mb-2 font-mono">Disposiciones y Artículos Clave</h4>
+                                <div id="modal-art-lista" class="space-y-2"></div>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 border-t border-white/10 flex justify-between items-center">
+                            <span class="text-[10px] text-neutral-500 font-mono">Alcaldía de San José de Guaribe · SATRIMG</span>
+                            <button id="modal-art-descargar-btn" class="px-5 py-2 rounded-full bg-sky-500 hover:bg-sky-400 text-white text-xs font-semibold transition flex items-center gap-2">
+                                <i class="fas fa-file-pdf"></i>
+                                <span>Descargar Documento Oficial</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        },
+
+        abrirArticulado: function(ordId) {
+            const ord = ORDENANZAS_MUNICIPALES.find(o => o.id === ordId);
+            if (!ord) return;
+
+            const modal = document.getElementById('modal-articulado-ordenanza');
+            if (!modal) return;
+
+            document.getElementById('modal-art-gaceta').innerText = ord.numero;
+            document.getElementById('modal-art-titulo').innerText = ord.titulo;
+            document.getElementById('modal-art-resumen').innerText = ord.resumen;
+            
+            const lista = document.getElementById('modal-art-lista');
+            if (lista) {
+                lista.innerHTML = ord.articulos.map(art => `
+                    <div class="p-3 rounded-xl bg-white/[0.03] border border-white/5 text-xs text-neutral-200 leading-relaxed font-mono">
+                        ${art}
+                    </div>
+                `).join('');
+            }
+
+            const dlBtn = document.getElementById('modal-art-descargar-btn');
+            if (dlBtn) {
+                dlBtn.onclick = () => this.descargarOrdenanzaPDF(ord.id);
+            }
+
+            modal.classList.remove('hidden');
+        },
+
+        cerrarModalArticulado: function() {
+            const modal = document.getElementById('modal-articulado-ordenanza');
+            if (modal) modal.classList.add('hidden');
+        },
+
+        descargarOrdenanzaPDF: function(ordId) {
+            const ord = ORDENANZAS_MUNICIPALES.find(o => o.id === ordId);
+            if (!ord) return;
+
+            const jsPDF = (window.jspdf && window.jspdf.jsPDF) ? window.jspdf.jsPDF : null;
+            if (!jsPDF) {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'info',
+                        title: ord.titulo,
+                        html: `<div class="text-left text-xs space-y-2"><p><strong>Gaceta:</strong> ${ord.numero}</p><p>${ord.resumen}</p></div>`,
+                        confirmButtonColor: '#000000'
+                    });
+                }
+                return;
+            }
+
+            const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'letter' });
+            
+            // Membrete Oficial
+            doc.setFillColor(15, 23, 42);
+            doc.rect(0, 0, 216, 28, 'F');
+
+            doc.setTextColor(255, 255, 255);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(10);
+            doc.text('REPÚBLICA BOLIVARIANA DE VENEZUELA', 108, 9, { align: 'center' });
+            doc.setFontSize(9);
+            doc.text('ESTADO BOLIVARIANO DE GUÁRICO · MUNICIPIO SAN JOSÉ DE GUARIBE', 108, 15, { align: 'center' });
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'normal');
+            doc.text('ADMINISTRACIÓN TRIBUTARIA MUNICIPAL (SATRIMG)', 108, 21, { align: 'center' });
+
+            // Barra dorada decorativa
+            doc.setFillColor(217, 119, 6);
+            doc.rect(0, 28, 216, 2, 'F');
+
+            // Encabezado de Documento
+            doc.setTextColor(30, 41, 59);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(12);
+            doc.text(ord.numero.toUpperCase(), 108, 38, { align: 'center' });
+
+            doc.setFontSize(13);
+            doc.setTextColor(2, 132, 199);
+            const titleLines = doc.splitTextToSize(ord.titulo.toUpperCase(), 180);
+            doc.text(titleLines, 108, 46, { align: 'center' });
+
+            let y = 46 + (titleLines.length * 6) + 4;
+
+            // Ficha Técnica
+            doc.setFillColor(248, 250, 252);
+            doc.setDrawColor(226, 232, 240);
+            doc.roundedRect(18, y, 180, 24, 3, 3, 'FD');
+
+            doc.setFontSize(9);
+            doc.setTextColor(71, 85, 105);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Categoría:', 24, y + 7);
+            doc.text('Fecha de Publicación:', 24, y + 14);
+            doc.text('Ámbito Territorial:', 24, y + 21);
+
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(15, 23, 42);
+            doc.text(ord.tipo_badge, 75, y + 7);
+            doc.text(ord.fecha, 75, y + 14);
+            doc.text('Municipio San José de Guaribe, Estado Guárico', 75, y + 21);
+
+            y += 32;
+
+            // Resumen Normativo
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(11);
+            doc.setTextColor(15, 23, 42);
+            doc.text('SÍNTESIS Y EXPOSICIÓN DE MOTIVOS:', 18, y);
+            y += 6;
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9.5);
+            doc.setTextColor(51, 65, 85);
+            const resLines = doc.splitTextToSize(ord.resumen, 180);
+            doc.text(resLines, 18, y);
+            y += (resLines.length * 5) + 6;
+
+            // Artículos Destacados
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(11);
+            doc.setTextColor(15, 23, 42);
+            doc.text('DISPOSICIONES Y ARTÍCULOS CLAVE:', 18, y);
+            y += 6;
+
+            ord.articulos.forEach(art => {
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(9);
+                doc.setTextColor(30, 41, 59);
+                const artLines = doc.splitTextToSize(`• ${art}`, 176);
+                doc.text(artLines, 22, y);
+                y += (artLines.length * 5) + 3;
+            });
+
+            // Sello y Validez
+            y = Math.max(y + 10, 225);
+            doc.setFillColor(241, 245, 249);
+            doc.roundedRect(18, y, 180, 26, 2, 2, 'F');
+
+            doc.setFontSize(8);
+            doc.setTextColor(71, 85, 105);
+            doc.text('DOCUMENTO PÚBLICO DE CONSULTA OFICIAL', 108, y + 6, { align: 'center' });
+            doc.text('Administración Tributaria Municipal · Alcaldía de San José de Guaribe', 108, y + 12, { align: 'center' });
+            doc.text(`Descargado el ${new Date().toLocaleDateString('es-VE')} a través del Sistema Alcaraván SGB V3`, 108, y + 18, { align: 'center' });
+            doc.text('Ley Orgánica de Coordinación y Armonización Tributaria (LOCAT)', 108, y + 23, { align: 'center' });
+
+            doc.save(ord.archivo_nombre || `${ord.id}.pdf`);
+        },
+
+        renderPopupOficial: function() {
+            const popup = POPUP_ACTIVO;
+            if (!popup || !popup.activo) return '';
+
+            return `
+                <div id="modal-popup-oficial" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+                    <div class="bg-[#141418] border border-white/10 rounded-3xl w-full max-w-lg p-6 sm:p-8 shadow-2xl space-y-6 text-center relative overflow-hidden animate-fade-in">
+                        <button onclick="window.PortalComercio.cerrarPopupOficial(false)" 
+                                class="absolute top-4 right-4 text-neutral-400 hover:text-white p-2">
+                            <i class="fas fa-times text-sm"></i>
+                        </button>
+
+                        <div class="space-y-3">
+                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-sky-500/20 to-indigo-500/20 border border-sky-500/30 flex items-center justify-center text-sky-400 text-xl mx-auto shadow-lg">
+                                <i class="fas fa-bullhorn"></i>
+                            </div>
+                            <span class="inline-block px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider uppercase bg-sky-500/10 text-sky-400 border border-sky-500/25">
+                                ${popup.badge}
+                            </span>
+                            <h3 class="text-xl sm:text-2xl font-black text-white tracking-tight leading-snug">
+                                ${popup.titulo}
+                            </h3>
+                            <p class="text-xs sm:text-sm text-neutral-300 leading-relaxed font-normal">
+                                ${popup.mensaje}
+                            </p>
+                        </div>
+
+                        <div class="space-y-3 pt-2">
+                            <button onclick="window.PortalComercio.descargarOrdenanzaPDF('${popup.ordenanza_id}'); window.PortalComercio.cerrarPopupOficial(false)"
+                                    class="w-full py-3 px-6 rounded-full bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-semibold text-xs transition shadow-lg flex items-center justify-center gap-2">
+                                <i class="fas fa-file-pdf"></i>
+                                <span>${popup.enlace_texto}</span>
+                            </button>
+                            <button onclick="window.PortalComercio.cerrarPopupOficial(true)"
+                                    class="text-[11px] text-neutral-400 hover:text-white transition">
+                                Entendido, no volver a mostrar hoy
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        },
+
+        cerrarPopupOficial: function(noMostrarHoy) {
+            const modal = document.getElementById('modal-popup-oficial');
+            if (modal) modal.classList.add('hidden');
+            if (noMostrarHoy) {
+                const hoy = new Date().toISOString().split('T')[0];
+                localStorage.setItem(`alcaravan_popup_${POPUP_ACTIVO.id}_visto`, hoy);
+            }
+        },
+
+        verificarPopup: function() {
+            const hoy = new Date().toISOString().split('T')[0];
+            const visto = localStorage.getItem(`alcaravan_popup_${POPUP_ACTIVO.id}_visto`);
+            if (visto !== hoy) {
+                setTimeout(() => {
+                    const modal = document.getElementById('modal-popup-oficial');
+                    if (modal) modal.classList.remove('hidden');
+                }, 1200);
+            }
+        },
+
         renderConsultaHero: function(container) {
             const tasas = getTasasInfo();
             container.innerHTML = `
-                <div class="max-w-4xl mx-auto space-y-12 py-10 sm:py-16 text-center animate-fade-in">
-                    <!-- Apple Hero Headline -->
-                    <div class="space-y-4">
+                <div class="max-w-5xl mx-auto space-y-12 py-6 sm:py-10 text-center animate-fade-in">
+                    <!-- Carrusel de Avisos y Campañas -->
+                    ${this.renderCarruselAvisos()}
+
+                    <!-- Encabezado Principal -->
+                    <div class="space-y-4 pt-4">
                         <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-sky-500/10 via-indigo-500/10 to-emerald-500/10 border border-white/10 text-neutral-300 text-xs font-medium tracking-wide shadow-sm">
                             <span class="w-2 h-2 rounded-full bg-sky-400 animate-ping"></span>
-                            <span class="text-white font-semibold">Hacienda Digital</span>
+                            <span class="text-white font-semibold">Administración Tributaria</span>
                             <span class="text-neutral-500">·</span>
                             <span class="text-sky-300 font-mono">LOCAT 2026</span>
                         </div>
@@ -77,7 +670,7 @@
                         </p>
                     </div>
 
-                    <!-- Apple Search Capsule con Aura Glowing -->
+                    <!-- Buscador de RIF Normalizado -->
                     <div class="max-w-md mx-auto space-y-4">
                         <div class="relative group">
                             <div class="absolute -inset-1 rounded-full bg-gradient-to-r from-sky-500/30 via-indigo-500/20 to-emerald-500/30 blur-xl opacity-60 group-hover:opacity-100 transition duration-500"></div>
@@ -112,8 +705,8 @@
                         </div>
                     </div>
 
-                    <!-- Carrusel Bento de Tasas de Cambio Oficiales BCV -->
-                    <div class="pt-2 max-w-3xl mx-auto space-y-3">
+                    <!-- Mesa de Cambio Oficial BCV -->
+                    <div class="pt-2 max-w-4xl mx-auto space-y-3">
                         <div class="flex items-center justify-between text-xs text-neutral-400 px-2 font-mono">
                             <span class="flex items-center gap-2">
                                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -160,11 +753,9 @@
                             </div>
                         </div>
                     </div>
-                        </div>
-                    </div>
 
                     <!-- Bento Grid de Módulos Tributarios -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-4 text-left">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-2 text-left max-w-4xl mx-auto">
                         <div class="p-8 rounded-3xl bg-gradient-to-b from-sky-500/[0.07] to-[#111114] border border-sky-500/20 space-y-3 hover:border-sky-400/40 hover:shadow-[0_0_30px_rgba(56,189,248,0.12)] transition duration-300">
                             <div class="w-11 h-11 rounded-2xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-400 text-sm shadow-sm">
                                 <i class="fas fa-suitcase"></i>
@@ -195,10 +786,19 @@
                             </p>
                         </div>
                     </div>
+
+                    <!-- Centro Oficial de Gacetas y Ordenanzas Municipales -->
+                    ${this.renderCentroOrdenanzas()}
                 </div>
 
                 ${this.renderModalInscripcion()}
+                ${this.renderModalArticulado()}
+                ${this.renderPopupOficial()}
             `;
+
+            // Inicializar autoplay de carrusel y verificación de popup
+            this.iniciarCarrusel();
+            this.verificarPopup();
         },
 
         renderDashboardSuite: function(container) {
@@ -631,7 +1231,7 @@
                             <div class="rounded-3xl bg-gradient-to-b from-[#1c1c1e] to-[#0a0a0c] border border-white/10 p-8 sm:p-10 shadow-2xl space-y-8 relative overflow-hidden">
                                 <div class="flex items-center justify-between border-b border-white/10 pb-6">
                                     <div class="space-y-0.5">
-                                        <div class="text-[10px] font-mono text-neutral-400 uppercase tracking-widest">Alcaldía Municipal · Hacienda</div>
+                                        <div class="text-[10px] font-mono text-neutral-400 uppercase tracking-widest">Alcaldía de San José de Guaribe · Administración Tributaria</div>
                                         <h3 class="text-base font-semibold text-white tracking-tight">Certificado de Solvencia</h3>
                                     </div>
                                     <div class="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-medium">
