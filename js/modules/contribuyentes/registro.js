@@ -110,8 +110,11 @@
                                     <input type="email" id="c-correo" required placeholder="contacto@empresa.com" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 text-xs outline-none focus:border-sky-500">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-400 mb-1">Teléfono</label>
-                                    <input type="tel" id="c-telefono" placeholder="0414-1234567" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 text-xs outline-none focus:border-sky-500">
+                                    <label class="block text-xs font-bold text-slate-400 mb-1">Teléfono (Solo Números)</label>
+                                    <input type="tel" id="c-telefono" placeholder="Solo números (ej: 04141234567)" 
+                                           inputmode="numeric" pattern="[0-9]*" maxlength="11"
+                                           oninput="if(window.HaciendaTelefono) window.HaciendaTelefono.handleInput(this); else this.value=this.value.replace(/\D/g, '')"
+                                           class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 text-xs font-mono outline-none focus:border-sky-500">
                                 </div>
                             </div>
                             <div>
@@ -125,7 +128,17 @@
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-slate-400 mb-1">Cédula del Representante</label>
-                                    <input type="text" id="c-rep-cedula" placeholder="V-12345678" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 text-xs outline-none focus:border-sky-500">
+                                    <div class="grid grid-cols-3 gap-2">
+                                        <select id="c-rep-cedula-tipo" class="bg-slate-950 border border-slate-800 rounded-xl px-2 py-2 text-slate-100 text-xs outline-none focus:border-sky-500">
+                                            <option value="V">V (Venezolano)</option>
+                                            <option value="E">E (Extranjero)</option>
+                                            <option value="P">P (Pasaporte)</option>
+                                        </select>
+                                        <input type="text" id="c-rep-cedula-numero" placeholder="Solo números (ej: 12345678)" 
+                                               inputmode="numeric" pattern="[0-9]*" maxlength="9"
+                                               oninput="if(window.HaciendaCedula) window.HaciendaCedula.handleInput(this, 'c-rep-cedula-tipo')"
+                                               class="col-span-2 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 text-xs font-mono outline-none focus:border-sky-500">
+                                    </div>
                                 </div>
                             </div>
                             <div>
@@ -225,16 +238,28 @@
                     throw new Error('El número de RIF es obligatorio y solo debe contener dígitos numéricos.');
                 }
 
+                // Sanitizar Teléfono a solo números
+                const rawTel = document.getElementById('c-telefono')?.value || '';
+                const telSanitizado = (global.HaciendaTelefono ? global.HaciendaTelefono.sanitizar(rawTel) : rawTel.replace(/\D/g, '')).trim();
+
+                // Normalizar Cédula del Representante (Tipo + Solo Números)
+                const tipoCed = document.getElementById('c-rep-cedula-tipo')?.value || 'V';
+                const numCed = document.getElementById('c-rep-cedula-numero')?.value || '';
+                const cedHelper = global.HaciendaCedula;
+                const parsedCedula = cedHelper 
+                    ? cedHelper.parse((tipoCed ? (tipoCed + '-') : '') + numCed) 
+                    : { tipo: tipoCed, numero: numCed.replace(/\D/g, ''), full: numCed ? (tipoCed + '-' + numCed.replace(/\D/g, '')) : '' };
+
                 const nuevo = {
                     rif: parsedRif.full,
                     tipo_persona: document.getElementById('c-tipo').value,
                     razon_social: document.getElementById('c-razon').value.trim(),
                     denominacion_comercial: document.getElementById('c-fantasia').value.trim(),
                     correo: document.getElementById('c-correo').value.trim(),
-                    telefono: document.getElementById('c-telefono').value.trim(),
+                    telefono: telSanitizado,
                     direccion_fiscal: document.getElementById('c-direccion').value.trim(),
                     representante_legal: document.getElementById('c-rep-nombre').value.trim(),
-                    representante_cedula: document.getElementById('c-rep-cedula').value.trim(),
+                    representante_cedula: parsedCedula.full,
                     fotos_local: fotoUrl ? [fotoUrl] : [],
                     estado: 'activo'
                 };

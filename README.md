@@ -178,6 +178,14 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
   - Dimensionamiento de infraestructura y cuotas gratuitas validado para municipios tipo San Jose de Guaribe.
   - Bump de Service Worker a `alcaravan-v3-cache-v3.5.1`.
 
+### Version 3.8.4 — 19/11/2026
+- **Sanitizacion Estricta de Telefonos y Cedula del Representante con Selector:**
+  - Creacion de los servicios auxiliares universales `HaciendaCedula` y `HaciendaTelefono` en `js/core/store.js`.
+  - Normalizador de cedulas de identidad con selector de tipo (`V` - Venezolano, `E` - Extranjero, `P` - Pasaporte) y campo de numero con sanitizacion numerica en tiempo real (`0-9`).
+  - Sanitizacion de telefonos sin guiones, parentesis ni caracteres especiales (`replace(/\D/g, '')`) tanto en `oninput` como al persistir en base de datos.
+  - Implementacion sincronizada en el modal de registro de contribuyentes del ERP (`js/modules/contribuyentes/registro.js`) y en la solicitud de censo comercial del portal (`js/modules/portal-comercio.js`).
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.8.4` y 312 pruebas automaticas en verde.
+
 ### Version 3.8.3 — 19/11/2026
 - **Adopcion Oficial de la Identidad Visual SACCFAG V3 (Tema SGB Silhouettes Light & Corporate):**
   - Reemplazo del tema negro obsidian por la paleta grafica oficial de SACCFAG V3: Fondo claro descansado (`#F8FAFC`), tarjetas y superficies en blanco puro (`#FFFFFF`), bordes sutiles (`#E2E8F0`) y tipografia corporativa de alto contraste en slate oscuro (`#0F172A`).

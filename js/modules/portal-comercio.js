@@ -1901,8 +1901,21 @@
             const parsed = rifHelper ? rifHelper.parse((tipo ? (tipo + '-') : '') + rawNum) : { tipo, numero: rawNum.replace(/\D/g, ''), full: tipo + '-' + rawNum.replace(/\D/g, '') };
             const razon = document.getElementById('ins-razon').value.trim();
             const codigoActividad = document.getElementById('ins-actividad').value;
-            const telefono = document.getElementById('ins-telefono').value.trim();
+
+            // Sanitizar Teléfono a solo dígitos numéricos
+            const rawTel = document.getElementById('ins-telefono')?.value || '';
+            const telefono = (global.HaciendaTelefono ? global.HaciendaTelefono.sanitizar(rawTel) : rawTel.replace(/\D/g, '')).trim();
+
             const correo = document.getElementById('ins-correo').value.trim();
+
+            // Cédula y Representante Legal
+            const repNombre = (document.getElementById('ins-rep-nombre')?.value || '').trim();
+            const tipoCed = document.getElementById('ins-rep-cedula-tipo')?.value || 'V';
+            const numCed = document.getElementById('ins-rep-cedula-numero')?.value || '';
+            const cedHelper = global.HaciendaCedula;
+            const parsedCedula = cedHelper 
+                ? cedHelper.parse((tipoCed ? (tipoCed + '-') : '') + numCed) 
+                : { tipo: tipoCed, numero: numCed.replace(/\D/g, ''), full: numCed ? (tipoCed + '-' + numCed.replace(/\D/g, '')) : '' };
 
             if (!parsed.numero || !razon) {
                 if (typeof Swal !== 'undefined') Swal.fire({ icon: 'warning', title: 'Datos requeridos', text: 'Indica el número de RIF (solo números) y la Razón Social.', confirmButtonColor: '#000000' });
@@ -1923,6 +1936,8 @@
                 correo: correo,
                 telefono: telefono,
                 direccion_fiscal: '',
+                representante_legal: repNombre,
+                representante_cedula: parsedCedula.full,
                 estado: 'activo'
             };
 
@@ -2005,12 +2020,36 @@
 
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label class="text-[11px] font-medium text-neutral-400 uppercase block mb-1">Teléfono</label>
-                                    <input type="text" id="ins-telefono" placeholder="0414-0000000" class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none focus:border-white/30">
+                                    <label class="text-[11px] font-medium text-neutral-400 uppercase block mb-1">Teléfono (Solo Números)</label>
+                                    <input type="tel" id="ins-telefono" placeholder="Solo números (ej: 04141234567)" 
+                                           inputmode="numeric" pattern="[0-9]*" maxlength="11"
+                                           oninput="if(window.HaciendaTelefono) window.HaciendaTelefono.handleInput(this); else this.value=this.value.replace(/\D/g, '')"
+                                           class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none focus:border-white/30 font-mono text-xs">
                                 </div>
                                 <div>
                                     <label class="text-[11px] font-medium text-neutral-400 uppercase block mb-1">Correo Electrónico</label>
-                                    <input type="email" id="ins-correo" placeholder="correo@comercio.com" class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none focus:border-white/30">
+                                    <input type="email" id="ins-correo" placeholder="correo@comercio.com" class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none focus:border-white/30 text-xs">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="text-[11px] font-medium text-neutral-400 uppercase block mb-1">Representante Legal</label>
+                                    <input type="text" id="ins-rep-nombre" placeholder="Nombre y Apellido" class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none focus:border-white/30 text-xs">
+                                </div>
+                                <div>
+                                    <label class="text-[11px] font-medium text-neutral-400 uppercase block mb-1">Cédula del Representante</label>
+                                    <div class="grid grid-cols-3 gap-2">
+                                        <select id="ins-rep-cedula-tipo" class="bg-[#18181b] border border-white/10 text-white rounded-xl px-2 py-2.5 text-xs outline-none focus:border-white/30">
+                                            <option value="V">V</option>
+                                            <option value="E">E</option>
+                                            <option value="P">P</option>
+                                        </select>
+                                        <input type="text" id="ins-rep-cedula-numero" placeholder="Solo números" 
+                                               inputmode="numeric" pattern="[0-9]*" maxlength="9"
+                                               oninput="if(window.HaciendaCedula) window.HaciendaCedula.handleInput(this, 'ins-rep-cedula-tipo')"
+                                               class="col-span-2 bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 text-xs font-mono outline-none focus:border-white/30">
+                                    </div>
                                 </div>
                             </div>
                         </div>

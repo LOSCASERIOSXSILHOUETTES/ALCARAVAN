@@ -251,6 +251,8 @@ const expectedModules = [
     { name: 'HaciendaAuth', methods: ['init', 'loginFuncionario', 'registrarFuncionario', 'hasPermission', 'updateSidebarAcl'] },
     { name: 'TasasBCV', methods: ['init', 'getTasas', 'getTCMMV', 'fetchEnVivo'] },
     { name: 'HaciendaRIF', methods: ['parse', 'format', 'handleInput', 'findMatch'] },
+    { name: 'HaciendaCedula', methods: ['parse', 'format', 'handleInput'] },
+    { name: 'HaciendaTelefono', methods: ['sanitizar', 'handleInput'] },
     { name: 'ContribuyentesModule', methods: ['render'] },
     { name: 'PatentesModule', methods: ['render'] },
     { name: 'DeclaracionesModule', methods: ['render'] },

@@ -198,6 +198,71 @@
 
     global.HaciendaRIF = RIFUtils;
 
+    // Normalizador y validador universal de Cédulas de Identidad
+    const CEDULA_TIPOS = [
+        { code: 'V', label: 'V - Venezolano' },
+        { code: 'E', label: 'E - Extranjero' },
+        { code: 'P', label: 'P - Pasaporte' }
+    ];
+
+    const CedulaUtils = {
+        TIPOS: CEDULA_TIPOS,
+
+        parse: function(input) {
+            if (!input) return { tipo: 'V', numero: '', full: '' };
+            let str = String(input).trim().toUpperCase();
+            let tipo = 'V';
+
+            const m = str.match(/^([VEP])[-_\s]*(.*)$/i);
+            if (m) {
+                tipo = m[1].toUpperCase();
+                str = m[2];
+            }
+            const numero = str.replace(/\D/g, '');
+            const validTipo = ['V', 'E', 'P'].includes(tipo) ? tipo : 'V';
+            return {
+                tipo: validTipo,
+                numero: numero,
+                full: numero ? `${validTipo}-${numero}` : ''
+            };
+        },
+
+        format: function(tipo, numero) {
+            const parsed = this.parse((tipo ? (tipo + '-') : '') + (numero || ''));
+            return parsed.full;
+        },
+
+        handleInput: function(inputEl, selectElId) {
+            if (!inputEl) return;
+            const rawVal = inputEl.value;
+            const parsed = this.parse(rawVal);
+
+            if (selectElId) {
+                const sel = typeof selectElId === 'string' ? document.getElementById(selectElId) : selectElId;
+                if (sel && /^[VEP]/i.test(rawVal.trim())) {
+                    sel.value = parsed.tipo;
+                }
+            }
+            inputEl.value = parsed.numero;
+        }
+    };
+
+    global.HaciendaCedula = CedulaUtils;
+
+    // Sanitizador y validador universal de Teléfonos
+    const TelefonoUtils = {
+        sanitizar: function(input) {
+            return String(input || '').replace(/\D/g, '').trim();
+        },
+
+        handleInput: function(inputEl) {
+            if (!inputEl) return;
+            inputEl.value = inputEl.value.replace(/\D/g, '');
+        }
+    };
+
+    global.HaciendaTelefono = TelefonoUtils;
+
     const Store = {
         _localStore: null,
         _cache: {},
