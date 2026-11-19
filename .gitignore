@@ -1,3 +1,10 @@
+# Credenciales y secretos privados
+.env
+*.env
+credentials.txt
+private_credentials*
+db_secret*
+
 # Logs y temporales
 *.log
 .DS_Store
