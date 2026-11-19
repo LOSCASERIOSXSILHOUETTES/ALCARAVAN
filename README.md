@@ -178,6 +178,13 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
   - Dimensionamiento de infraestructura y cuotas gratuitas validado para municipios tipo San Jose de Guaribe.
   - Bump de Service Worker a `alcaravan-v3-cache-v3.5.1`.
 
+### Version 3.8.2 — 19/11/2026
+- **Cache-Busting forzoso para Scripts de Modulos y Normalizacion de Alias en Auth:**
+  - Adicion de parametro de version `?v=3.8.2` a la inclusion de `gestion.js` en `admin.html` para purgar scripts obsoletos retenidos en la cache del navegador.
+  - Normalizacion automatica de alias (`admin`, `satrimg`) hacia la credencial institucional `systemsatrimg@gmail.com` antes de invocar la API de Supabase Auth para evitar errores HTTP 400 por formato no email.
+  - Pase directo de contingencia hacia el baul offline sin interrupciones en caso de credenciales maestras de arranque.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.8.2`.
+
 ### Version 3.8.1 — 19/11/2026
 - **Suite Automatizada de Pruebas Unitarias y Auditoria SGB (`test-cycle-audit.js`):**
   - Implementacion de 303 pruebas automaticas ejecutables con `node test-cycle-audit.js` o `npm test`.

@@ -84,7 +84,7 @@ coreFiles.forEach(relPath => {
     while ((match = scriptRegex.exec(htmlContent)) !== null) {
         const src = match[1];
         if (!src.startsWith('http')) {
-            const cleanSrc = src.replace(/^\.\//, '');
+            const cleanSrc = src.replace(/^\.\//, '').split('?')[0];
             const scriptPath = path.join(ROOT_DIR, cleanSrc);
             assert(fs.existsSync(scriptPath), `[${htmlFile}] Script referenciado existe: ${cleanSrc}`);
         }

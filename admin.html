@@ -201,7 +201,7 @@
             <div id="erp-auth-demo-box" class="p-3 bg-slate-950 rounded-xl border border-slate-800 text-[11px] space-y-1 text-slate-400">
                 <div class="text-[10px] font-mono uppercase text-slate-500 font-bold">Credenciales Maestras de Inicio:</div>
                 <div class="flex items-center justify-between">
-                    <span>Admin: <strong class="text-sky-400 font-mono">admin</strong></span>
+                    <span>Admin: <strong class="text-sky-400 font-mono">systemsatrimg@gmail.com</strong> (o <strong class="text-sky-400 font-mono">admin</strong>)</span>
                     <button type="button" onclick="window.autocompletarAdmin()" 
                             class="text-[10px] text-sky-400 hover:underline font-mono">Autocompletar</button>
                 </div>
@@ -253,7 +253,7 @@
     <script src="js/modules/solvencias/emisor.js"></script>
     <script src="js/modules/comunicacion/comunicacion.js"></script>
     <script src="js/modules/comunicacion/popups.js"></script>
-    <script src="js/modules/usuarios/gestion.js"></script>
+    <script src="js/modules/usuarios/gestion.js?v=3.8.2"></script>
 
     <!-- Orquestador del ERP Interno -->
     <script>
@@ -324,7 +324,7 @@
         window.autocompletarAdmin = function() {
             const emailInput = document.getElementById('erp-auth-email');
             const passInput = document.getElementById('erp-auth-password');
-            if (emailInput) emailInput.value = 'admin';
+            if (emailInput) emailInput.value = 'systemsatrimg@gmail.com';
             if (passInput) passInput.value = 'Venezuela28754133';
             window.handleAuthSubmit(new Event('submit'));
         };

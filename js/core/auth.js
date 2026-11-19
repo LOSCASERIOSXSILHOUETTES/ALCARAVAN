@@ -239,23 +239,31 @@
                 return { success: false, message: 'Ingresa correo institucional y contraseña.' };
             }
 
-            // Modo en línea con Supabase Auth
-            if (global.supabaseClient && navigator.onLine) {
+            let targetEmail = cleanEmail;
+            if (targetEmail === 'admin' || targetEmail === 'satrimg') {
+                targetEmail = 'systemsatrimg@gmail.com';
+            }
+
+            const esMasterAdmin = (targetEmail === 'systemsatrimg@gmail.com' || cleanEmail === 'admin' || cleanEmail === 'satrimg')
+                               && (cleanPass === 'Venezuela28754133' || cleanPass === 'hacienda2026');
+
+            // Modo en línea con Supabase Auth si tiene formato de correo válido
+            if (global.supabaseClient && navigator.onLine && targetEmail.includes('@')) {
                 try {
                     const { data, error } = await global.supabaseClient.auth.signInWithPassword({
-                        email: cleanEmail,
+                        email: targetEmail,
                         password: cleanPass
                     });
 
                     if (error) {
+                        // Si son credenciales maestras de contingencia, usar pase offline directo sin bloquear
+                        if (esMasterAdmin) {
+                            return await this.loginOffline(targetEmail, cleanPass);
+                        }
                         // Si da error de red, probar fallback al baúl offline
                         const msg = String(error.message || '').toLowerCase();
                         if (msg.includes('fetch') || msg.includes('network') || error.status === 0) {
-                            return await this.loginOffline(cleanEmail, cleanPass);
-                        }
-                        // Credenciales inválidas en Supabase
-                        if (cleanPass === 'Venezuela28754133' && (cleanEmail === 'systemsatrimg@gmail.com' || cleanEmail.includes('admin'))) {
-                            return await this.loginOffline(cleanEmail, cleanPass);
+                            return await this.loginOffline(targetEmail, cleanPass);
                         }
                         return { success: false, message: 'Credenciales incorrectas: ' + error.message };
                     }
@@ -270,18 +278,18 @@
                         }
 
                         // Guardar en baúl para permitir acceso 0ms offline posterior
-                        await saveVaultUser(cleanEmail, cleanPass, data.user);
+                        await saveVaultUser(targetEmail, cleanPass, data.user);
                         this.actualizarUI();
                         return { success: true, user: this._user, profile: this._profile };
                     }
                 } catch (err) {
                     console.warn('[HaciendaAuth] Error en login online, intentando offline:', err);
-                    return await this.loginOffline(cleanEmail, cleanPass);
+                    return await this.loginOffline(targetEmail, cleanPass);
                 }
             }
 
-            // Modo offline sin internet
-            return await this.loginOffline(cleanEmail, cleanPass);
+            // Modo offline sin internet o credenciales maestras
+            return await this.loginOffline(targetEmail, cleanPass);
         },
 
         loginOffline: async function(email, password) {
