@@ -666,7 +666,6 @@
         }
     };
 
-    global.UsuariosModule = Usuarios();
     global.UsuariosModule = Usuarios;
 
 })(typeof window !== 'undefined' ? window : this);
