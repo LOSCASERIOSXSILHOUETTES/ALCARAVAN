@@ -108,7 +108,7 @@
                             </div>
                             <h3 class="text-sm font-semibold text-white">Cuentas y Pagos</h3>
                             <p class="text-xs text-neutral-400 leading-relaxed">
-                                Cuentas recaudadoras oficiales de la Alcaldía y conciliación electrónica a 0ms sin intermediarios.
+                                Cuentas recaudadoras oficiales de la Alcaldía para transferencias y pagos móviles directos.
                             </p>
                         </div>
                     </div>
@@ -471,7 +471,7 @@
                         <div class="p-8 sm:p-10 rounded-3xl bg-[#121214] border border-white/[0.08] shadow-2xl space-y-6">
                             <div class="space-y-1">
                                 <h3 class="text-lg font-semibold text-white">Reportar Transferencia de Impuesto</h3>
-                                <p class="text-xs text-neutral-400">Ingresa la referencia bancaria para su conciliación automática a 0ms.</p>
+                                <p class="text-xs text-neutral-400">Ingresa la referencia bancaria para su verificación y conciliación en taquilla.</p>
                             </div>
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">

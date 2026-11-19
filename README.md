@@ -104,6 +104,12 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.4.1 — 19/11/2026
+- **Depuracion de Terminologia Tecnica e Institucionalizacion de la UI:**
+  - Eliminacion de jerga de desarrollo ("0ms", "SGB", etc.) de todas las vistas, modales, footers y alertas de cara al comerciante y funcionario.
+  - Textos institucionales sobrios adaptados al marco de la LOCAT y administracion tributaria municipal.
+  - Auto-recarga y reemplazo forzoso en Service Worker PWA (`alcaravan-v3-cache-v3.3.0`) para desestimar versiones obsoletas cacheadas en el navegador.
+
 ### Version 3.4.0 — 19/11/2026
 - **Suite Tributaria Apple Bento Grid para el Contribuyente (`index.html`):**
   - Rediseño minimalista Obsidian Apple (#000000 puro, radial glow, SF Pro typography, tarjetas Bento y micro-interacciones a 0ms).

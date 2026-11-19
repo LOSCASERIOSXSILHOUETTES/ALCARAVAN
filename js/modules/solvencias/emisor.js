@@ -19,7 +19,7 @@
                                 Solvencias Municipales Automatizadas
                             </h2>
                             <p class="text-xs text-slate-400 mt-1">
-                                Emisión de Solvencias Únicas, Comerciales y de Inmuebles con verificación de no deuda a 0ms.
+                                Emisión de Solvencias Únicas, Comerciales y de Inmuebles con verificación de solvencia fiscal en línea.
                             </p>
                         </div>
                         <button onclick="window.SolvenciasModule.abrirModalSolvencia()" class="px-5 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs rounded-xl shadow-lg transition flex items-center gap-2">
@@ -158,7 +158,7 @@
                 panel.innerHTML = `
                     <div class="font-bold flex items-center gap-2 text-emerald-400">
                         <i class="fas fa-check-circle"></i>
-                        ESTADO DE CUENTA SOLVENTE (0ms)
+                        ESTADO DE CUENTA SOLVENTE
                     </div>
                     <p class="text-emerald-200">
                         El contribuyente no presenta deudas fiscales vencidas en el sistema. Aprobado para emisión inmediata.

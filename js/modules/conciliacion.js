@@ -520,7 +520,7 @@
                                 <button onclick="window.HaciendaSmartLedger && window.HaciendaSmartLedger.inyectarConciliacion()" 
                                         class="px-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-900/30 transition flex items-center justify-center gap-2">
                                     <i class="fas fa-check-double text-xs"></i>
-                                    <span>Inyectar Conciliación a Hacienda (0ms)</span>
+                                    <span>Inyectar Conciliación a Hacienda</span>
                                 </button>
                             </div>
                         </div>
@@ -680,7 +680,7 @@
                 Swal.fire({
                     icon: 'success',
                     title: 'Día registrado',
-                    text: 'Registro de conciliación guardado a 0ms.',
+                    text: 'Registro de conciliación guardado exitosamente.',
                     timer: 1500,
                     showConfirmButton: false
                 });

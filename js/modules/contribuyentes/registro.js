@@ -116,7 +116,7 @@
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-400 mb-1">Foto del Local / Fachada (ImgBB / Offline 0ms)</label>
+                                <label class="block text-xs font-bold text-slate-400 mb-1">Foto del Local / Fachada Comercial</label>
                                 <input type="file" id="c-foto" accept="image/*" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-slate-300 text-xs file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-sky-600 file:text-white hover:file:bg-sky-500">
                             </div>
                             <div class="pt-4 flex justify-end gap-3 border-t border-slate-800">
@@ -217,7 +217,7 @@
                     Swal.fire({
                         icon: 'success',
                         title: 'Contribuyente Registrado',
-                        text: 'Registrado con éxito en el Padrón Municipal a 0ms.',
+                        text: 'Registrado con éxito en el Padrón Municipal.',
                         confirmButtonColor: '#0284c7',
                         timer: 1800,
                         showConfirmButton: false

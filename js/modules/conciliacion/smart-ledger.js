@@ -431,7 +431,7 @@
         if (global.Swal) {
             const confirm = await global.Swal.fire({
                 title: '¿Inyectar Conciliación?',
-                text: `Se registrarán y conciliarán ${slProcessedData.length} partidas en la cuenta bancaria a 0ms.`,
+                text: `Se registrarán y conciliarán ${slProcessedData.length} partidas en la cuenta bancaria.`,
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#10b981',
@@ -540,7 +540,7 @@
                 global.Swal.fire({
                     icon: 'success',
                     title: '¡Conciliación Guardada!',
-                    text: `Se inyectaron ${agrupadosPorFecha.size} días bancarios a 0ms (${pagosConciliadosTotal} pagos de contribuyentes conciliados y habilitados para Solvencia).`,
+                    text: `Se registraron ${agrupadosPorFecha.size} días bancarios (${pagosConciliadosTotal} pagos de contribuyentes conciliados y habilitados para Solvencia).`,
                     timer: 2500,
                     showConfirmButton: false
                 });
