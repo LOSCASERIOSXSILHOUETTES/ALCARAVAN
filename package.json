@@ -1,0 +1,19 @@
+{
+  "name": "alcaravan-sgb-v3",
+  "version": "3.8.1",
+  "description": "Sistema de Gestion Tributaria Municipal y Hacienda (GUIRIRI SGB V3)",
+  "main": "admin.html",
+  "scripts": {
+    "test": "node test-cycle-audit.js",
+    "check": "node --check js/core/*.js js/modules/**/*.js sw.js"
+  },
+  "keywords": [
+    "tributos",
+    "hacienda",
+    "locat",
+    "sgb",
+    "offline-first"
+  ],
+  "author": "LOSCASERIOSXSILHOUETTES",
+  "license": "UNLICENSED"
+}

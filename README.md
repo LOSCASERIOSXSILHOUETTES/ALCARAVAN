@@ -178,6 +178,15 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
   - Dimensionamiento de infraestructura y cuotas gratuitas validado para municipios tipo San Jose de Guaribe.
   - Bump de Service Worker a `alcaravan-v3-cache-v3.5.1`.
 
+### Version 3.8.1 — 19/11/2026
+- **Suite Automatizada de Pruebas Unitarias y Auditoria SGB (`test-cycle-audit.js`):**
+  - Implementacion de 303 pruebas automaticas ejecutables con `node test-cycle-audit.js` o `npm test`.
+  - Validacion sintactica estricta con compilacion VM (cero tolerancia a `SyntaxError`).
+  - Verificacion de ejecucion en sandbox simulado (previene errores de tipo como `TypeError: X is not a function`).
+  - Auditoria del ciclo sagrado de datos a 0ms para las 16 tablas del sistema tributario (`store.js`, `realtime-sync.js`, `schema_hacienda.sql`).
+  - Auditoria de consistencia en la matriz de permisos ACL (29 permisos granulares validados contra atributos `data-perm` del HTML).
+  - Verificacion de integridad fisica de todos los archivos referenciados en HTML y assets de Service Worker.
+
 ### Version 3.8.0 — 19/11/2026
 - **Sistema de Usuarios Registrados en Supabase y Control de Acceso Granular (ACL) estilo SACCFAG V3:**
   - Registro de la 16ta tabla `user_profiles` en `js/core/store.js` (`TABLES`, `TABLE_SCHEMAS`, `TABLE_ON_CONFLICT`), `js/core/realtime-sync.js` (`SYNCABLE_TABLES`) y `sql/schema_hacienda.sql`.

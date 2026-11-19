@@ -140,7 +140,7 @@
         }
     }
 
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
         window.addEventListener('online', () => {
             if (channel) {
                 try { global.supabaseClient.removeChannel(channel); } catch(_) {}

@@ -97,6 +97,8 @@
     }
 
     const Usuarios = {
+        ROSTER_PERMISOS: ROSTER_PERMISOS,
+
         getUsers: function() {
             const store = global.HaciendaStore;
             return store ? (store.get('user_profiles') || []) : [];
