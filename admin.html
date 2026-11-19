@@ -98,6 +98,11 @@
                     </span>
                 </div>
                 <div class="flex items-center gap-4">
+                    <div id="sync-status-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                        <span>Modo Local (0ms)</span>
+                    </div>
+
                     <div class="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 text-xs">
                         <span class="text-slate-400">Tasa BCV (LOCAT):</span>
                         <span class="font-mono font-bold text-amber-400">56,50 Bs./TCMMV</span>
@@ -175,6 +180,7 @@
         }
     </script>
     <script src="js/core/store.js"></script>
+    <script src="js/core/realtime-sync.js"></script>
     <script src="js/core/auth.js"></script>
     <script src="js/core/uploader.js"></script>
     <script src="js/modules/patentes/catalogo-locat.js"></script>
@@ -199,6 +205,9 @@
                 }
                 if (window.HaciendaStore) {
                     await window.HaciendaStore.init();
+                }
+                if (window.HaciendaRealtime) {
+                    window.HaciendaRealtime.init();
                 }
                 if (window.HaciendaAuth) {
                     window.HaciendaAuth.init();

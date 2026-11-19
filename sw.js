@@ -1,5 +1,5 @@
 // ALCARAVAN — Service Worker Offline-First Cache Engine (SGB Silhouettes V3)
-const CACHE_NAME = 'alcaravan-v3-cache-v3.5.1';
+const CACHE_NAME = 'alcaravan-v3-cache-v3.6.0';
 
 const STATIC_ASSETS = [
     './',
@@ -8,6 +8,7 @@ const STATIC_ASSETS = [
     './manifest.json',
     './js/config.js',
     './js/core/store.js',
+    './js/core/realtime-sync.js',
     './js/core/auth.js',
     './js/core/uploader.js',
     './js/services/tasas-bcv.js',

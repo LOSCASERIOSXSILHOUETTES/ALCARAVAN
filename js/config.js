@@ -7,8 +7,8 @@
 (function defineHaciendaConfig(global) {
     "use strict";
 
-    var DEFAULT_URL = "https://ixkhrgxnmvfoteifkrko.supabase.co";
-    var DEFAULT_ANON_KEY = "sb_publishable_fQjxtJ_edbl3u52Ky8P8ig_JXxlBuLQ";
+    var DEFAULT_URL = "https://jsfxdyeridowlgmhnlrv.supabase.co";
+    var DEFAULT_ANON_KEY = "sb_publishable_k2qo91SV56OwCUc3uS-08A_YfOWPD67";
     var DEFAULT_IMGBB_KEY = "d6e8b23c91a0c8b2a1a8c5e6f3b2d1c0"; // Fallback demo key
 
     global.HACIENDA_CONFIG = Object.freeze({

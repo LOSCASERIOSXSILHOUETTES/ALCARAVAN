@@ -66,6 +66,11 @@
         </div>
 
         <div class="flex items-center gap-4 text-xs">
+            <div id="sync-status-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                <span>Modo Local (0ms)</span>
+            </div>
+
             <div class="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 font-mono text-[11px] shadow-sm">
                 <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
                 <span>TCMMV: <strong data-tasa="tcmmv">1.007,40 Bs.</strong></span>
@@ -226,6 +231,7 @@
         }
     </script>
     <script src="js/core/store.js"></script>
+    <script src="js/core/realtime-sync.js"></script>
     <script src="js/core/auth.js"></script>
     <script src="js/services/tasas-bcv.js"></script>
     <script src="js/modules/patentes/catalogo-locat.js"></script>
@@ -241,6 +247,10 @@
 
             if (window.HaciendaStore) {
                 await window.HaciendaStore.init();
+            }
+
+            if (window.HaciendaRealtime) {
+                window.HaciendaRealtime.init();
             }
 
             const container = document.getElementById('portal-main-content');

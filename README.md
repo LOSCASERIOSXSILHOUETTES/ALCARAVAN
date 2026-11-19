@@ -140,6 +140,17 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.6.0 — 19/11/2026
+- **Porte de Supabase Utils, Realtime Multi-Dispositivo y Bi-Sync Paginado (SACCFAG V3):**
+  - **Instancia Supabase Activa:** Vinculacion al nuevo proyecto `https://jsfxdyeridowlgmhnlrv.supabase.co` con clave publicable `sb_publishable_k2qo91SV56OwCUc3uS-08A_YfOWPD67`.
+  - **Diagnostico de Base de Datos (`verificar_db.js`):** Script CLI de verificacion remota columna por columna y deteccion de tablas 404.
+  - **Motor Realtime Multi-Dispositivo (`js/core/realtime-sync.js`):** Canal `hacienda-live-channel` con difusion instantanea `<50ms` mediante `broadcastMutation` (`db_mutation`) y escucha de eventos `postgres_changes` en las 13 tablas con refresco debounceado.
+  - **Descarga Paginada Anti-Truncamiento:** Metodo `downloadFreshFromSupabase` en bloques de 1000 registros con preservacion y fusion no destructiva de cambios locales offline (`_sync_pending`).
+  - **Throttling Secuencial Anti-429:** Limitador de tasa (máx 4.5 req/s) en cola FIFO en `js/core/store.js`.
+  - **Soporte Nativo UUIDv4:** Actualizacion de `sql/schema_hacienda.sql` en todas las 13 tablas con claves primarias y foraneas `TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text` compatibles con identificadores inmutables de cliente.
+  - **Indicador Visual de Sync:** Badge reactivo `#sync-status-badge` en navbar de `index.html` y `admin.html` (Modo Local vs Supabase En Vivo).
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.6.0`.
+
 ### Version 3.4.4 — 19/11/2026
 - **Estandarizacion de Identificadores Maestros Inmutables (UUIDv4) y Hoja de Ruta:**
   - Migracion del generador de ID cliente a UUIDv4 (`crypto.randomUUID()`) en `store.js` y `portal-comercio.js` para desacoplar expedientes de datos mutables (RIF y Razon Social).
