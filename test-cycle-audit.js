@@ -46,6 +46,7 @@ console.log("--- 1. VERIFICACION DE ARCHIVOS ESTRUCTURALES ---");
 const coreFiles = [
     'index.html',
     'admin.html',
+    'styles.css',
     'sw.js',
     'manifest.json',
     'verificar_db.js',

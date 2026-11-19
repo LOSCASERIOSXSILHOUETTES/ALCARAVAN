@@ -178,6 +178,14 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
   - Dimensionamiento de infraestructura y cuotas gratuitas validado para municipios tipo San Jose de Guaribe.
   - Bump de Service Worker a `alcaravan-v3-cache-v3.5.1`.
 
+### Version 3.8.3 — 19/11/2026
+- **Adopcion Oficial de la Identidad Visual SACCFAG V3 (Tema SGB Silhouettes Light & Corporate):**
+  - Reemplazo del tema negro obsidian por la paleta grafica oficial de SACCFAG V3: Fondo claro descansado (`#F8FAFC`), tarjetas y superficies en blanco puro (`#FFFFFF`), bordes sutiles (`#E2E8F0`) y tipografia corporativa de alto contraste en slate oscuro (`#0F172A`).
+  - Incorporacion de `styles.css` con acentos morados e indigo SGB (`#7C3AED` / `#4F46E5`), gradiente violeta oficial (`linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)`) y efectos de resplandor (`glow-morado`) en botones primarios, badges de estado y selector activo del sidebar.
+  - Formulario e inputs con estilo institucional: fondo blanco, bordes `#CBD5E1` y foco morado interactivo.
+  - Activacion por defecto de `class="sgb-light"` en `admin.html` e `index.html` con persistencia en `localStorage`.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.8.3` con inclusion de `styles.css` en la cache offline.
+
 ### Version 3.8.2 — 19/11/2026
 - **Cache-Busting forzoso para Scripts de Modulos y Normalizacion de Alias en Auth:**
   - Adicion de parametro de version `?v=3.8.2` a la inclusion de `gestion.js` en `admin.html` para purgar scripts obsoletos retenidos en la cache del navegador.

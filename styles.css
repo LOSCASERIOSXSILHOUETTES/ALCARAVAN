@@ -1,0 +1,936 @@
+/* =========================================================================
+   SACCFAG V3 — TEMA SGB SILHOUETTES: CLARO CON MORADO
+   Estilo gráfico premium inspirado en SGB Silhouettes (Fondo claro + Acentos Violeta/Índigo)
+   ========================================================================= */
+
+:root {
+    --sgb-bg: #F8FAFC;
+    --sgb-surface: #FFFFFF;
+    --sgb-surface-card: #FFFFFF;
+    --sgb-surface-muted: #F1F5F9;
+    --sgb-border: #E2E8F0;
+    --sgb-border-subtle: #F1F5F9;
+    --sgb-text-main: #0F172A;
+    --sgb-text-muted: #64748B;
+    --sgb-text-light: #94A3B8;
+    
+    /* Acentos Morado e Índigo SGB */
+    --sgb-purple: #7C3AED;
+    --sgb-purple-dark: #6D28D9;
+    --sgb-purple-light: #8B5CF6;
+    --sgb-indigo: #4F46E5;
+    --sgb-indigo-dark: #4338CA;
+    --sgb-gradient-morado: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+    --sgb-gradient-morado-hover: linear-gradient(135deg, #4338CA 0%, #6D28D9 100%);
+    --sgb-glow-morado: 0 4px 14px rgba(124, 58, 237, 0.32);
+    --sgb-badge-morado-bg: rgba(124, 58, 237, 0.08);
+    --sgb-badge-morado-border: rgba(124, 58, 237, 0.22);
+    
+    /* Estados Semánticos SGB */
+    --sgb-emerald: #10B981;
+    --sgb-rose: #EF4444;
+    --sgb-amber: #F59E0B;
+}
+
+/* =========================================================================
+   REGLAS DEL TEMA CLARO CON MORADO (.sgb-light)
+   ========================================================================= */
+
+html.sgb-light body {
+    background-color: var(--sgb-bg) !important;
+    color: var(--sgb-text-main) !important;
+}
+
+/* Scrollbars SGB Claro */
+html.sgb-light ::-webkit-scrollbar-track {
+    background: #F1F5F9 !important;
+}
+html.sgb-light ::-webkit-scrollbar-thumb {
+    background: #CBD5E1 !important;
+    border-radius: 4px;
+}
+html.sgb-light ::-webkit-scrollbar-thumb:hover {
+    background: #94A3B8 !important;
+}
+
+/* Estructura Base: Sidebar, Header y Main */
+html.sgb-light #saccfag-sidebar {
+    background-color: #FFFFFF !important;
+    border-right-color: #E2E8F0 !important;
+    box-shadow: 2px 0 16px rgba(15, 23, 42, 0.04) !important;
+}
+
+html.sgb-light header {
+    background-color: #FFFFFF !important;
+    border-bottom-color: #E2E8F0 !important;
+    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04) !important;
+}
+
+html.sgb-light #app-content {
+    background-color: #F8FAFC !important;
+}
+
+/* Re-mapeo Universal de Tarjetas, Paneles y Contenedores a Blanco SGB */
+html.sgb-light [class*="bg-slate-800"],
+html.sgb-light [class*="bg-slate-900"],
+html.sgb-light [class*="bg-slate-950"],
+html.sgb-light .bg-slate-800,
+html.sgb-light .bg-slate-900,
+html.sgb-light .bg-slate-950 {
+    background-color: #FFFFFF !important;
+    border-color: #E2E8F0 !important;
+}
+
+/* Hover suave en filas y contenedores */
+html.sgb-light .hover\:bg-slate-800\/40:hover,
+html.sgb-light .hover\:bg-slate-800\/60:hover,
+html.sgb-light .hover\:bg-slate-800:hover,
+html.sgb-light .hover\:bg-slate-900\/40:hover {
+    background-color: rgba(124, 58, 237, 0.04) !important;
+}
+
+/* Cards internas de resumen, métricas y resultados (Calculadora y Paneles) */
+html.sgb-light .p-3.rounded-xl[class*="bg-slate-"],
+html.sgb-light .p-4.rounded-xl[class*="bg-slate-"],
+html.sgb-light .p-3.rounded-2xl[class*="bg-slate-"],
+html.sgb-light .p-4.rounded-2xl[class*="bg-slate-"] {
+    background-color: #F8FAFC !important;
+    border: 1px solid #E2E8F0 !important;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+}
+
+html.sgb-light .p-3.rounded-xl[class*="bg-slate-"] span,
+html.sgb-light .p-4.rounded-xl[class*="bg-slate-"] span,
+html.sgb-light .p-3.rounded-2xl[class*="bg-slate-"] span,
+html.sgb-light .p-4.rounded-2xl[class*="bg-slate-"] span {
+    color: #475569 !important;
+}
+
+/* Card Destacada TOTAL ANUAL USABLE en Calculadora */
+html.sgb-light .bg-gradient-to-br.from-indigo-950\/60 {
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.05) 0%, rgba(124, 58, 237, 0.08) 100%) !important;
+    border: 1px solid rgba(124, 58, 237, 0.25) !important;
+    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.08) !important;
+}
+
+html.sgb-light .bg-gradient-to-br.from-indigo-950\/60 span {
+    color: var(--sgb-purple) !important;
+}
+
+/* Valores y totales en Calculadora Anual con alto contraste */
+html.sgb-light #calc-display-bruto-variable,
+html.sgb-light #calc-display-total-variable-usable {
+    color: #D97706 !important; /* Ámbar 600 contrastado */
+}
+
+html.sgb-light #calc-display-total-fijo-usable {
+    color: #4F46E5 !important; /* Índigo SGB */
+}
+
+html.sgb-light #calc-display-total-entes {
+    color: #7C3AED !important; /* Morado SGB */
+}
+
+html.sgb-light #calc-display-total-usable {
+    color: #059669 !important; /* Esmeralda 600 */
+}
+
+/* Sombras Suaves en Cards */
+html.sgb-light .rounded-3xl.bg-slate-900\/80,
+html.sgb-light .rounded-2xl.bg-slate-900\/90,
+html.sgb-light .rounded-3xl.border-slate-800,
+html.sgb-light .rounded-2xl.border-slate-800 {
+    box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.05), 0 2px 4px -2px rgba(15, 23, 42, 0.03) !important;
+}
+
+/* Bordes SGB Claro */
+html.sgb-light .border-slate-800,
+html.sgb-light .border-slate-800\/60,
+html.sgb-light .border-slate-800\/80,
+html.sgb-light .border-slate-800\/90,
+html.sgb-light .border-slate-700,
+html.sgb-light .border-slate-700\/60 {
+    border-color: #E2E8F0 !important;
+}
+
+/* Textos adaptados para fondo claro */
+html.sgb-light .text-white,
+html.sgb-light .text-slate-100,
+html.sgb-light .text-slate-200,
+html.sgb-light .text-slate-300 {
+    color: #0F172A !important;
+}
+
+html.sgb-light .text-slate-400 {
+    color: #64748B !important;
+}
+
+html.sgb-light .text-slate-500 {
+    color: #94A3B8 !important;
+}
+
+/* =========================================================================
+   ELEMENTOS CON EL TOQUE MORADO SGB
+   ========================================================================= */
+
+/* Logo y Acento Superior del Sidebar */
+html.sgb-light .w-9.h-9.rounded-xl.bg-gradient-to-tr {
+    background: var(--sgb-gradient-morado) !important;
+    box-shadow: var(--sgb-glow-morado) !important;
+}
+html.sgb-light .w-9.h-9.rounded-xl.bg-gradient-to-tr .bg-slate-950 {
+    background-color: #FFFFFF !important;
+}
+
+/* =========================================================================
+   ETIQUETAS MORADAS CON FONDO BLANCO SGB (Badges, Tags, Chips, Contadores)
+   ========================================================================= */
+
+html.sgb-light .text-sky-400,
+html.sgb-light .text-sky-500,
+html.sgb-light .text-indigo-400,
+html.sgb-light .text-indigo-500 {
+    color: var(--sgb-purple) !important;
+}
+
+/* Etiquetas con Fondo Blanco y Borde/Letras Moradas */
+html.sgb-light .bg-sky-500\/10,
+html.sgb-light .bg-sky-500\/20,
+html.sgb-light .bg-indigo-500\/10,
+html.sgb-light .bg-indigo-500\/20,
+html.sgb-light .bg-purple-500\/10,
+html.sgb-light .bg-purple-500\/20,
+html.sgb-light .rounded-full.bg-slate-800,
+html.sgb-light span.bg-slate-800,
+html.sgb-light span.bg-slate-800\/80,
+html.sgb-light #sync-status-badge:not(.bg-emerald-500\/10),
+html.sgb-light #concil-badge-conteo,
+html.sgb-light code.bg-slate-800 {
+    background-color: #FFFFFF !important;
+    border: 1px solid rgba(124, 58, 237, 0.28) !important;
+    color: var(--sgb-purple) !important;
+    box-shadow: 0 1px 3px rgba(124, 58, 237, 0.08) !important;
+}
+
+/* Contenido interno de etiquetas moradas */
+html.sgb-light .rounded-full.bg-slate-800,
+html.sgb-light .rounded-full.bg-slate-800 *,
+html.sgb-light span.bg-slate-800,
+html.sgb-light span.bg-slate-800 *,
+html.sgb-light #sync-status-badge:not(.bg-emerald-500\/10),
+html.sgb-light #sync-status-badge:not(.bg-emerald-500\/10) *,
+html.sgb-light #concil-badge-conteo,
+html.sgb-light code.bg-slate-800 {
+    color: var(--sgb-purple) !important;
+}
+
+/* Indicador de estado offline o en espera */
+html.sgb-light #sync-status-badge .bg-slate-400 {
+    background-color: var(--sgb-purple) !important;
+}
+
+/* Botones secundarios (Editar, Pasar todo, etc.) con bg-slate-800 */
+html.sgb-light button.bg-slate-800,
+html.sgb-light button.bg-slate-700 {
+    background-color: #FFFFFF !important;
+    border-color: #CBD5E1 !important;
+    color: #334155 !important;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
+}
+
+html.sgb-light button.bg-slate-800:hover,
+html.sgb-light button.bg-slate-700:hover {
+    background-color: rgba(124, 58, 237, 0.06) !important;
+    border-color: rgba(124, 58, 237, 0.35) !important;
+    color: var(--sgb-purple) !important;
+}
+
+html.sgb-light button.bg-slate-800 i,
+html.sgb-light button.bg-slate-800 span {
+    color: inherit !important;
+}
+
+/* Botones de Navegación del Sidebar */
+html.sgb-light .nav-tab-btn {
+    color: #475569 !important;
+}
+html.sgb-light .nav-tab-btn:hover {
+    background-color: rgba(124, 58, 237, 0.06) !important;
+    color: var(--sgb-purple) !important;
+}
+html.sgb-light .nav-tab-btn.bg-sky-600\/20,
+html.sgb-light .nav-tab-btn[data-active="true"] {
+    background: var(--sgb-gradient-morado) !important;
+    color: #FFFFFF !important;
+    border-color: transparent !important;
+    box-shadow: var(--sgb-glow-morado) !important;
+}
+html.sgb-light .nav-tab-btn.bg-sky-600\/20 i,
+html.sgb-light .nav-tab-btn.bg-sky-600\/20 span {
+    color: #FFFFFF !important;
+}
+
+/* Botones Primarios y Acciones Principales con Morado SGB */
+html.sgb-light .bg-gradient-to-r.from-sky-600,
+html.sgb-light .bg-sky-600,
+html.sgb-light .bg-sky-500,
+html.sgb-light .saccfag-auth-btn {
+    background: var(--sgb-gradient-morado) !important;
+    color: #FFFFFF !important;
+    border: none !important;
+    box-shadow: var(--sgb-glow-morado) !important;
+}
+
+html.sgb-light .bg-gradient-to-r.from-sky-600:hover,
+html.sgb-light .bg-sky-600:hover,
+html.sgb-light .bg-sky-500:hover,
+html.sgb-light .saccfag-auth-btn:hover {
+    background: var(--sgb-gradient-morado-hover) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(124, 58, 237, 0.42) !important;
+}
+
+/* Avatar de Usuario en Header y Sidebar */
+html.sgb-light #sidebar-user-initial,
+html.sgb-light #header-user-initial {
+    background: var(--sgb-gradient-morado) !important;
+    color: #FFFFFF !important;
+    box-shadow: var(--sgb-glow-morado) !important;
+    border: none !important;
+}
+
+/* Botón Instalar PWA */
+html.sgb-light #nav-install-pwa-btn {
+    background: rgba(16, 185, 129, 0.08) !important;
+    border-color: rgba(16, 185, 129, 0.25) !important;
+    color: #059669 !important;
+}
+
+/* =========================================================================
+   INPUTS Y FORMULARIOS SGB CLARO
+   ========================================================================= */
+
+html.sgb-light input:not([type="checkbox"]):not([type="radio"]),
+html.sgb-light select,
+html.sgb-light textarea {
+    background-color: #FFFFFF !important;
+    color: #0F172A !important;
+    border-color: #CBD5E1 !important;
+}
+
+html.sgb-light input:not([type="checkbox"]):not([type="radio"]):focus,
+html.sgb-light select:focus,
+html.sgb-light textarea:focus {
+    border-color: var(--sgb-purple) !important;
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.16) !important;
+    outline: none !important;
+}
+
+html.sgb-light input[type="date"] {
+    color-scheme: light !important;
+}
+
+/* Selector Reactivo de Ente en Header de Ingresos */
+html.sgb-light #ingresos-ente-selector {
+    color: #0F172A !important;
+}
+html.sgb-light #ingresos-ente-selector option {
+    background-color: #FFFFFF !important;
+    color: #0F172A !important;
+}
+
+/* =========================================================================
+   TABLAS EN TEMA SGB CLARO
+   ========================================================================= */
+
+html.sgb-light table thead {
+    background-color: #F1F5F9 !important;
+    color: #475569 !important;
+    border-bottom: 1px solid #E2E8F0 !important;
+}
+
+html.sgb-light table thead th {
+    color: #475569 !important;
+    font-weight: 700 !important;
+}
+
+html.sgb-light table tbody tr {
+    background-color: #FFFFFF !important;
+    border-bottom: 1px solid #F1F5F9 !important;
+}
+
+html.sgb-light table tbody tr:hover {
+    background-color: #F8FAFC !important;
+}
+
+/* Separadores de Día en Conciliación y Smart Ledger (Morado SGB) */
+html.sgb-light tr.bg-blue-900\/40,
+html.sgb-light tr.border-blue-800 {
+    background-color: #F5F3FF !important; /* Violet 50 */
+    border-top: 1px solid #DDD6FE !important;
+    border-bottom: 1px solid #DDD6FE !important;
+}
+
+html.sgb-light tr.bg-blue-900\/40 span,
+html.sgb-light tr.bg-blue-900\/40 td {
+    color: #6D28D9 !important; /* Violet 700 */
+}
+
+/* Insignias de totales en los separadores de día */
+html.sgb-light tr.bg-blue-900\/40 .bg-blue-950 {
+    background-color: #FFFFFF !important;
+    border-color: #DDD6FE !important;
+}
+
+/* =========================================================================
+   MODALES Y SWEETALERT2 SGB CLARO
+   ========================================================================= */
+
+html.sgb-light .swal2-popup {
+    background: #FFFFFF !important;
+    color: #0F172A !important;
+    border: 1px solid #E2E8F0 !important;
+    box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.18) !important;
+    border-radius: 1.5rem !important;
+}
+
+html.sgb-light .swal2-title {
+    color: #0F172A !important;
+}
+
+html.sgb-light .swal2-html-container {
+    color: #475569 !important;
+}
+
+html.sgb-light .swal2-confirm {
+    background: var(--sgb-gradient-morado) !important;
+    box-shadow: var(--sgb-glow-morado) !important;
+    border-radius: 0.75rem !important;
+}
+
+html.sgb-light .swal2-cancel {
+    background: #E2E8F0 !important;
+    color: #475569 !important;
+    border-radius: 0.75rem !important;
+}
+
+/* Modales nativos (Transferencias, Carga Rápida, Nuevo Día) */
+html.sgb-light #concil-modal-dia .bg-slate-900,
+html.sgb-light #concil-modal-transferencia .bg-slate-900,
+html.sgb-light #concil-modal-reintegro .bg-slate-900,
+html.sgb-light #concil-modal-monthly .bg-slate-900,
+html.sgb-light #concil-modal-historial-transf .bg-slate-900 {
+    background-color: #FFFFFF !important;
+    border-color: #E2E8F0 !important;
+    box-shadow: 0 25px 60px rgba(15, 23, 42, 0.15) !important;
+}
+
+html.sgb-light #concil-modal-dia .bg-slate-950,
+html.sgb-light #concil-modal-transferencia .bg-slate-950,
+html.sgb-light #concil-modal-reintegro .bg-slate-950,
+html.sgb-light #concil-modal-monthly .bg-slate-950 {
+    background-color: #F8FAFC !important;
+    border-color: #E2E8F0 !important;
+}
+
+/* Pantalla de Login SGB Claro */
+html.sgb-light #saccfag-login-overlay {
+    background: #F1F5F9 !important;
+}
+html.sgb-light .saccfag-login-card {
+    background: #FFFFFF !important;
+    border-color: #E2E8F0 !important;
+    box-shadow: 0 25px 60px rgba(15, 23, 42, 0.08) !important;
+}
+html.sgb-light .saccfag-login-card h2 {
+    color: #0F172A !important;
+}
+
+/* ==========================================================================
+   OPTIMIZACIONES MÓVILES: VIEWPORT 100dvh, SCROLL SUAVE Y BARRAS FLOTANTES
+   ========================================================================== */
+@supports (height: 100dvh) {
+    body {
+        height: 100dvh !important;
+    }
+}
+
+#app-content {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+}
+
+@media (max-width: 768px) {
+    #app-content {
+        padding-bottom: 7rem !important;
+    }
+}
+
+/* Soporte Tema Claro para barras de acción sticky */
+html.sgb-light .sticky.bottom-2 {
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    border-color: #E2E8F0 !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Modales y Visor de Auditoría Forense - Scroll óptimo y touch friendly */
+#modal-visor-expediente {
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+}
+
+#visor-modal-nav {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+#visor-modal-nav::-webkit-scrollbar {
+    display: none;
+}
+
+/* ==========================================================================
+   WIDGET BCV Y BADGES MONETARIOS (ALTA LEGIBILIDAD Y CONTRASTE)
+   ========================================================================== */
+#bcv-widget {
+    background-color: #020617 !important;
+    border: 1px solid rgba(16, 185, 129, 0.5) !important;
+    color: #FFFFFF !important;
+}
+
+#bcv-widget #widget-bcv-price {
+    color: #FFFFFF !important;
+    font-weight: 900 !important;
+    letter-spacing: -0.02em;
+}
+
+#bcv-widget .text-emerald-400,
+#bcv-widget i.fa-dollar-sign {
+    color: #34D399 !important;
+}
+
+#bcv-widget #widget-bcv-date {
+    color: #94A3B8 !important;
+}
+
+html.sgb-light #bcv-widget {
+    background-color: #ECFDF5 !important;
+    border: 1px solid #A7F3D0 !important;
+    color: #065F46 !important;
+    box-shadow: 0 1px 3px rgba(6, 95, 70, 0.08) !important;
+}
+
+html.sgb-light #bcv-widget #widget-bcv-price {
+    color: #065F46 !important;
+    font-weight: 900 !important;
+}
+
+html.sgb-light #bcv-widget .text-emerald-400,
+html.sgb-light #bcv-widget i.fa-dollar-sign {
+    color: #059669 !important;
+}
+
+html.sgb-light #bcv-widget #widget-bcv-date {
+    color: #047857 !important;
+}
+
+.usd-badge {
+    background-color: rgba(2, 6, 23, 0.9) !important;
+    border: 1px solid rgba(16, 185, 129, 0.4) !important;
+    color: #34D399 !important;
+}
+
+html.sgb-light .usd-badge {
+    background-color: #ECFDF5 !important;
+    border: 1px solid #A7F3D0 !important;
+    color: #065F46 !important;
+}
+
+/* =========================================================================
+   CAPAS Z-INDEX PARA MODALES Y OVERLAYS (Soporte CSS nativo)
+   ========================================================================= */
+.z-\[60\] { z-index: 60 !important; }
+.z-\[70\] { z-index: 70 !important; }
+.z-\[90\] { z-index: 90 !important; }
+.z-\[100\] { z-index: 100 !important; }
+.z-\[1000\] { z-index: 1000 !important; }
+
+#ejec-modal-overlay,
+#ref-modal-overlay,
+#modal-visor-expediente,
+#modal-busqueda-partida,
+#modal-catalogo-partidas,
+.sgb-modal-overlay {
+    z-index: 9999 !important;
+}
+
+/* =========================================================================
+   SCROLLBAR UNIVERSAL PARA MODALES Y LISTAS (.custom-scrollbar)
+   ========================================================================= */
+.custom-scrollbar {
+    scrollbar-width: thin !important;
+    scrollbar-color: #64748b rgba(15, 23, 42, 0.6) !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 8px !important;
+    height: 8px !important;
+    display: block !important;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.6) !important;
+    border-radius: 9999px !important;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #64748b !important;
+    border-radius: 9999px !important;
+    border: 2px solid rgba(15, 23, 42, 0.6) !important;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8 !important;
+}
+
+/* =========================================================================
+   CONTENEDOR Y LISTA SCROLLEABLE PARA MODALES DE BENEFICIARIOS
+   ========================================================================= */
+.modal-beneficiarios-card {
+    max-height: 85vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+}
+
+.modal-beneficiarios-scroll {
+    max-height: 50vh !important;
+    min-height: 140px !important;
+    overflow-y: scroll !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: #64748b #0f172a !important;
+}
+
+.modal-beneficiarios-scroll::-webkit-scrollbar {
+    width: 8px !important;
+    height: 8px !important;
+    display: block !important;
+}
+
+.modal-beneficiarios-scroll::-webkit-scrollbar-track {
+    background: #0f172a !important;
+    border-radius: 6px !important;
+}
+
+.modal-beneficiarios-scroll::-webkit-scrollbar-thumb {
+    background: #64748b !important;
+    border-radius: 6px !important;
+    border: 2px solid #0f172a !important;
+}
+
+.modal-beneficiarios-scroll::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8 !important;
+}
+
+/* En tema claro sgb-light el interior del modal es dark slate */
+html.sgb-light .modal-beneficiarios-scroll {
+    scrollbar-color: #64748b #0f172a !important;
+}
+html.sgb-light .modal-beneficiarios-scroll::-webkit-scrollbar-track {
+    background: #0f172a !important;
+}
+html.sgb-light .modal-beneficiarios-scroll::-webkit-scrollbar-thumb {
+    background: #64748b !important;
+    border: 2px solid #0f172a !important;
+}
+html.sgb-light .modal-beneficiarios-scroll::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8 !important;
+}
+
+/* Prevenir que la rueda del raton modifique inputs numericos y congele el scroll en modales */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+/* Modales de Retenciones y Comprobantes - Scroll Suave Universal */
+#modal-comprobante-form,
+#modal-asig-detalles-factura,
+#modal-exportar-txt-seniat {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+}
+
+#modal-comprobante-form .custom-scrollbar,
+#modal-asig-detalles-factura .custom-scrollbar {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+}
+
+/* =========================================================================
+   SCROLLBAR DE ALTA VISIBILIDAD PARA PC DE ESCRITORIO (REFORMULACIONES Y TABLAS)
+   ========================================================================= */
+.ref-scroll-container {
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: #64748b #090d16 !important;
+    -webkit-overflow-scrolling: touch !important;
+}
+
+.ref-scroll-container::-webkit-scrollbar {
+    width: 10px !important;
+    height: 10px !important;
+    display: block !important;
+}
+
+.ref-scroll-container::-webkit-scrollbar-track {
+    background: #090d16 !important;
+    border-radius: 6px !important;
+    border: 1px solid rgba(51, 65, 85, 0.4) !important;
+}
+
+.ref-scroll-container::-webkit-scrollbar-thumb {
+    background: #64748b !important;
+    border-radius: 6px !important;
+    border: 2px solid #090d16 !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+}
+
+.ref-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: #0284c7 !important;
+}
+
+.ref-scroll-container::-webkit-scrollbar-corner {
+    background: #090d16 !important;
+}
+
+/* =========================================================================
+   REGLAS ESPECÍFICAS PARA ALCARAVAN / ADMINISTRACIÓN TRIBUTARIA (SGB LIGHT)
+   Colores corporativos oficiales de SACCFAG V3 (Fondo claro + Morado SGB)
+   ========================================================================= */
+
+html.sgb-light body {
+    background-color: #F8FAFC !important;
+    color: #0F172A !important;
+}
+
+/* Sidebar ERP en Blanco Puro con Borde Sutil y Sombra Suave */
+html.sgb-light aside,
+html.sgb-light #erp-app-wrapper aside {
+    background-color: #FFFFFF !important;
+    border-right: 1px solid #E2E8F0 !important;
+    box-shadow: 2px 0 16px rgba(15, 23, 42, 0.04) !important;
+}
+
+html.sgb-light aside .border-b,
+html.sgb-light aside .border-t {
+    border-color: #E2E8F0 !important;
+}
+
+/* Header ERP en Blanco Puro */
+html.sgb-light header,
+html.sgb-light #erp-app-wrapper header {
+    background-color: #FFFFFF !important;
+    border-bottom: 1px solid #E2E8F0 !important;
+    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04) !important;
+}
+
+/* Área de Trabajo Principal */
+html.sgb-light #app-main-content,
+html.sgb-light main,
+html.sgb-light #erp-app-wrapper main {
+    background-color: #F8FAFC !important;
+}
+
+/* Botones de Navegación del Sidebar */
+html.sgb-light .nav-link {
+    color: #475569 !important;
+    transition: all 0.15s ease-in-out !important;
+}
+
+html.sgb-light .nav-link:hover {
+    background-color: rgba(124, 58, 237, 0.06) !important;
+    color: var(--sgb-purple) !important;
+}
+
+html.sgb-light .nav-link.bg-sky-600\/20,
+html.sgb-light .nav-link[data-active="true"] {
+    background: var(--sgb-gradient-morado) !important;
+    color: #FFFFFF !important;
+    border-color: transparent !important;
+    box-shadow: var(--sgb-glow-morado) !important;
+}
+
+html.sgb-light .nav-link.bg-sky-600\/20 i,
+html.sgb-light .nav-link.bg-sky-600\/20 span {
+    color: #FFFFFF !important;
+}
+
+/* Modal y Overlay de Autenticación */
+html.sgb-light #erp-login-modal {
+    background: rgba(241, 245, 249, 0.95) !important;
+    backdrop-filter: blur(8px) !important;
+}
+
+html.sgb-light #erp-login-modal > div {
+    background-color: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    box-shadow: 0 25px 60px rgba(15, 23, 42, 0.08) !important;
+}
+
+html.sgb-light #erp-login-modal h2 {
+    color: #0F172A !important;
+}
+
+/* Botones Primarios y Gradientes de Acción (Morado SACCFAG V3) */
+html.sgb-light button.bg-gradient-to-r.from-sky-600,
+html.sgb-light button.bg-sky-600,
+html.sgb-light button.bg-sky-500,
+html.sgb-light #erp-auth-submit-btn,
+html.sgb-light button.bg-gradient-to-r.from-amber-500 {
+    background: var(--sgb-gradient-morado) !important;
+    color: #FFFFFF !important;
+    border: none !important;
+    box-shadow: var(--sgb-glow-morado) !important;
+}
+
+html.sgb-light button.bg-gradient-to-r.from-sky-600:hover,
+html.sgb-light button.bg-sky-600:hover,
+html.sgb-light #erp-auth-submit-btn:hover,
+html.sgb-light button.bg-gradient-to-r.from-amber-500:hover {
+    background: var(--sgb-gradient-morado-hover) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(124, 58, 237, 0.42) !important;
+}
+
+/* Reemplazo Masivo de Superficies Oscuras a Blanco SGB */
+html.sgb-light [class*="bg-slate-950"],
+html.sgb-light [class*="bg-slate-900"],
+html.sgb-light [class*="bg-slate-800"],
+html.sgb-light .bg-slate-950,
+html.sgb-light .bg-slate-900,
+html.sgb-light .bg-slate-800 {
+    background-color: #FFFFFF !important;
+    border-color: #E2E8F0 !important;
+}
+
+/* Superficies Secundarias y Paneles Muted (#F8FAFC) */
+html.sgb-light .bg-slate-950\/60,
+html.sgb-light .bg-slate-950\/70,
+html.sgb-light .bg-slate-950\/80,
+html.sgb-light .bg-slate-950\/90,
+html.sgb-light .p-3.bg-slate-950,
+html.sgb-light .p-4.bg-slate-950,
+html.sgb-light .p-6.bg-slate-950,
+html.sgb-light #erp-auth-demo-box {
+    background-color: #F8FAFC !important;
+    border: 1px solid #E2E8F0 !important;
+}
+
+/* Inputs, Selects y Textareas en Blanco con Foco Morado */
+html.sgb-light input:not([type="checkbox"]):not([type="radio"]),
+html.sgb-light select,
+html.sgb-light textarea {
+    background-color: #FFFFFF !important;
+    color: #0F172A !important;
+    border: 1px solid #CBD5E1 !important;
+}
+
+html.sgb-light input:not([type="checkbox"]):not([type="radio"]):focus,
+html.sgb-light select:focus,
+html.sgb-light textarea:focus {
+    border-color: var(--sgb-purple) !important;
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.16) !important;
+    outline: none !important;
+}
+
+/* Tipografía de Alto Contraste */
+html.sgb-light .text-slate-100,
+html.sgb-light .text-slate-200,
+html.sgb-light .text-white {
+    color: #0F172A !important;
+}
+
+html.sgb-light .text-slate-300,
+html.sgb-light .text-slate-400 {
+    color: #64748B !important;
+}
+
+html.sgb-light .text-slate-500 {
+    color: #94A3B8 !important;
+}
+
+/* Acentos y Enlaces Morados */
+html.sgb-light .text-sky-400,
+html.sgb-light .text-sky-500,
+html.sgb-light .text-indigo-400,
+html.sgb-light .text-indigo-500 {
+    color: var(--sgb-purple) !important;
+}
+
+html.sgb-light a.text-sky-400:hover {
+    color: var(--sgb-purple-dark) !important;
+}
+
+/* Insignias y Chips Morados */
+html.sgb-light .bg-sky-500\/10,
+html.sgb-light .bg-indigo-500\/10 {
+    background-color: rgba(124, 58, 237, 0.08) !important;
+    border: 1px solid rgba(124, 58, 237, 0.22) !important;
+    color: var(--sgb-purple) !important;
+}
+
+/* Tablas en Tema Claro */
+html.sgb-light table thead {
+    background-color: #F1F5F9 !important;
+    border-bottom: 1px solid #E2E8F0 !important;
+}
+
+html.sgb-light table thead th {
+    color: #475569 !important;
+    font-weight: 700 !important;
+}
+
+html.sgb-light table tbody tr {
+    background-color: #FFFFFF !important;
+    border-bottom: 1px solid #F1F5F9 !important;
+}
+
+html.sgb-light table tbody tr:hover {
+    background-color: rgba(124, 58, 237, 0.03) !important;
+}
+
+/* Overlays de modales */
+html.sgb-light .fixed.inset-0.bg-slate-950\/80,
+html.sgb-light .fixed.inset-0.bg-slate-950\/90,
+html.sgb-light .fixed.inset-0.bg-slate-950\/95 {
+    background-color: rgba(15, 23, 42, 0.45) !important;
+    backdrop-filter: blur(6px) !important;
+}
+
+/* Portal index.html en tema claro */
+html.sgb-light body.portal-light {
+    background-color: #F8FAFC !important;
+    background-image: 
+        radial-gradient(ellipse 90% 60% at 50% -20%, rgba(124, 58, 237, 0.08), transparent),
+        radial-gradient(circle at 12% 25%, rgba(79, 70, 229, 0.05), transparent 45%),
+        radial-gradient(circle at 88% 35%, rgba(16, 185, 129, 0.05), transparent 45%) !important;
+    color: #0F172A !important;
+}
+
+
+
+
+
+
+
