@@ -151,21 +151,6 @@
                 </button>
             </div>
 
-            <!-- Accesos Rapidos de Demostracion -->
-            <div class="pt-4 border-t border-slate-800/80 space-y-2">
-                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block text-center">Acceso Rápido de Prueba:</span>
-                <div class="grid grid-cols-2 gap-2">
-                    <button onclick="window.App.loginRapido('admin', 'hacienda2026')" 
-                            class="py-2 bg-slate-800/60 hover:bg-slate-800 text-slate-300 text-[11px] font-bold rounded-lg border border-slate-700 transition">
-                        Admin Hacienda
-                    </button>
-                    <button onclick="window.App.loginRapido('cajero', 'caja2026')" 
-                            class="py-2 bg-slate-800/60 hover:bg-slate-800 text-slate-300 text-[11px] font-bold rounded-lg border border-slate-700 transition">
-                        Cajero Taquilla
-                    </button>
-                </div>
-            </div>
-
             <div class="text-center pt-2">
                 <a href="index.html" class="text-xs text-sky-400 hover:text-sky-300 font-bold transition">
                     ← Volver al Portal del Contribuyente
@@ -261,12 +246,6 @@
                         Swal.fire({ icon: 'error', title: 'Error de Acceso', text: res.message, confirmButtonColor: '#0284c7' });
                     }
                 }
-            },
-
-            loginRapido: function(u, p) {
-                document.getElementById('admin-login-usuario').value = u;
-                document.getElementById('admin-login-clave').value = p;
-                this.ejecutarLoginFuncionario();
             },
 
             switchTab: function(tabId) {

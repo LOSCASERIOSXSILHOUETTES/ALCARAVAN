@@ -122,77 +122,7 @@
                 }
             }
 
-            // Sembrar contribuyentes de demostracion si esta vacio
-            if (!this._cache['hacienda_contribuyentes'] || this._cache['hacienda_contribuyentes'].length === 0) {
-                const contribuyentesIniciales = [
-                    {
-                        id: 1,
-                        rif: 'J-30123456-7',
-                        razon_social: 'INVERSIONES Y VIVERES EL GUIRIRI C.A.',
-                        denominacion_comercial: 'SUPERMERCADO EL GUIRIRI',
-                        tipo_persona: 'juridica',
-                        correo: 'comercio@guiriri.com',
-                        telefono: '0414-1234567',
-                        direccion_fiscal: 'Av. Bolivar con Calle Miranda, Local 12-A',
-                        representante_legal: 'Carlos Perez',
-                        representante_cedula: 'V-15678901',
-                        estado: 'activo'
-                    },
-                    {
-                        id: 2,
-                        rif: 'J-40987654-2',
-                        razon_social: 'FARMACIA Y MATERIAL MEDICO ALCARAVAN C.A.',
-                        denominacion_comercial: 'FARMACIA ALCARAVAN',
-                        tipo_persona: 'juridica',
-                        correo: 'contacto@farmaciaalcaravan.com',
-                        telefono: '0424-7654321',
-                        direccion_fiscal: 'Calle Comercio, Centro Municipal',
-                        representante_legal: 'Elena Rodriguez',
-                        representante_cedula: 'V-18234567',
-                        estado: 'activo'
-                    }
-                ];
-                this._cache['hacienda_contribuyentes'] = contribuyentesIniciales;
-                if (this._localStore) {
-                    await this._localStore.setItem('hacienda_contribuyentes', contribuyentesIniciales);
-                }
-            }
-
-            // Sembrar patentes asociadas si esta vacio
-            if (!this._cache['hacienda_patentes'] || this._cache['hacienda_patentes'].length === 0) {
-                const patentesIniciales = [
-                    {
-                        id: 1,
-                        numero_patente: 'PAT-2026-0001',
-                        contribuyente_id: 1,
-                        tipo: 'comercial',
-                        codigo_locat: 'COM-001',
-                        descripcion_actividad: 'Venta al por menor de viveres, alimentos y abarrotes',
-                        alicuota: 0.0100,
-                        minimo_tributable_tcmmv: 0.30,
-                        estado: 'activa',
-                        fecha_emision: '2026-01-15',
-                        fecha_vencimiento: '2026-12-31'
-                    },
-                    {
-                        id: 2,
-                        numero_patente: 'PAT-2026-0002',
-                        contribuyente_id: 2,
-                        tipo: 'comercial',
-                        codigo_locat: 'COM-003',
-                        descripcion_actividad: 'Farmacias, expendios de medicinas y material medico',
-                        alicuota: 0.0100,
-                        minimo_tributable_tcmmv: 0.35,
-                        estado: 'activa',
-                        fecha_emision: '2026-01-15',
-                        fecha_vencimiento: '2026-12-31'
-                    }
-                ];
-                this._cache['hacienda_patentes'] = patentesIniciales;
-                if (this._localStore) {
-                    await this._localStore.setItem('hacienda_patentes', patentesIniciales);
-                }
-            }
+            console.log('[HaciendaStore] Inicializado a 0ms en LocalForage');
 
             console.log('[HaciendaStore] Inicializado a 0ms en LocalForage');
             this.initRealtime();
