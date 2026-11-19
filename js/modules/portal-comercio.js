@@ -1217,7 +1217,9 @@
             }
 
             const rifCompleto = tipo + '-' + numero.replace(/^[JVGE]-?/i, '');
-            const contribuyenteId = Date.now();
+            const contribuyenteId = (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function')
+                ? crypto.randomUUID()
+                : ('usr_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8));
 
             const nuevoContribuyente = {
                 id: contribuyenteId,

@@ -154,7 +154,9 @@
 
             const isUpdate = record.id && this._cache[table].some(r => String(r.id) === String(record.id));
             if (!record.id) {
-                record.id = Date.now(); // ID temporal cliente
+                record.id = (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function')
+                    ? crypto.randomUUID()
+                    : ('c_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8));
             }
 
             record._sync_pending = true;

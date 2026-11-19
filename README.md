@@ -36,6 +36,41 @@ Para garantizar la privacidad institucional y facilitar la experiencia del usuar
 
 ---
 
+## Hoja de Ruta (Roadmap) y Etapas de Construccion
+
+El desarrollo de Alcaravan / Guiriri SGB V3 avanza de manera progresiva bajo las especificaciones funcionales de los 6 manuales tecnicos oficiales de Sistemas Tecnologicos Alcaravan S.A.:
+
+### Etapa Actual: Etapa 1 — Registro, Identificacion Inmutable y Expediente Digital (Punto de Partida)
+- **Identificador Maestro Inmutable (UUIDv4):**
+  - Cada contribuyente y comercio se crea con un identificador unico inmutable (`crypto.randomUUID()`) generado en el momento del registro.
+  - La arquitectura desacopla el expediente del RIF y de la Razon Social, garantizando que cambios de firma mercantil, correcciones tipograficas o traspasos no rompan enlaces ni huerfanen documentos.
+- **Expediente Digital en la Nube (Google Apps Script + Google Drive):**
+  - Almacenamiento institucional en cuenta de Google dedicada sin costo de servidores ni bases de datos de pago.
+  - Generacion automatica de carpetas jerarquicas por UUID del contribuyente con subcarpetas tematicas:
+    - `01_Expediente_Legal/` (Acta Constitutiva en PDF, RIF digitalizado, Poderes de Representacion).
+    - `02_Inspeccion_Local/` (Las 4 fotos obligatorias del local: 2 frontales y 2 laterales segun Pagina 15 del Manual 1).
+    - `03_Comprobantes_Pago/` (Vouchers y recibos de transferencias/pagos moviles).
+    - `04_Solvencias_y_Licencias/` (Patentes comerciales y certificados de solvencia con QR).
+- **Dimensionamiento de Capacidad (Caso de Estudio: San Jose de Guaribe):**
+  - En municipios con padron de 200 a 450 comercios, el expediente completo inicial ronda 1,8 MB por comercio (con compresion Canvas en navegador).
+  - Los 15 GB gratuitos de Google Drive rinden entre 8 y 10 anos de recaudacion continua sin saturar cuotas.
+  - El limite de Google Apps Script (20.000 llamadas diarias) opera a menos del 0.3% de su capacidad.
+- **Acceso Directo para la Administracion Tributaria:**
+  - Vinculacion del enlace directo `drive_folder_url` en la ficha de cada contribuyente en `admin.html` para inspeccion en 1 clic.
+
+### Proximas Etapas:
+- **Etapa 2 — Autoliquidacion y Liquidacion de Actividades Economicas (Manuales 1 y 6):**
+  - Monitoreo en tiempo real de tasas oficiales BCV (Dolar, Euro y Moneda de Mayor Valor TCMMV - Art. 30 LOCAT).
+  - Comparativo automatico en vivo: max(Base * Alicuota, Minimo TCMMV en Bs.).
+- **Etapa 3 — Gestion de Pagos, Caja y Conciliacion Smart Ledger V8 (Manual 1 - Pags 20 a 23):**
+  - Consignacion de transferencias y conciliacion automatica contra extractos bancarios en PDF con pareo heuristico a 0ms.
+- **Etapa 4 — Modulos Especiales: Inmuebles, Vehiculos y Tramites (Manuales 2, 3 y 4):**
+  - Catastro municipal (derecho de frente), patentes de vehiculos (trimestres automotrices) y solicitudes de permisos.
+- **Etapa 5 — Auditoria Fiscal y Emision de Solvencias Municipales QR (Manual 5):**
+  - Bloqueo automatico por planillas pendientes y emision de solvencias unicas con verificacion QR.
+
+---
+
 ## Modulos del ERP Interno (`admin.html`)
 
 ### 1. Padron de Contribuyentes (RUC)
@@ -103,6 +138,13 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 ---
 
 ## Bitacora de Decisiones y Cambios
+
+### Version 3.4.4 — 19/11/2026
+- **Estandarizacion de Identificadores Maestros Inmutables (UUIDv4) y Hoja de Ruta:**
+  - Migracion del generador de ID cliente a UUIDv4 (`crypto.randomUUID()`) en `store.js` y `portal-comercio.js` para desacoplar expedientes de datos mutables (RIF y Razon Social).
+  - Documentacion exhaustiva de la Hoja de Ruta (Roadmap) y diseno del arbol documental en Google Drive / Google Apps Script.
+  - Dimensionamiento de infraestructura y cuotas gratuitas validado para municipios tipo San Jose de Guaribe.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.5.1`.
 
 ### Version 3.4.3 — 19/11/2026
 - **Integracion en Vivo de Tasas Oficiales BCV (DolarApi / BCV API):**
