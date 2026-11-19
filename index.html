@@ -20,39 +20,177 @@
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Inter, sans-serif;
-            background-color: #000000;
-            background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(120, 119, 198, 0.12), transparent);
+            background-color: #060608;
+            background-image: 
+                radial-gradient(ellipse 90% 60% at 50% -20%, rgba(56, 189, 248, 0.15), transparent),
+                radial-gradient(circle at 12% 25%, rgba(99, 102, 241, 0.09), transparent 45%),
+                radial-gradient(circle at 88% 35%, rgba(16, 185, 129, 0.08), transparent 45%);
             color: #f5f5f7;
         }
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 9999px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
+
+        @keyframes tickerTape {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .ticker-wrapper {
+            position: relative;
+            overflow: hidden;
+            mask-image: linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%);
+        }
+        .ticker-track {
+            display: flex;
+            width: max-content;
+            animation: tickerTape 36s linear infinite;
+        }
+        .ticker-track:hover {
+            animation-play-state: paused;
+        }
     </style>
 </head>
 
 <body class="min-h-screen flex flex-col select-none">
 
     <!-- Apple-style Frosted Navbar -->
-    <header class="h-16 sticky top-0 z-50 backdrop-blur-2xl bg-black/60 border-b border-white/[0.08] px-6 sm:px-12 flex items-center justify-between transition-all">
+    <header class="h-16 sticky top-0 z-50 backdrop-blur-2xl bg-black/70 border-b border-white/[0.08] px-6 sm:px-12 flex items-center justify-between transition-all">
         <div class="flex items-center gap-3">
-            <span class="font-semibold text-sm tracking-tight text-white">Alcaraván</span>
-            <span class="text-[10px] text-neutral-400 font-mono tracking-wider px-2 py-0.5 rounded-full bg-white/[0.04] border border-white/5 uppercase">Hacienda</span>
+            <span class="font-semibold text-sm tracking-tight text-white flex items-center gap-2">
+                <span class="w-6 h-6 rounded-lg bg-gradient-to-tr from-sky-500 via-indigo-500 to-emerald-400 flex items-center justify-center text-[11px] text-white font-bold shadow-md shadow-sky-500/25">A</span>
+                <span>Alcaraván</span>
+            </span>
+            <span class="text-[10px] text-sky-300 font-mono tracking-wider px-2.5 py-0.5 rounded-full bg-sky-500/10 border border-sky-500/20 uppercase font-semibold">Hacienda</span>
         </div>
 
         <div class="flex items-center gap-4 text-xs">
-            <div class="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/5 text-neutral-400 font-mono text-[11px]">
-                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                <span>BCV: 56,50 Bs.</span>
+            <div class="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 font-mono text-[11px] shadow-sm">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                <span class="font-semibold">TCMMV: 58,20 Bs.</span>
             </div>
 
             <a href="admin.html" 
-               class="text-neutral-400 hover:text-white text-xs font-medium transition flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-white/[0.05]">
+               class="text-neutral-400 hover:text-white text-xs font-medium transition flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/5">
                 <span>Funcionarios</span>
                 <i class="fas fa-chevron-right text-[9px] opacity-70"></i>
             </a>
         </div>
     </header>
+
+    <!-- Financial Ticker Tape / Carrusel de Divisas BCV & Monedas -->
+    <div class="border-b border-white/[0.06] bg-[#09090c]/85 backdrop-blur-xl py-2.5 px-2 ticker-wrapper">
+        <div class="ticker-track flex items-center gap-4">
+            <!-- Bloque 1 de Monedas -->
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-xs font-mono shadow-sm">
+                <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                <span class="text-amber-300 font-bold">TCMMV (LOCAT):</span>
+                <span class="text-white font-bold tracking-tight">58,20 Bs.</span>
+                <span class="text-[10px] text-amber-300 bg-amber-500/20 px-1.5 py-0.5 rounded uppercase font-sans font-semibold">Mayor Valor</span>
+            </div>
+
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/5 text-xs font-mono">
+                <span class="text-emerald-400 font-bold">$ USD:</span>
+                <span class="text-white font-medium">54,85 Bs.</span>
+                <span class="text-[10px] text-emerald-400 font-sans font-semibold">▲ +0,12%</span>
+            </div>
+
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/5 text-xs font-mono">
+                <span class="text-sky-400 font-bold">€ EUR:</span>
+                <span class="text-white font-medium">58,20 Bs.</span>
+                <span class="text-[10px] text-sky-400 font-sans font-semibold">▲ +0,09%</span>
+            </div>
+
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/5 text-xs font-mono">
+                <span class="text-rose-400 font-bold">¥ CNY:</span>
+                <span class="text-white font-medium">7,56 Bs.</span>
+                <span class="text-[10px] text-emerald-400 font-sans font-semibold">▲ +0,05%</span>
+            </div>
+
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/5 text-xs font-mono">
+                <span class="text-fuchsia-400 font-bold">円 JPY:</span>
+                <span class="text-white font-medium">0,35 Bs.</span>
+                <span class="text-[10px] text-neutral-400 font-sans">▼ -0,02%</span>
+            </div>
+
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/5 text-xs font-mono">
+                <span class="text-indigo-400 font-bold">₽ RUB:</span>
+                <span class="text-white font-medium">0,56 Bs.</span>
+                <span class="text-[10px] text-emerald-400 font-sans font-semibold">▲ +0,04%</span>
+            </div>
+
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/5 text-xs font-mono">
+                <span class="text-amber-400 font-bold">₺ TRY:</span>
+                <span class="text-white font-medium">1,61 Bs.</span>
+                <span class="text-[10px] text-emerald-400 font-sans font-semibold">▲ +0,01%</span>
+            </div>
+
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-xs font-mono">
+                <span class="text-cyan-400 font-bold">PTR:</span>
+                <span class="text-white font-medium">60,00 $</span>
+            </div>
+
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs font-mono text-emerald-300">
+                <i class="fas fa-university text-[10px]"></i>
+                <span class="font-semibold">Tasas Oficiales Banco Central de Venezuela</span>
+            </div>
+
+            <!-- Bloque 2 Clonado (Loop infinito continuo) -->
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-xs font-mono shadow-sm">
+                <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                <span class="text-amber-300 font-bold">TCMMV (LOCAT):</span>
+                <span class="text-white font-bold tracking-tight">58,20 Bs.</span>
+                <span class="text-[10px] text-amber-300 bg-amber-500/20 px-1.5 py-0.5 rounded uppercase font-sans font-semibold">Mayor Valor</span>
+            </div>
+
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/5 text-xs font-mono">
+                <span class="text-emerald-400 font-bold">$ USD:</span>
+                <span class="text-white font-medium">54,85 Bs.</span>
+                <span class="text-[10px] text-emerald-400 font-sans font-semibold">▲ +0,12%</span>
+            </div>
+
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/5 text-xs font-mono">
+                <span class="text-sky-400 font-bold">€ EUR:</span>
+                <span class="text-white font-medium">58,20 Bs.</span>
+                <span class="text-[10px] text-sky-400 font-sans font-semibold">▲ +0,09%</span>
+            </div>
+
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/5 text-xs font-mono">
+                <span class="text-rose-400 font-bold">¥ CNY:</span>
+                <span class="text-white font-medium">7,56 Bs.</span>
+                <span class="text-[10px] text-emerald-400 font-sans font-semibold">▲ +0,05%</span>
+            </div>
+
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/5 text-xs font-mono">
+                <span class="text-fuchsia-400 font-bold">円 JPY:</span>
+                <span class="text-white font-medium">0,35 Bs.</span>
+                <span class="text-[10px] text-neutral-400 font-sans">▼ -0,02%</span>
+            </div>
+
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/5 text-xs font-mono">
+                <span class="text-indigo-400 font-bold">₽ RUB:</span>
+                <span class="text-white font-medium">0,56 Bs.</span>
+                <span class="text-[10px] text-emerald-400 font-sans font-semibold">▲ +0,04%</span>
+            </div>
+
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/5 text-xs font-mono">
+                <span class="text-amber-400 font-bold">₺ TRY:</span>
+                <span class="text-white font-medium">1,61 Bs.</span>
+                <span class="text-[10px] text-emerald-400 font-sans font-semibold">▲ +0,01%</span>
+            </div>
+
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-xs font-mono">
+                <span class="text-cyan-400 font-bold">PTR:</span>
+                <span class="text-white font-medium">60,00 $</span>
+            </div>
+
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs font-mono text-emerald-300">
+                <i class="fas fa-shield-alt text-[10px]"></i>
+                <span class="font-semibold">Tasas Oficiales Banco Central de Venezuela</span>
+            </div>
+        </div>
+    </div>
 
     <!-- Main Dynamic Content -->
     <main class="flex-1 px-6 sm:px-12 py-8 overflow-y-auto">

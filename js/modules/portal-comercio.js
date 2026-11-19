@@ -36,54 +36,108 @@
 
         renderConsultaHero: function(container) {
             container.innerHTML = `
-                <div class="max-w-4xl mx-auto space-y-16 py-12 sm:py-20 text-center animate-fade-in">
+                <div class="max-w-4xl mx-auto space-y-12 py-10 sm:py-16 text-center animate-fade-in">
                     <!-- Apple Hero Headline -->
                     <div class="space-y-4">
-                        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/10 text-neutral-300 text-xs font-medium tracking-wide">
-                            <span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
-                            <span>Hacienda Digital · LOCAT 2026</span>
+                        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-sky-500/10 via-indigo-500/10 to-emerald-500/10 border border-white/10 text-neutral-300 text-xs font-medium tracking-wide shadow-sm">
+                            <span class="w-2 h-2 rounded-full bg-sky-400 animate-ping"></span>
+                            <span class="text-white font-semibold">Hacienda Digital</span>
+                            <span class="text-neutral-500">·</span>
+                            <span class="text-sky-300 font-mono">LOCAT 2026</span>
                         </div>
                         <h1 class="text-4xl sm:text-6xl md:text-7xl font-semibold tracking-tight text-white leading-tight">
                             Tributos.<br>
-                            <span class="text-neutral-500">Hecho simple.</span>
+                            <span class="bg-clip-text text-transparent bg-gradient-to-r from-sky-400 via-indigo-300 to-emerald-400">Hecho simple.</span>
                         </h1>
                         <p class="text-neutral-400 text-sm sm:text-base max-w-lg mx-auto font-normal leading-relaxed pt-2">
-                            Autoliquidaciones mensuales, inmuebles, patentes de vehículos, publicidad comercial y solvencias oficiales con código QR.
+                            Autoliquidaciones mensuales, catastro de inmuebles, patentes de vehículos, publicidad comercial y solvencias oficiales con código QR.
                         </p>
                     </div>
 
-                    <!-- Apple Search Capsule -->
+                    <!-- Apple Search Capsule con Aura Glowing -->
                     <div class="max-w-md mx-auto space-y-4">
-                        <div class="flex items-center bg-[#161618] border border-white/10 hover:border-white/20 focus-within:border-white/30 rounded-full p-1.5 shadow-2xl transition duration-200">
-                            <select id="pc-rif-tipo" class="bg-transparent text-white font-medium text-xs px-3.5 py-2.5 outline-none border-r border-white/10 cursor-pointer">
-                                <option value="J" class="bg-[#1c1c1e] text-white">J</option>
-                                <option value="V" class="bg-[#1c1c1e] text-white">V</option>
-                                <option value="G" class="bg-[#1c1c1e] text-white">G</option>
-                                <option value="E" class="bg-[#1c1c1e] text-white">E</option>
-                            </select>
-                            <input type="text" id="pc-rif-numero" placeholder="RIF (ej. 30123456-7)" 
-                                   onkeydown="if(event.key==='Enter') window.PortalComercio.ejecutarConsultaRif()"
-                                   class="w-full bg-transparent text-white text-xs sm:text-sm font-mono px-3.5 py-2 outline-none placeholder:text-neutral-600">
-                            <button onclick="window.PortalComercio.ejecutarConsultaRif()" 
-                                    class="bg-white hover:bg-neutral-200 text-black text-xs font-semibold rounded-full px-5 py-2.5 transition shrink-0 flex items-center gap-1.5 shadow-sm">
-                                <span>Ingresar</span>
-                                <i class="fas fa-arrow-right text-[10px]"></i>
-                            </button>
+                        <div class="relative group">
+                            <div class="absolute -inset-1 rounded-full bg-gradient-to-r from-sky-500/30 via-indigo-500/20 to-emerald-500/30 blur-xl opacity-60 group-hover:opacity-100 transition duration-500"></div>
+                            <div class="relative flex items-center bg-[#131316] border border-white/10 hover:border-white/25 focus-within:border-sky-400/50 rounded-full p-1.5 shadow-2xl transition duration-200">
+                                <select id="pc-rif-tipo" class="bg-transparent text-white font-medium text-xs px-3.5 py-2.5 outline-none border-r border-white/10 cursor-pointer">
+                                    <option value="J" class="bg-[#1c1c1e] text-white">J</option>
+                                    <option value="V" class="bg-[#1c1c1e] text-white">V</option>
+                                    <option value="G" class="bg-[#1c1c1e] text-white">G</option>
+                                    <option value="E" class="bg-[#1c1c1e] text-white">E</option>
+                                </select>
+                                <input type="text" id="pc-rif-numero" placeholder="RIF (ej. 30123456-7)" 
+                                       onkeydown="if(event.key==='Enter') window.PortalComercio.ejecutarConsultaRif()"
+                                       class="w-full bg-transparent text-white text-xs sm:text-sm font-mono px-3.5 py-2 outline-none placeholder:text-neutral-600">
+                                <button onclick="window.PortalComercio.ejecutarConsultaRif()" 
+                                        class="bg-gradient-to-r from-white to-neutral-200 hover:from-neutral-200 hover:to-white text-black text-xs font-semibold rounded-full px-5 py-2.5 transition shrink-0 flex items-center gap-1.5 shadow-md shadow-white/10">
+                                    <span>Ingresar</span>
+                                    <i class="fas fa-arrow-right text-[10px]"></i>
+                                </button>
+                            </div>
                         </div>
 
                         <div>
                             <button onclick="window.PortalComercio.abrirModalInscripcion()" 
-                                    class="text-neutral-500 hover:text-neutral-300 text-xs font-medium transition inline-flex items-center gap-1">
+                                    class="text-neutral-400 hover:text-sky-300 text-xs font-medium transition inline-flex items-center gap-1.5 py-1 px-3 rounded-full hover:bg-white/[0.04]">
                                 <span>¿Establecimiento no registrado? Solicitar censo municipal</span>
                                 <span>→</span>
                             </button>
                         </div>
                     </div>
 
+                    <!-- Carrusel Bento de Tasas de Cambio Oficiales BCV -->
+                    <div class="pt-2 max-w-3xl mx-auto space-y-3">
+                        <div class="flex items-center justify-between text-xs text-neutral-400 px-2 font-mono">
+                            <span class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                <span class="text-neutral-300 font-semibold">Mesa de Cambio Oficial BCV</span>
+                            </span>
+                            <span class="text-[11px] text-neutral-500">Unidad de Cuenta · LOCAT Art. 30</span>
+                        </div>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 text-left">
+                            <!-- Card TCMMV -->
+                            <div class="p-4 rounded-2xl bg-gradient-to-b from-amber-500/10 to-amber-500/[0.02] border border-amber-500/25 space-y-1 shadow-lg hover:border-amber-400/50 hover:shadow-[0_0_20px_rgba(245,158,11,0.15)] transition duration-300">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[10px] font-mono text-amber-300 font-bold uppercase tracking-wider">TCMMV (LOCAT)</span>
+                                    <i class="fas fa-crown text-[10px] text-amber-400"></i>
+                                </div>
+                                <div class="text-lg font-bold text-white font-mono tracking-tight">58,20 <span class="text-xs text-amber-300 font-normal">Bs.</span></div>
+                                <div class="text-[10px] text-amber-400/80 font-sans font-medium">Mayor Valor Oficial</div>
+                            </div>
+                            <!-- Card USD -->
+                            <div class="p-4 rounded-2xl bg-gradient-to-b from-emerald-500/10 to-emerald-500/[0.02] border border-emerald-500/20 space-y-1 shadow-lg hover:border-emerald-400/50 hover:shadow-[0_0_20px_rgba(16,185,129,0.15)] transition duration-300">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[10px] font-mono text-emerald-400 font-bold uppercase tracking-wider">Dólar (USD)</span>
+                                    <i class="fas fa-dollar-sign text-[10px] text-emerald-400"></i>
+                                </div>
+                                <div class="text-lg font-bold text-white font-mono tracking-tight">54,85 <span class="text-xs text-emerald-400 font-normal">Bs.</span></div>
+                                <div class="text-[10px] text-emerald-400 font-sans font-medium">▲ +0,12% BCV</div>
+                            </div>
+                            <!-- Card EUR -->
+                            <div class="p-4 rounded-2xl bg-gradient-to-b from-sky-500/10 to-sky-500/[0.02] border border-sky-500/20 space-y-1 shadow-lg hover:border-sky-400/50 hover:shadow-[0_0_20px_rgba(56,189,248,0.15)] transition duration-300">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[10px] font-mono text-sky-400 font-bold uppercase tracking-wider">Euro (EUR)</span>
+                                    <i class="fas fa-euro-sign text-[10px] text-sky-400"></i>
+                                </div>
+                                <div class="text-lg font-bold text-white font-mono tracking-tight">58,20 <span class="text-xs text-sky-400 font-normal">Bs.</span></div>
+                                <div class="text-[10px] text-sky-400 font-sans font-medium">▲ +0,09% BCV</div>
+                            </div>
+                            <!-- Card CNY / JPY -->
+                            <div class="p-4 rounded-2xl bg-gradient-to-b from-rose-500/10 to-rose-500/[0.02] border border-rose-500/20 space-y-1 shadow-lg hover:border-rose-400/50 hover:shadow-[0_0_20px_rgba(244,63,94,0.15)] transition duration-300">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[10px] font-mono text-rose-400 font-bold uppercase tracking-wider">Yuan (CNY)</span>
+                                    <i class="fas fa-yen-sign text-[10px] text-rose-400"></i>
+                                </div>
+                                <div class="text-lg font-bold text-white font-mono tracking-tight">7,56 <span class="text-xs text-rose-400 font-normal">Bs.</span></div>
+                                <div class="text-[10px] text-neutral-400 font-sans">Yen: 0,35 · Rublo: 0,56</div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Bento Grid de Módulos Tributarios -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-6 text-left">
-                        <div class="p-8 rounded-3xl bg-[#121214] border border-white/[0.06] space-y-3 hover:border-white/[0.12] transition">
-                            <div class="w-10 h-10 rounded-2xl bg-white/[0.06] border border-white/10 flex items-center justify-center text-white text-sm">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-4 text-left">
+                        <div class="p-8 rounded-3xl bg-gradient-to-b from-sky-500/[0.07] to-[#111114] border border-sky-500/20 space-y-3 hover:border-sky-400/40 hover:shadow-[0_0_30px_rgba(56,189,248,0.12)] transition duration-300">
+                            <div class="w-11 h-11 rounded-2xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-400 text-sm shadow-sm">
                                 <i class="fas fa-suitcase"></i>
                             </div>
                             <h3 class="text-sm font-semibold text-white">Mis Empresas (LOCAT)</h3>
@@ -92,8 +146,8 @@
                             </p>
                         </div>
 
-                        <div class="p-8 rounded-3xl bg-[#121214] border border-white/[0.06] space-y-3 hover:border-white/[0.12] transition">
-                            <div class="w-10 h-10 rounded-2xl bg-white/[0.06] border border-white/10 flex items-center justify-center text-white text-sm">
+                        <div class="p-8 rounded-3xl bg-gradient-to-b from-purple-500/[0.07] to-[#111114] border border-purple-500/20 space-y-3 hover:border-purple-400/40 hover:shadow-[0_0_30px_rgba(168,85,247,0.12)] transition duration-300">
+                            <div class="w-11 h-11 rounded-2xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400 text-sm shadow-sm">
                                 <i class="fas fa-building"></i>
                             </div>
                             <h3 class="text-sm font-semibold text-white">Inmuebles y Vehículos</h3>
@@ -102,8 +156,8 @@
                             </p>
                         </div>
 
-                        <div class="p-8 rounded-3xl bg-[#121214] border border-white/[0.06] space-y-3 hover:border-white/[0.12] transition">
-                            <div class="w-10 h-10 rounded-2xl bg-white/[0.06] border border-white/10 flex items-center justify-center text-white text-sm">
+                        <div class="p-8 rounded-3xl bg-gradient-to-b from-emerald-500/[0.07] to-[#111114] border border-emerald-500/20 space-y-3 hover:border-emerald-400/40 hover:shadow-[0_0_30px_rgba(16,185,129,0.12)] transition duration-300">
+                            <div class="w-11 h-11 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-sm shadow-sm">
                                 <i class="fas fa-university"></i>
                             </div>
                             <h3 class="text-sm font-semibold text-white">Cuentas y Pagos</h3>
@@ -138,17 +192,17 @@
             container.innerHTML = `
                 <div class="max-w-5xl mx-auto space-y-8 py-6">
                     <!-- Barra de Bienvenida y Tasa MMAV (Estilo SATGUAICA / Apple) -->
-                    <div class="p-8 rounded-3xl bg-[#121214] border border-white/[0.08] shadow-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                    <div class="p-8 rounded-3xl bg-gradient-to-r from-[#121216] via-[#14141a] to-[#121216] border border-white/[0.08] shadow-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                         <div class="space-y-2">
                             <div class="flex items-center gap-3">
                                 <h2 class="text-xl sm:text-2xl font-semibold text-white tracking-tight">${c.razon_social}</h2>
                                 ${esSolvente ? `
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-medium">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-medium shadow-sm">
                                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
                                         Solvente
                                     </span>
                                 ` : `
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[11px] font-medium">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 text-[11px] font-medium shadow-sm">
                                         <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
                                         ${declaracionesPendientes.length} por pagar
                                     </span>
@@ -157,21 +211,33 @@
                             <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-neutral-400 font-mono">
                                 <span>RIF: ${c.rif}</span>
                                 <span class="text-neutral-600">·</span>
-                                <span>${patentes.length} Empresa(s) registrada(s)</span>
+                                <span class="text-sky-300/80">${patentes.length} Empresa(s)</span>
                                 <span class="text-neutral-600">·</span>
                                 <span>${c.correo || 'Contribuyente Municipal'}</span>
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-3 shrink-0">
-                            <!-- Píldora Tasa MMAV (Art 30 LOCAT) -->
-                            <div class="px-4 py-2 rounded-2xl bg-[#1c1c1e] border border-white/10 text-xs font-mono">
-                                <span class="text-neutral-500 text-[10px] block uppercase font-sans">Tasa MMAV / TCMMV</span>
+                        <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+                            <!-- Píldora Tasa TCMMV (Art 30 LOCAT) -->
+                            <div class="px-4 py-2 rounded-2xl bg-amber-500/10 border border-amber-500/25 text-xs font-mono shadow-sm">
+                                <span class="text-amber-300 text-[10px] block uppercase font-sans font-semibold">TCMMV (LOCAT)</span>
                                 <span class="text-white font-bold">${TASA_MMAV.toFixed(2)} Bs.</span>
                             </div>
 
+                            <!-- Píldora Dólar BCV -->
+                            <div class="px-3.5 py-2 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-xs font-mono">
+                                <span class="text-emerald-400 text-[10px] block uppercase font-sans font-semibold">USD BCV</span>
+                                <span class="text-white font-medium">54,85 Bs.</span>
+                            </div>
+
+                            <!-- Píldora Euro BCV -->
+                            <div class="px-3.5 py-2 rounded-2xl bg-sky-500/10 border border-sky-500/20 text-xs font-mono">
+                                <span class="text-sky-400 text-[10px] block uppercase font-sans font-semibold">EUR BCV</span>
+                                <span class="text-white font-medium">58,20 Bs.</span>
+                            </div>
+
                             <button onclick="window.PortalComercio.cerrarConsulta()" 
-                                    class="text-xs text-neutral-400 hover:text-white px-4 py-2.5 rounded-2xl border border-white/10 hover:border-white/20 transition">
+                                    class="text-xs text-neutral-400 hover:text-white px-4 py-2.5 rounded-2xl border border-white/10 hover:border-white/20 transition bg-white/[0.03]">
                                 Salir
                             </button>
                         </div>
@@ -203,15 +269,15 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         <!-- 1. Mis Empresas (Actividades Económicas) -->
                         <div onclick="window.PortalComercio.navegarModulo('empresas')" 
-                             class="p-8 rounded-3xl bg-[#121214] border border-white/[0.08] hover:border-white/20 transition cursor-pointer space-y-4 group relative overflow-hidden shadow-xl">
+                             class="p-8 rounded-3xl bg-gradient-to-b from-sky-500/[0.08] to-[#111114] border border-sky-500/25 hover:border-sky-400/50 hover:shadow-[0_0_35px_rgba(56,189,248,0.15)] transition duration-300 cursor-pointer space-y-4 group relative overflow-hidden shadow-xl">
                             <div class="flex items-center justify-between">
-                                <div class="w-12 h-12 rounded-2xl bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center text-lg">
+                                <div class="w-12 h-12 rounded-2xl bg-sky-500/15 border border-sky-500/30 text-sky-400 flex items-center justify-center text-lg shadow-sm">
                                     <i class="fas fa-suitcase"></i>
                                 </div>
                                 ${esSolvente ? `
-                                    <span class="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Solvente</span>
+                                    <span class="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-semibold shadow-sm">Solvente</span>
                                 ` : `
-                                    <span class="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">${declaracionesPendientes.length} Pendiente(s)</span>
+                                    <span class="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 font-semibold shadow-sm">${declaracionesPendientes.length} Pendiente(s)</span>
                                 `}
                             </div>
                             <div class="space-y-1">
@@ -221,114 +287,116 @@
                                 </p>
                             </div>
                             <div class="pt-2 text-xs text-neutral-500 font-mono flex items-center justify-between border-t border-white/5">
-                                <span>${patentes.length} Patente(s)</span>
-                                <span class="group-hover:translate-x-1 transition text-white">Gestionar →</span>
+                                <span class="text-sky-400/80">${patentes.length} Patente(s)</span>
+                                <span class="group-hover:translate-x-1 transition text-sky-300 font-medium">Gestionar →</span>
                             </div>
                         </div>
 
                         <!-- 2. Mis Inmuebles (Derecho de Frente) -->
                         <div onclick="window.PortalComercio.navegarModulo('inmuebles')" 
-                             class="p-8 rounded-3xl bg-[#121214] border border-white/[0.08] hover:border-white/20 transition cursor-pointer space-y-4 group relative overflow-hidden shadow-xl">
+                             class="p-8 rounded-3xl bg-gradient-to-b from-purple-500/[0.08] to-[#111114] border border-purple-500/25 hover:border-purple-400/50 hover:shadow-[0_0_35px_rgba(168,85,247,0.15)] transition duration-300 cursor-pointer space-y-4 group relative overflow-hidden shadow-xl">
                             <div class="flex items-center justify-between">
-                                <div class="w-12 h-12 rounded-2xl bg-neutral-500/10 border border-neutral-500/20 text-neutral-300 flex items-center justify-center text-lg">
+                                <div class="w-12 h-12 rounded-2xl bg-purple-500/15 border border-purple-500/30 text-purple-400 flex items-center justify-center text-lg shadow-sm">
                                     <i class="fas fa-building"></i>
                                 </div>
-                                <span class="text-[10px] font-mono text-neutral-500">Catastro</span>
+                                <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/20">Catastro</span>
                             </div>
                             <div class="space-y-1">
-                                <h3 class="text-base font-semibold text-white group-hover:text-neutral-200 transition">Mis Inmuebles</h3>
+                                <h3 class="text-base font-semibold text-white group-hover:text-purple-300 transition">Mis Inmuebles</h3>
                                 <p class="text-xs text-neutral-400 leading-relaxed">
                                     Registro de inmuebles urbanos, terrenos, locales comerciales y cálculo de derecho de frente.
                                 </p>
                             </div>
                             <div class="pt-2 text-xs text-neutral-500 font-mono flex items-center justify-between border-t border-white/5">
-                                <span>${inmuebles.length} Inmueble(s)</span>
-                                <span class="group-hover:translate-x-1 transition text-white">Consultar →</span>
+                                <span class="text-purple-400/80">${inmuebles.length} Inmueble(s)</span>
+                                <span class="group-hover:translate-x-1 transition text-purple-300 font-medium">Consultar →</span>
                             </div>
                         </div>
 
                         <!-- 3. Mis Vehículos (Patente Vehicular) -->
                         <div onclick="window.PortalComercio.navegarModulo('vehiculos')" 
-                             class="p-8 rounded-3xl bg-[#121214] border border-white/[0.08] hover:border-white/20 transition cursor-pointer space-y-4 group relative overflow-hidden shadow-xl">
+                             class="p-8 rounded-3xl bg-gradient-to-b from-emerald-500/[0.08] to-[#111114] border border-emerald-500/25 hover:border-emerald-400/50 hover:shadow-[0_0_35px_rgba(16,185,129,0.15)] transition duration-300 cursor-pointer space-y-4 group relative overflow-hidden shadow-xl">
                             <div class="flex items-center justify-between">
-                                <div class="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center text-lg">
+                                <div class="w-12 h-12 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-lg shadow-sm">
                                     <i class="fas fa-car"></i>
                                 </div>
-                                <span class="text-[10px] font-mono text-neutral-500">Trimestres</span>
+                                <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">Trimestres</span>
                             </div>
                             <div class="space-y-1">
-                                <h3 class="text-base font-semibold text-white group-hover:text-rose-300 transition">Mis Vehículos</h3>
+                                <h3 class="text-base font-semibold text-white group-hover:text-emerald-300 transition">Mis Vehículos</h3>
                                 <p class="text-xs text-neutral-400 leading-relaxed">
                                     Registro automotriz comercial o particular, consulta de trimestres y pago de patentes.
                                 </p>
                             </div>
                             <div class="pt-2 text-xs text-neutral-500 font-mono flex items-center justify-between border-t border-white/5">
-                                <span>${vehiculos.length} Vehículo(s)</span>
-                                <span class="group-hover:translate-x-1 transition text-white">Consultar →</span>
+                                <span class="text-emerald-400/80">${vehiculos.length} Vehículo(s)</span>
+                                <span class="group-hover:translate-x-1 transition text-emerald-300 font-medium">Consultar →</span>
                             </div>
                         </div>
 
                         <!-- 4. Mis Publicidades (Propaganda Comercial) -->
                         <div onclick="window.PortalComercio.navegarModulo('publicidad')" 
-                             class="p-8 rounded-3xl bg-[#121214] border border-white/[0.08] hover:border-white/20 transition cursor-pointer space-y-4 group relative overflow-hidden shadow-xl">
+                             class="p-8 rounded-3xl bg-gradient-to-b from-amber-500/[0.08] to-[#111114] border border-amber-500/25 hover:border-amber-400/50 hover:shadow-[0_0_35px_rgba(245,158,11,0.15)] transition duration-300 cursor-pointer space-y-4 group relative overflow-hidden shadow-xl">
                             <div class="flex items-center justify-between">
-                                <div class="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center text-lg">
+                                <div class="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center text-lg shadow-sm">
                                     <i class="fas fa-object-group"></i>
                                 </div>
-                                <span class="text-[10px] font-mono text-neutral-500">Vallas y Avisos</span>
+                                <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20">Vallas y Avisos</span>
                             </div>
                             <div class="space-y-1">
-                                <h3 class="text-base font-semibold text-white group-hover:text-purple-300 transition">Mis Publicidades</h3>
+                                <h3 class="text-base font-semibold text-white group-hover:text-amber-300 transition">Mis Publicidades</h3>
                                 <p class="text-xs text-neutral-400 leading-relaxed">
                                     Registro de avisos luminosos, vallas publicitarias en fachada y metros cuadrados autorizados.
                                 </p>
                             </div>
                             <div class="pt-2 text-xs text-neutral-500 font-mono flex items-center justify-between border-t border-white/5">
-                                <span>${publicidades.length} Aviso(s)</span>
-                                <span class="group-hover:translate-x-1 transition text-white">Consultar →</span>
+                                <span class="text-amber-400/80">${publicidades.length} Aviso(s)</span>
+                                <span class="group-hover:translate-x-1 transition text-amber-300 font-medium">Consultar →</span>
                             </div>
                         </div>
 
                         <!-- 5. Gestión de Tasas y Multas -->
                         <div onclick="window.PortalComercio.navegarModulo('tasas')" 
-                             class="p-8 rounded-3xl bg-[#121214] border border-white/[0.08] hover:border-white/20 transition cursor-pointer space-y-4 group relative overflow-hidden shadow-xl">
+                             class="p-8 rounded-3xl bg-gradient-to-b from-rose-500/[0.08] to-[#111114] border border-rose-500/25 hover:border-rose-400/50 hover:shadow-[0_0_35px_rgba(244,63,94,0.15)] transition duration-300 cursor-pointer space-y-4 group relative overflow-hidden shadow-xl">
                             <div class="flex items-center justify-between">
-                                <div class="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center text-lg">
+                                <div class="w-12 h-12 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-400 flex items-center justify-center text-lg shadow-sm">
                                     <i class="fas fa-file-invoice"></i>
                                 </div>
-                                <span class="text-[10px] font-mono text-neutral-500">Historial</span>
+                                <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-300 border border-rose-500/20">Historial</span>
                             </div>
                             <div class="space-y-1">
-                                <h3 class="text-base font-semibold text-white group-hover:text-amber-300 transition">Tasas y Multas</h3>
+                                <h3 class="text-base font-semibold text-white group-hover:text-rose-300 transition">Tasas y Multas</h3>
                                 <p class="text-xs text-neutral-400 leading-relaxed">
                                     Timbres fiscales, certificaciones administrativas, estado de cuenta y recibos correlativos.
                                 </p>
                             </div>
                             <div class="pt-2 text-xs text-neutral-500 font-mono flex items-center justify-between border-t border-white/5">
-                                <span>${pagos.length} Comprobante(s)</span>
-                                <span class="group-hover:translate-x-1 transition text-white">Revisar →</span>
+                                <span class="text-rose-400/80">${pagos.length} Comprobante(s)</span>
+                                <span class="group-hover:translate-x-1 transition text-rose-300 font-medium">Revisar →</span>
                             </div>
                         </div>
 
                         <!-- 6. Cuentas Bancarias Municipales -->
                         <div onclick="window.PortalComercio.navegarModulo('cuentas')" 
-                             class="p-8 rounded-3xl bg-[#121214] border border-white/[0.08] hover:border-white/20 transition cursor-pointer space-y-4 group relative overflow-hidden shadow-xl">
+                             class="p-8 rounded-3xl bg-gradient-to-b from-teal-500/[0.08] to-[#111114] border border-teal-500/25 hover:border-teal-400/50 hover:shadow-[0_0_35px_rgba(20,184,166,0.15)] transition duration-300 cursor-pointer space-y-4 group relative overflow-hidden shadow-xl">
                             <div class="flex items-center justify-between">
-                                <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center text-lg">
+                                <div class="w-12 h-12 rounded-2xl bg-teal-500/15 border border-teal-500/30 text-teal-400 flex items-center justify-center text-lg shadow-sm">
                                     <i class="fas fa-university"></i>
                                 </div>
-                                <span class="text-[10px] font-mono text-neutral-500">Oficial</span>
+                                <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-300 border border-teal-500/20">Oficial</span>
                             </div>
                             <div class="space-y-1">
-                                <h3 class="text-base font-semibold text-white group-hover:text-indigo-300 transition">Cuentas Bancarias</h3>
+                                <h3 class="text-base font-semibold text-white group-hover:text-teal-300 transition">Cuentas Bancarias</h3>
                                 <p class="text-xs text-neutral-400 leading-relaxed">
                                     Datos bancarios del Banco de Venezuela y Banesco para realizar transferencias y pagos móviles.
                                 </p>
                             </div>
                             <div class="pt-2 text-xs text-neutral-500 font-mono flex items-center justify-between border-t border-white/5">
-                                <span>Cuentas Recaudadoras</span>
-                                <span class="group-hover:translate-x-1 transition text-white">Ver Cuentas →</span>
+                                <span class="text-teal-400/80">Cuentas Recaudadoras</span>
+                                <span class="group-hover:translate-x-1 transition text-teal-300 font-medium">Ver Cuentas →</span>
                             </div>
+                        </div>
+                    </div>
                         </div>
                     </div>
                 </div>

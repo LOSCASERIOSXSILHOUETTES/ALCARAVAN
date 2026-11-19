@@ -104,6 +104,14 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.4.2 — 19/11/2026
+- **Carrusel / Ticker Tape Financiero de Divisas BCV y Pulido Visual Apple Fintech:**
+  - Implementacion de carrusel ticker horizontal infinito en la cabecera con animacion continua fluida y pausa al hover (Dolar USD, Euro EUR, Yuan CNY, Yen JPY, Rublo RUB, Lira Turca TRY, Petro PTR y Moneda de Mayor Valor TCMMV - Art. 30 LOCAT).
+  - Ambient glow mesh multicolor (aurora de zafiro, esmeralda e indigo con efecto vidrio frosted y bordes difuminados por mascara de gradiente).
+  - Carrusel Bento en el Hero con tarjetas de tasas oficiales y variaciones porcentuales.
+  - Personalizacion cromatica de los 6 modulos Bento Grid (Cyan para Empresas, Purpura para Catastro/Inmuebles, Esmeralda para Vehiculos, Ambar para Publicidad, Coral para Tasas y Teal para Cuentas Bancarias).
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.4.0`.
+
 ### Version 3.4.1 — 19/11/2026
 - **Depuracion de Terminologia Tecnica e Institucionalizacion de la UI:**
   - Eliminacion de jerga de desarrollo ("0ms", "SGB", etc.) de todas las vistas, modales, footers y alertas de cara al comerciante y funcionario.
