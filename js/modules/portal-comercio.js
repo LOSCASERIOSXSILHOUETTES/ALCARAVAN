@@ -10,6 +10,19 @@
     let activeContribuyente = null;
     let activeModule = 'grid'; // 'grid', 'empresas', 'inmuebles', 'vehiculos', 'publicidad', 'tasas', 'cuentas'
     let activeEmpresaTab = 'declarar'; // 'declarar', 'pagar', 'solvencia', 'historial'
+    let loginModo = 'rif'; // 'rif' o 'correo'
+
+    async function hashClave(text) {
+        if (!text) return '';
+        if (global.HaciendaAuth && typeof global.HaciendaAuth.hashPassword === 'function') {
+            return await global.HaciendaAuth.hashPassword(text);
+        }
+        if (!crypto || !crypto.subtle) {
+            try { return btoa(unescape(encodeURIComponent(text))); } catch (_) { return btoa(text); }
+        }
+        const buffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+        return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
 
     function getTasaMMAV() {
         if (global.TasasBCV && typeof global.TasasBCV.getTCMMV === 'function') {
@@ -784,22 +797,66 @@
 
                     <!-- The Card -->
                     <div class="w-full max-w-[390px] mx-auto bg-white rounded-2xl p-6 border border-slate-200 shadow-sm mt-8 text-left space-y-4">
-                        <label class="block text-xs font-medium text-slate-700">RIF o Cédula</label>
+                        <!-- Selector de Modo de Acceso Híbrido -->
+                        <div class="flex items-center bg-slate-100 p-1 rounded-xl text-xs font-medium">
+                            <button id="pc-tab-rif" type="button" onclick="window.PortalComercio.cambiarLoginModo('rif')"
+                                    class="flex-1 py-1.5 rounded-lg text-center font-medium transition ${loginModo === 'rif' ? 'bg-white text-black shadow-sm' : 'text-slate-500 hover:text-black'}">
+                                Por RIF
+                            </button>
+                            <button id="pc-tab-correo" type="button" onclick="window.PortalComercio.cambiarLoginModo('correo')"
+                                    class="flex-1 py-1.5 rounded-lg text-center font-medium transition ${loginModo === 'correo' ? 'bg-white text-black shadow-sm' : 'text-slate-500 hover:text-black'}">
+                                Por Correo
+                            </button>
+                        </div>
 
-                        <div class="flex items-center border border-slate-200 rounded-xl bg-white focus-within:border-slate-400 transition overflow-hidden">
-                            <select id="pc-rif-tipo" class="bg-transparent text-slate-800 font-medium text-sm px-3 py-2.5 outline-none cursor-pointer border-r border-slate-200">
-                                <option value="J">J</option>
-                                <option value="V">V</option>
-                                <option value="G">G</option>
-                                <option value="E">E</option>
-                                <option value="C">C</option>
-                                <option value="P">P</option>
-                            </select>
-                            <input type="text" id="pc-rif-numero" placeholder="Ej: 123456789" 
-                                   inputmode="numeric" pattern="[0-9]*" maxlength="10"
-                                   oninput="if(window.HaciendaRIF) window.HaciendaRIF.handleInput(this, 'pc-rif-tipo')"
-                                   onkeydown="if(event.key==='Enter') window.PortalComercio.ejecutarConsultaRif()"
-                                   class="w-full bg-transparent text-slate-800 text-sm px-3 py-2.5 outline-none placeholder:text-slate-400 font-mono">
+                        <!-- Campo RIF -->
+                        <div id="pc-box-rif" class="space-y-1 ${loginModo === 'rif' ? '' : 'hidden'}">
+                            <label class="block text-xs font-medium text-slate-700">RIF o Cédula</label>
+                            <div class="flex items-center border border-slate-200 rounded-xl bg-white focus-within:border-slate-400 transition overflow-hidden">
+                                <select id="pc-rif-tipo" class="bg-transparent text-slate-800 font-medium text-sm px-3 py-2.5 outline-none cursor-pointer border-r border-slate-200">
+                                    <option value="J">J</option>
+                                    <option value="V">V</option>
+                                    <option value="G">G</option>
+                                    <option value="E">E</option>
+                                    <option value="C">C</option>
+                                    <option value="P">P</option>
+                                </select>
+                                <input type="text" id="pc-rif-numero" placeholder="Ej: 123456789" 
+                                       inputmode="numeric" pattern="[0-9]*" maxlength="10"
+                                       oninput="if(window.HaciendaRIF) window.HaciendaRIF.handleInput(this, 'pc-rif-tipo')"
+                                       onkeydown="if(event.key==='Enter') window.PortalComercio.ejecutarConsultaRif()"
+                                       class="w-full bg-transparent text-slate-800 text-sm px-3 py-2.5 outline-none placeholder:text-slate-400 font-mono">
+                            </div>
+                        </div>
+
+                        <!-- Campo Correo -->
+                        <div id="pc-box-correo" class="space-y-1 ${loginModo === 'correo' ? '' : 'hidden'}">
+                            <label class="block text-xs font-medium text-slate-700">Correo Electrónico Registrado</label>
+                            <div class="flex items-center border border-slate-200 rounded-xl bg-white focus-within:border-slate-400 transition overflow-hidden">
+                                <input type="email" id="pc-login-correo" placeholder="correo@comercio.com"
+                                       onkeydown="if(event.key==='Enter') window.PortalComercio.ejecutarConsultaRif()"
+                                       class="w-full bg-transparent text-slate-800 text-sm px-3 py-2.5 outline-none placeholder:text-slate-400">
+                            </div>
+                        </div>
+
+                        <!-- Campo Contraseña -->
+                        <div class="space-y-1">
+                            <div class="flex items-center justify-between">
+                                <label class="block text-xs font-medium text-slate-700">Contraseña de Acceso</label>
+                                <button type="button" onclick="window.PortalComercio.abrirRecuperarClave()" 
+                                        class="text-[11px] text-slate-400 hover:text-black transition">
+                                    ¿Olvidó su clave?
+                                </button>
+                            </div>
+                            <div class="flex items-center border border-slate-200 rounded-xl bg-white focus-within:border-slate-400 transition overflow-hidden px-3">
+                                <input type="password" id="pc-login-clave" placeholder="••••••••"
+                                       onkeydown="if(event.key==='Enter') window.PortalComercio.ejecutarConsultaRif()"
+                                       class="w-full bg-transparent text-slate-800 text-sm py-2.5 outline-none placeholder:text-slate-400">
+                                <button type="button" onclick="window.PortalComercio.toggleVerClave()" 
+                                        class="text-slate-400 hover:text-slate-600 transition pl-2 text-xs" title="Mostrar u ocultar contraseña">
+                                    <i id="pc-clave-eye" class="fas fa-eye"></i>
+                                </button>
+                            </div>
                         </div>
 
                         <button onclick="window.PortalComercio.ejecutarConsultaRif()" 
@@ -823,6 +880,8 @@
                 </div>
 
                 ${this.renderModalInscripcion()}
+                ${this.renderModalRecuperarClave()}
+                ${this.renderModalPrimerIngreso()}
                 ${this.renderModalArticulado()}
                 ${this.renderPopupOficial()}
             `;
@@ -1634,20 +1693,146 @@
             if (container) this.render(container);
         },
 
-        ejecutarConsultaRif: function() {
-            const tipo = document.getElementById('pc-rif-tipo') ? document.getElementById('pc-rif-tipo').value : 'J';
-            const rawNum = document.getElementById('pc-rif-numero') ? document.getElementById('pc-rif-numero').value : '';
-            const rifHelper = global.HaciendaRIF;
-            const parsed = rifHelper ? rifHelper.parse((tipo ? (tipo + '-') : '') + rawNum) : { tipo: tipo || 'J', numero: rawNum.replace(/\D/g, ''), full: (tipo || 'J') + '-' + rawNum.replace(/\D/g, '') };
+        cambiarLoginModo: function(modo) {
+            loginModo = modo;
+            const tabRif = document.getElementById('pc-tab-rif');
+            const tabCorreo = document.getElementById('pc-tab-correo');
+            const boxRif = document.getElementById('pc-box-rif');
+            const boxCorreo = document.getElementById('pc-box-correo');
 
-            if (!parsed.numero) {
+            if (tabRif && tabCorreo && boxRif && boxCorreo) {
+                if (modo === 'rif') {
+                    tabRif.className = 'flex-1 py-1.5 rounded-lg text-center font-medium transition bg-white text-black shadow-sm';
+                    tabCorreo.className = 'flex-1 py-1.5 rounded-lg text-center font-medium transition text-slate-500 hover:text-black';
+                    boxRif.classList.remove('hidden');
+                    boxCorreo.classList.add('hidden');
+                    const numInput = document.getElementById('pc-rif-numero');
+                    if (numInput) numInput.focus();
+                } else {
+                    tabCorreo.className = 'flex-1 py-1.5 rounded-lg text-center font-medium transition bg-white text-black shadow-sm';
+                    tabRif.className = 'flex-1 py-1.5 rounded-lg text-center font-medium transition text-slate-500 hover:text-black';
+                    boxCorreo.classList.remove('hidden');
+                    boxRif.classList.add('hidden');
+                    const mailInput = document.getElementById('pc-login-correo');
+                    if (mailInput) mailInput.focus();
+                }
+            }
+        },
+
+        toggleVerClave: function() {
+            const input = document.getElementById('pc-login-clave');
+            const icon = document.getElementById('pc-clave-eye');
+            if (!input) return;
+            if (input.type === 'password') {
+                input.type = 'text';
+                if (icon) icon.className = 'fas fa-eye-slash';
+            } else {
+                input.type = 'password';
+                if (icon) icon.className = 'fas fa-eye';
+            }
+        },
+
+        ejecutarConsultaRif: async function() {
+            const store = global.HaciendaStore;
+            if (!store) return;
+
+            const contribuyentes = store.get('hacienda_contribuyentes') || [];
+            let match = null;
+            let displayIdentificador = '';
+
+            if (loginModo === 'correo') {
+                const correo = (document.getElementById('pc-login-correo')?.value || '').trim().toLowerCase();
+                if (!correo || !correo.includes('@')) {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Correo Requerido',
+                            text: 'Ingrese un correo electrónico válido registrado en el padrón municipal.',
+                            confirmButtonColor: '#000000'
+                        });
+                    }
+                    return;
+                }
+                displayIdentificador = correo;
+                match = contribuyentes.find(c => String(c.correo || '').trim().toLowerCase() === correo);
+            } else {
+                const tipo = document.getElementById('pc-rif-tipo') ? document.getElementById('pc-rif-tipo').value : 'J';
+                const rawNum = document.getElementById('pc-rif-numero') ? document.getElementById('pc-rif-numero').value : '';
+                const rifHelper = global.HaciendaRIF;
+                const parsed = rifHelper ? rifHelper.parse((tipo ? (tipo + '-') : '') + rawNum) : { tipo: tipo || 'J', numero: rawNum.replace(/\D/g, ''), full: (tipo || 'J') + '-' + rawNum.replace(/\D/g, '') };
+
+                if (!parsed.numero) {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'RIF Requerido',
+                            text: 'Ingresa el número de RIF del contribuyente (solo números).',
+                            confirmButtonColor: '#000000'
+                        });
+                    }
+                    return;
+                }
+                displayIdentificador = parsed.full;
+                match = rifHelper ? rifHelper.findMatch(contribuyentes, parsed.tipo, parsed.numero) : contribuyentes.find(c => c.rif === parsed.full);
+            }
+
+            if (!match) {
                 if (typeof Swal !== 'undefined') {
-                    Swal.fire({ icon: 'warning', title: 'RIF Requerido', text: 'Ingresa el número de RIF del contribuyente (solo números).', confirmButtonColor: '#000000' });
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Comercio no Registrado',
+                        text: `El identificador (${displayIdentificador}) no se encuentra registrado en el Padrón Municipal. ¿Deseas solicitar el censo comercial?`,
+                        showCancelButton: true,
+                        confirmButtonText: 'Inscribir Comercio',
+                        cancelButtonText: 'Cancelar',
+                        confirmButtonColor: '#000000'
+                    }).then(res => {
+                        if (res.isConfirmed) {
+                            this.abrirModalInscripcion(displayIdentificador);
+                        }
+                    });
                 }
                 return;
             }
 
-            this.seleccionarRif(parsed.full);
+            // Primer Ingreso: el contribuyente no tiene clave asignada en el padrón
+            if (!match.clave) {
+                this.abrirModalPrimerIngreso(match);
+                return;
+            }
+
+            // Validar contraseña
+            const claveInput = (document.getElementById('pc-login-clave')?.value || '').trim();
+            if (!claveInput) {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Contraseña Requerida',
+                        text: 'Ingresa tu contraseña de acceso para iniciar sesión.',
+                        confirmButtonColor: '#000000'
+                    });
+                }
+                return;
+            }
+
+            const hashIngresado = await hashClave(claveInput);
+            if (hashIngresado !== match.clave) {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Contraseña Incorrecta',
+                        text: 'La contraseña no coincide. Si la olvidó, use la opción "¿Olvidó su clave?" para restablecerla con la cédula del representante legal.',
+                        confirmButtonColor: '#000000'
+                    });
+                }
+                return;
+            }
+
+            activeContribuyente = match;
+            activeModule = 'grid'; // Abre la Suite Principal
+
+            const container = document.getElementById('portal-main-content');
+            if (container) this.render(container);
         },
 
         seleccionarRif: function(rif) {
@@ -1659,30 +1844,160 @@
             const contribuyentes = store.get('hacienda_contribuyentes') || [];
             const match = rifHelper ? rifHelper.findMatch(contribuyentes, parsed.tipo, parsed.numero) : contribuyentes.find(c => c.rif === parsed.full);
 
-            if (!match) {
-                if (typeof Swal !== 'undefined') {
-                    Swal.fire({
-                        icon: 'info',
-                        title: 'Comercio no Registrado',
-                        text: `El RIF ${parsed.full} no se encuentra registrado en el Padrón Municipal. ¿Deseas solicitar la inscripción?`,
-                        showCancelButton: true,
-                        confirmButtonText: 'Inscribir Comercio',
-                        cancelButtonText: 'Cancelar',
-                        confirmButtonColor: '#000000'
-                    }).then(res => {
-                        if (res.isConfirmed) {
-                            this.abrirModalInscripcion(parsed.full);
-                        }
-                    });
-                }
+            if (match) {
+                activeContribuyente = match;
+                activeModule = 'grid';
+                const container = document.getElementById('portal-main-content');
+                if (container) this.render(container);
+            }
+        },
+
+        abrirModalPrimerIngreso: function(contribuyente) {
+            const m = document.getElementById('modal-primer-ingreso');
+            const hiddenId = document.getElementById('pi-contribuyente-id');
+            const infoBox = document.getElementById('pi-comercio-info');
+            if (hiddenId) hiddenId.value = contribuyente.id;
+            if (infoBox) infoBox.textContent = `${contribuyente.razon_social} (${contribuyente.rif})`;
+            if (m) m.classList.remove('hidden');
+        },
+
+        cerrarModalPrimerIngreso: function() {
+            const m = document.getElementById('modal-primer-ingreso');
+            if (m) m.classList.add('hidden');
+        },
+
+        guardarPrimerIngreso: async function() {
+            const store = global.HaciendaStore;
+            if (!store) return;
+
+            const cId = document.getElementById('pi-contribuyente-id')?.value;
+            const contribuyentes = store.get('hacienda_contribuyentes') || [];
+            const c = contribuyentes.find(item => item.id == cId);
+            if (!c) return;
+
+            const numCed = (document.getElementById('pi-cedula-numero')?.value || '').replace(/\D/g, '');
+            const clave = (document.getElementById('pi-clave')?.value || '').trim();
+            const claveConfirm = (document.getElementById('pi-clave-confirm')?.value || '').trim();
+
+            if (!numCed) {
+                if (typeof Swal !== 'undefined') Swal.fire({ icon: 'warning', title: 'Cédula Requerida', text: 'Ingresa la cédula del representante legal para validar identidad.', confirmButtonColor: '#000000' });
                 return;
             }
 
-            activeContribuyente = match;
-            activeModule = 'grid'; // Abre la Suite Principal
+            const regCedulaDigits = String(c.representante_cedula || '').replace(/\D/g, '');
+            if (regCedulaDigits && regCedulaDigits !== numCed) {
+                if (typeof Swal !== 'undefined') Swal.fire({ icon: 'error', title: 'Validación Fallida', text: 'La cédula del representante legal no coincide con la registrada en el padrón municipal.', confirmButtonColor: '#000000' });
+                return;
+            }
 
+            if (!clave || clave.length < 6) {
+                if (typeof Swal !== 'undefined') Swal.fire({ icon: 'warning', title: 'Contraseña Corta', text: 'La contraseña debe tener al menos 6 caracteres.', confirmButtonColor: '#000000' });
+                return;
+            }
+
+            if (clave !== claveConfirm) {
+                if (typeof Swal !== 'undefined') Swal.fire({ icon: 'warning', title: 'Contraseñas no coinciden', text: 'La confirmación no coincide con la nueva contraseña.', confirmButtonColor: '#000000' });
+                return;
+            }
+
+            const hash = await hashClave(clave);
+            c.clave = hash;
+            c.updated_at = new Date().toISOString();
+
+            await store.set('hacienda_contribuyentes', c);
+
+            this.cerrarModalPrimerIngreso();
+
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Contraseña Activada',
+                    text: 'Su contraseña ha sido creada exitosamente. Bienvenido al Portal.',
+                    confirmButtonColor: '#000000',
+                    timer: 2000
+                });
+            }
+
+            activeContribuyente = c;
+            activeModule = 'grid';
             const container = document.getElementById('portal-main-content');
             if (container) this.render(container);
+        },
+
+        abrirRecuperarClave: function() {
+            const m = document.getElementById('modal-recuperar-clave');
+            if (m) m.classList.remove('hidden');
+        },
+
+        cerrarModalRecuperarClave: function() {
+            const m = document.getElementById('modal-recuperar-clave');
+            if (m) m.classList.add('hidden');
+        },
+
+        guardarRecuperarClave: async function() {
+            const store = global.HaciendaStore;
+            if (!store) return;
+
+            const ident = (document.getElementById('rec-identificador')?.value || '').trim();
+            const numCed = (document.getElementById('rec-cedula-numero')?.value || '').replace(/\D/g, '');
+            const nuevaClave = (document.getElementById('rec-nueva-clave')?.value || '').trim();
+            const confirmClave = (document.getElementById('rec-confirm-clave')?.value || '').trim();
+
+            if (!ident) {
+                if (typeof Swal !== 'undefined') Swal.fire({ icon: 'warning', title: 'Identificador Requerido', text: 'Ingrese el RIF o el Correo del comercio.', confirmButtonColor: '#000000' });
+                return;
+            }
+
+            const contribuyentes = store.get('hacienda_contribuyentes') || [];
+            const rifHelper = global.HaciendaRIF;
+            const parsed = rifHelper ? rifHelper.parse(ident) : null;
+
+            const match = contribuyentes.find(c => {
+                if (String(c.correo || '').trim().toLowerCase() === ident.toLowerCase()) return true;
+                if (parsed && parsed.numero) {
+                    const matchDigits = String(c.rif || '').replace(/\D/g, '');
+                    return matchDigits === parsed.numero;
+                }
+                return c.rif === ident;
+            });
+
+            if (!match) {
+                if (typeof Swal !== 'undefined') Swal.fire({ icon: 'error', title: 'Comercio no encontrado', text: 'No existe ningún contribuyente registrado con ese RIF o Correo.', confirmButtonColor: '#000000' });
+                return;
+            }
+
+            const regCedulaDigits = String(match.representante_cedula || '').replace(/\D/g, '');
+            if (regCedulaDigits && regCedulaDigits !== numCed) {
+                if (typeof Swal !== 'undefined') Swal.fire({ icon: 'error', title: 'Validación Fallida', text: 'La cédula del representante legal no coincide con los registros municipales.', confirmButtonColor: '#000000' });
+                return;
+            }
+
+            if (!nuevaClave || nuevaClave.length < 6) {
+                if (typeof Swal !== 'undefined') Swal.fire({ icon: 'warning', title: 'Contraseña Corta', text: 'La nueva contraseña debe tener al menos 6 caracteres.', confirmButtonColor: '#000000' });
+                return;
+            }
+
+            if (nuevaClave !== confirmClave) {
+                if (typeof Swal !== 'undefined') Swal.fire({ icon: 'warning', title: 'Contraseñas no coinciden', text: 'La contraseña y su confirmación no son iguales.', confirmButtonColor: '#000000' });
+                return;
+            }
+
+            const hash = await hashClave(nuevaClave);
+            match.clave = hash;
+            match.updated_at = new Date().toISOString();
+
+            await store.set('hacienda_contribuyentes', match);
+
+            this.cerrarModalRecuperarClave();
+
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Contraseña Restablecida',
+                    text: 'Su contraseña ha sido actualizada exitosamente. Ya puede iniciar sesión.',
+                    confirmButtonColor: '#000000'
+                });
+            }
         },
 
         cerrarConsulta: function() {
@@ -1865,6 +2180,20 @@
                 return;
             }
 
+            // Contraseña de acceso
+            const clave = (document.getElementById('ins-clave')?.value || '').trim();
+            const claveConfirm = (document.getElementById('ins-clave-confirm')?.value || '').trim();
+
+            if (!clave || clave.length < 6) {
+                if (typeof Swal !== 'undefined') Swal.fire({ icon: 'warning', title: 'Contraseña Requerida', text: 'La contraseña de acceso debe contener al menos 6 caracteres.', confirmButtonColor: '#000000' });
+                return;
+            }
+            if (clave !== claveConfirm) {
+                if (typeof Swal !== 'undefined') Swal.fire({ icon: 'warning', title: 'Contraseñas no coinciden', text: 'La contraseña y su confirmación no son iguales.', confirmButtonColor: '#000000' });
+                return;
+            }
+            const hashClaveVal = await hashClave(clave);
+
             const rifCompleto = parsed.full;
             const contribuyenteId = (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function')
                 ? crypto.randomUUID()
@@ -1881,6 +2210,7 @@
                 direccion_fiscal: '',
                 representante_legal: repNombre,
                 representante_cedula: parsedCedula.full,
+                clave: hashClaveVal,
                 estado: 'activo'
             };
 
@@ -1995,11 +2325,145 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="text-[11px] font-medium text-neutral-400 uppercase block mb-1">Contraseña de Acceso</label>
+                                    <input type="password" id="ins-clave" placeholder="Mínimo 6 caracteres" class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none focus:border-white/30 text-xs">
+                                </div>
+                                <div>
+                                    <label class="text-[11px] font-medium text-neutral-400 uppercase block mb-1">Confirmar Contraseña</label>
+                                    <input type="password" id="ins-clave-confirm" placeholder="Repite la contraseña" class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none focus:border-white/30 text-xs">
+                                </div>
+                            </div>
                         </div>
 
                         <div class="flex justify-end gap-3 pt-2 border-t border-white/5">
                             <button onclick="window.PortalComercio.cerrarModalInscripcion()" class="px-5 py-2.5 text-xs text-neutral-400 hover:text-white rounded-full">Cancelar</button>
                             <button onclick="window.PortalComercio.guardarInscripcion()" class="bg-white hover:bg-neutral-200 text-black text-xs font-semibold rounded-full px-6 py-2.5 transition">Registrar Comercio</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        },
+
+        renderModalPrimerIngreso: function() {
+            return `
+                <div id="modal-primer-ingreso" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+                    <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl p-6 sm:p-8 space-y-4 border border-slate-200">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                            <div>
+                                <h3 class="text-base font-bold text-black">Primer Ingreso al Portal</h3>
+                                <p class="text-xs text-slate-500">Configure su contraseña segura de acceso</p>
+                            </div>
+                            <button onclick="window.PortalComercio.cerrarModalPrimerIngreso()" class="text-slate-400 hover:text-black p-1">
+                                <i class="fas fa-times text-sm"></i>
+                            </button>
+                        </div>
+
+                        <div class="p-3 bg-amber-50 rounded-2xl border border-amber-200 text-xs text-amber-800 leading-relaxed">
+                            <span id="pi-comercio-info" class="font-semibold block mb-1">Comercio</span>
+                            Su comercio se encuentra registrado en el padrón municipal pero aún no tiene clave. Por su seguridad, confirme la Cédula del Representante Legal para activar su acceso.
+                        </div>
+
+                        <input type="hidden" id="pi-contribuyente-id">
+
+                        <div class="space-y-3 text-xs">
+                            <div>
+                                <label class="text-[11px] font-medium text-slate-600 uppercase block mb-1">Cédula del Representante Legal (Solo Números)</label>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <select id="pi-cedula-tipo" class="bg-white border border-slate-200 text-slate-800 rounded-xl px-2 py-2.5 text-xs outline-none focus:border-slate-400">
+                                        <option value="V">V</option>
+                                        <option value="E">E</option>
+                                        <option value="P">P</option>
+                                    </select>
+                                    <input type="text" id="pi-cedula-numero" placeholder="Solo números (ej: 12345678)"
+                                           inputmode="numeric" pattern="[0-9]*" maxlength="9"
+                                           oninput="if(window.HaciendaCedula) window.HaciendaCedula.handleInput(this, 'pi-cedula-tipo')"
+                                           class="col-span-2 bg-white border border-slate-200 text-slate-800 rounded-xl px-3 py-2.5 text-xs font-mono outline-none focus:border-slate-400">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="text-[11px] font-medium text-slate-600 uppercase block mb-1">Nueva Contraseña (Mínimo 6 caracteres)</label>
+                                <input type="password" id="pi-clave" placeholder="••••••••" 
+                                       class="w-full bg-white border border-slate-200 text-slate-800 rounded-xl px-3 py-2.5 outline-none focus:border-slate-400 text-xs">
+                            </div>
+
+                            <div>
+                                <label class="text-[11px] font-medium text-slate-600 uppercase block mb-1">Confirmar Nueva Contraseña</label>
+                                <input type="password" id="pi-clave-confirm" placeholder="••••••••" 
+                                       class="w-full bg-white border border-slate-200 text-slate-800 rounded-xl px-3 py-2.5 outline-none focus:border-slate-400 text-xs">
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
+                            <button onclick="window.PortalComercio.cerrarModalPrimerIngreso()" class="px-4 py-2.5 text-xs text-slate-500 hover:text-black">Cancelar</button>
+                            <button onclick="window.PortalComercio.guardarPrimerIngreso()" 
+                                    class="bg-black hover:bg-neutral-800 text-white text-xs font-semibold rounded-xl px-5 py-2.5 transition">
+                                Activar Acceso →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        },
+
+        renderModalRecuperarClave: function() {
+            return `
+                <div id="modal-recuperar-clave" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+                    <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl p-6 sm:p-8 space-y-4 border border-slate-200">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                            <div>
+                                <h3 class="text-base font-bold text-black">Recuperación de Contraseña</h3>
+                                <p class="text-xs text-slate-500">Validación de identidad municipal</p>
+                            </div>
+                            <button onclick="window.PortalComercio.cerrarModalRecuperarClave()" class="text-slate-400 hover:text-black p-1">
+                                <i class="fas fa-times text-sm"></i>
+                            </button>
+                        </div>
+
+                        <div class="space-y-3 text-xs">
+                            <div>
+                                <label class="text-[11px] font-medium text-slate-600 uppercase block mb-1">RIF del Comercio o Correo</label>
+                                <input type="text" id="rec-identificador" placeholder="Ej: J-123456789 o correo@comercio.com" 
+                                       class="w-full bg-white border border-slate-200 text-slate-800 rounded-xl px-3 py-2.5 outline-none focus:border-slate-400 text-xs">
+                            </div>
+
+                            <div>
+                                <label class="text-[11px] font-medium text-slate-600 uppercase block mb-1">Cédula del Representante Legal (Solo Números)</label>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <select id="rec-cedula-tipo" class="bg-white border border-slate-200 text-slate-800 rounded-xl px-2 py-2.5 text-xs outline-none focus:border-slate-400">
+                                        <option value="V">V</option>
+                                        <option value="E">E</option>
+                                        <option value="P">P</option>
+                                    </select>
+                                    <input type="text" id="rec-cedula-numero" placeholder="Solo números"
+                                           inputmode="numeric" pattern="[0-9]*" maxlength="9"
+                                           oninput="if(window.HaciendaCedula) window.HaciendaCedula.handleInput(this, 'rec-cedula-tipo')"
+                                           class="col-span-2 bg-white border border-slate-200 text-slate-800 rounded-xl px-3 py-2.5 text-xs font-mono outline-none focus:border-slate-400">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="text-[11px] font-medium text-slate-600 uppercase block mb-1">Nueva Contraseña (Mínimo 6 caracteres)</label>
+                                <input type="password" id="rec-nueva-clave" placeholder="••••••••" 
+                                       class="w-full bg-white border border-slate-200 text-slate-800 rounded-xl px-3 py-2.5 outline-none focus:border-slate-400 text-xs">
+                            </div>
+
+                            <div>
+                                <label class="text-[11px] font-medium text-slate-600 uppercase block mb-1">Confirmar Nueva Contraseña</label>
+                                <input type="password" id="rec-confirm-clave" placeholder="••••••••" 
+                                       class="w-full bg-white border border-slate-200 text-slate-800 rounded-xl px-3 py-2.5 outline-none focus:border-slate-400 text-xs">
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
+                            <button onclick="window.PortalComercio.cerrarModalRecuperarClave()" class="px-4 py-2.5 text-xs text-slate-500 hover:text-black">Cancelar</button>
+                            <button onclick="window.PortalComercio.guardarRecuperarClave()" 
+                                    class="bg-black hover:bg-neutral-800 text-white text-xs font-semibold rounded-xl px-5 py-2.5 transition">
+                                Restablecer Clave →
+                            </button>
                         </div>
                     </div>
                 </div>

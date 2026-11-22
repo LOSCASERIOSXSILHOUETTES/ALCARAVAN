@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS "public"."hacienda_contribuyentes" (
     "acta_constitutiva_url" TEXT,
     "fotos_local" JSONB DEFAULT '[]'::jsonb,
     "estado" TEXT NOT NULL DEFAULT 'activo', -- 'activo', 'bloqueado', 'en_revision'
+    "clave" TEXT,
     "created_at" TIMESTAMPTZ DEFAULT NOW(),
     "updated_at" TIMESTAMPTZ DEFAULT NOW()
 );

@@ -140,6 +140,18 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.8.8 — 22/11/2026
+- **Autenticacion Hibrida Segura para el Portal del Contribuyente (RIF / Correo + Clave):**
+  - Soporte de acceso dual: inicio de sesion por **RIF + Contraseña** o por **Correo Electronico + Contraseña**.
+  - Selector de pestaña minimalista ("Por RIF" / "Por Correo") integrado en la tarjeta de acceso sin alterar la estetica limpia de la referencia visual.
+  - Campo de contraseña con alternancia para mostrar/ocultar clave (`fa-eye` / `fa-eye-slash`).
+  - Encriptacion mediante hash SHA-256 (`crypto.subtle`) para almacenamiento seguro offline y sincronizacion remota.
+  - **Primer Ingreso al Portal:** Activacion guiada de clave para comercios existentes validando la Cedula del Representante Legal en modal exclusivo.
+  - **Recuperacion de Contraseña:** Enlace "¿Olvido su clave?" con verificacion de Cedula del Representante Legal contra el padron municipal.
+  - **Censo Municipal:** Exigencia obligatoria de creacion y confirmacion de clave (minimo 6 caracteres) al inscribir un nuevo comercio.
+  - Registro del campo `clave` en `TABLE_SCHEMAS['hacienda_contribuyentes']` (`js/core/store.js`) y `sql/schema_hacienda.sql`.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.8.8` con 312 pruebas automatizadas en verde.
+
 ### Version 3.8.7 — 22/11/2026
 - **Fidelidad Pixel-Perfect al Mockup Oficial del Portal del Contribuyente:**
   - Header minimalista exacto: Emblema "A" negro, texto "Alcaravan | San Jose de Guaribe", tasa interactiva "TCMMV BCV: 1.009,07 Bs. v" y boton contorneado "Funcionarios".

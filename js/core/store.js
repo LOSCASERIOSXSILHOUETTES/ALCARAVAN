@@ -37,7 +37,7 @@
             'id', 'rif', 'razon_social', 'denominacion_comercial', 'tipo_persona',
             'correo', 'telefono', 'direccion_fiscal', 'representante_legal',
             'representante_cedula', 'acta_constitutiva_url', 'fotos_local',
-            'estado', 'created_at', 'updated_at'
+            'estado', 'clave', 'created_at', 'updated_at'
         ],
         'hacienda_patentes': [
             'id', 'numero_patente', 'contribuyente_id', 'tipo', 'codigo_locat',
