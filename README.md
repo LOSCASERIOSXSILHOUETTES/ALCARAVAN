@@ -140,6 +140,14 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.8.9 — 22/11/2026
+- **Asignacion Administrativa de Contraseñas a Contribuyentes en Panel ERP:**
+  - **Accion Directa en Padrón RUC:** Boton "Clave" en cada fila de la tabla de contribuyentes con indicador visual de estado (llave verde si tiene clave, gris si esta pendiente de primer ingreso).
+  - **Modal de Gestion de Clave:** Permite a los administradores asignar o restablecer la contraseña de acceso al portal de cualquier comercio, con generador automatico de claves seguras en 1 clic (`GuaribeXXXX!`).
+  - **Registro de Nuevos Contribuyentes:** Campo opcional de contraseña incorporado en el formulario de registro del ERP (`modal-registro-contribuyente`), permitiendo registrar al comercio con su clave lista o dejarlo para que la cree en su primer ingreso.
+  - Encriptacion mediante hash SHA-256 antes de persistir en `HaciendaStore` y sincronizar con Supabase.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.8.9` con 312 pruebas automatizadas en verde.
+
 ### Version 3.8.8 — 22/11/2026
 - **Autenticacion Hibrida Segura para el Portal del Contribuyente (RIF / Correo + Clave):**
   - Soporte de acceso dual: inicio de sesion por **RIF + Contraseña** o por **Correo Electronico + Contraseña**.

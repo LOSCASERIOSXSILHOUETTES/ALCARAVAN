@@ -145,6 +145,15 @@
                                 <label class="block text-xs font-bold text-slate-400 mb-1">Foto del Local / Fachada Comercial</label>
                                 <input type="file" id="c-foto" accept="image/*" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-slate-300 text-xs file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-sky-600 file:text-white hover:file:bg-sky-500">
                             </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 mb-1">Contraseña para Portal del Contribuyente (Opcional)</label>
+                                <div class="relative">
+                                    <input type="text" id="c-clave" placeholder="Si se deja vacía, el comerciante la crea en su primer ingreso" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 text-xs font-mono outline-none focus:border-sky-500 pr-20">
+                                    <button type="button" onclick="document.getElementById('c-clave').value = 'Guaribe' + Math.floor(1000 + Math.random() * 9000) + '!'" class="absolute right-2 top-1.5 px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-[10px] text-sky-400 font-bold rounded-lg transition">
+                                        Generar
+                                    </button>
+                                </div>
+                            </div>
                             <div class="pt-4 flex justify-end gap-3 border-t border-slate-800">
                                 <button type="button" onclick="window.ContribuyentesModule.cerrarModalRegistro()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl">Cancelar</button>
                                 <button type="submit" id="btn-guardar-contribuyente" class="px-5 py-2 bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs rounded-xl shadow-lg">Registrar Contribuyente</button>
@@ -176,13 +185,21 @@
                         <div class="text-[11px] text-slate-500">${c.representante_cedula || ''}</div>
                     </td>
                     <td class="py-3 px-4">
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${c.estado === 'activo' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}">
-                            ${(c.estado || 'activo').toUpperCase()}
-                        </span>
+                        <div class="flex items-center gap-1.5">
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${c.estado === 'activo' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}">
+                                ${(c.estado || 'activo').toUpperCase()}
+                            </span>
+                            ${c.clave 
+                                ? `<span title="Clave configurada" class="text-emerald-400 text-xs"><i class="fas fa-key"></i></span>` 
+                                : `<span title="Sin clave establecida" class="text-slate-600 text-xs"><i class="fas fa-key"></i></span>`}
+                        </div>
                     </td>
-                    <td class="py-3 px-4 text-right space-x-2">
-                        <button onclick="window.ContribuyentesModule.asignarPatenteRapida(${c.id})" class="px-2.5 py-1 bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-400 border border-indigo-500/30 rounded-lg text-[11px] font-semibold transition" title="Emitir Patente Comercial">
+                    <td class="py-3 px-4 text-right space-x-2 whitespace-nowrap">
+                        <button onclick="window.ContribuyentesModule.asignarPatenteRapida('${c.id}')" class="px-2.5 py-1 bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-400 border border-indigo-500/30 rounded-lg text-[11px] font-semibold transition" title="Emitir Patente Comercial">
                             <i class="fas fa-certificate"></i> Patente
+                        </button>
+                        <button onclick="window.ContribuyentesModule.asignarClaveContribuyente('${c.id}')" class="px-2.5 py-1 bg-amber-600/20 hover:bg-amber-600/40 text-amber-400 border border-amber-500/30 rounded-lg text-[11px] font-semibold transition" title="Asignar o Cambiar Contraseña del Contribuyente">
+                            <i class="fas fa-key"></i> Clave
                         </button>
                     </td>
                 </tr>
@@ -250,6 +267,20 @@
                     ? cedHelper.parse((tipoCed ? (tipoCed + '-') : '') + numCed) 
                     : { tipo: tipoCed, numero: numCed.replace(/\D/g, ''), full: numCed ? (tipoCed + '-' + numCed.replace(/\D/g, '')) : '' };
 
+                const rawClave = (document.getElementById('c-clave')?.value || '').trim();
+                let hashClave = null;
+                if (rawClave) {
+                    if (rawClave.length < 6) {
+                        throw new Error('La contraseña debe tener al menos 6 caracteres.');
+                    }
+                    if (global.HaciendaAuth && typeof global.HaciendaAuth.hashPassword === 'function') {
+                        hashClave = await global.HaciendaAuth.hashPassword(rawClave);
+                    } else {
+                        const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(rawClave));
+                        hashClave = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+                    }
+                }
+
                 const nuevo = {
                     rif: parsedRif.full,
                     tipo_persona: document.getElementById('c-tipo').value,
@@ -261,6 +292,7 @@
                     representante_legal: document.getElementById('c-rep-nombre').value.trim(),
                     representante_cedula: parsedCedula.full,
                     fotos_local: fotoUrl ? [fotoUrl] : [],
+                    clave: hashClave,
                     estado: 'activo'
                 };
 
@@ -271,10 +303,15 @@
                     Swal.fire({
                         icon: 'success',
                         title: 'Contribuyente Registrado',
-                        text: 'Registrado con éxito en el Padrón Municipal.',
-                        confirmButtonColor: '#0284c7',
-                        timer: 1800,
-                        showConfirmButton: false
+                        html: rawClave ? `
+                            <div class="text-xs space-y-2 text-slate-300">
+                                <p>Registrado con éxito en el Padrón Municipal.</p>
+                                <div class="bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-sky-400 font-mono font-bold select-all">
+                                    Clave asignada: ${rawClave}
+                                </div>
+                            </div>
+                        ` : 'Registrado con éxito en el Padrón Municipal.',
+                        confirmButtonColor: '#0284c7'
                     });
                 }
             } catch (err) {
@@ -292,6 +329,114 @@
                         global.PatentesModule.abrirModalPatente(contribuyenteId);
                     }
                 }, 100);
+            }
+        },
+
+        asignarClaveContribuyente: async function(id) {
+            const store = global.HaciendaStore;
+            if (!store) return;
+            const contribuyentes = store.get('hacienda_contribuyentes') || [];
+            const c = contribuyentes.find(item => String(item.id) === String(id));
+            if (!c) {
+                if (typeof Swal !== 'undefined') Swal.fire({ icon: 'error', title: 'No encontrado', text: 'Contribuyente no encontrado en el padrón.', confirmButtonColor: '#0284c7' });
+                return;
+            }
+
+            const estadoClave = c.clave 
+                ? '<span class="text-emerald-400 font-semibold">Configurada</span>' 
+                : '<span class="text-amber-400 font-semibold">Sin clave (Pendiente de primer ingreso)</span>';
+
+            const claveSugerida = 'Guaribe' + Math.floor(1000 + Math.random() * 9000) + '!';
+
+            if (typeof Swal === 'undefined') {
+                const manual = prompt(`Asignar contraseña a ${c.razon_social} (${c.rif}):`, claveSugerida);
+                if (!manual || manual.length < 6) return;
+                let hash = null;
+                if (global.HaciendaAuth && typeof global.HaciendaAuth.hashPassword === 'function') {
+                    hash = await global.HaciendaAuth.hashPassword(manual.trim());
+                } else {
+                    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(manual.trim()));
+                    hash = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+                }
+                c.clave = hash;
+                c.updated_at = new Date().toISOString();
+                await store.set('hacienda_contribuyentes', c);
+                alert('Contraseña actualizada con éxito: ' + manual.trim());
+                this.filtrarTabla();
+                return;
+            }
+
+            const { value: formValues } = await Swal.fire({
+                title: 'Seguridad del Contribuyente',
+                html: `
+                    <div class="text-left text-xs space-y-3 p-1">
+                        <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl space-y-1">
+                            <div class="font-bold text-slate-100">${c.razon_social}</div>
+                            <div class="text-slate-400 font-mono text-[11px]">${c.rif} · Rep: ${c.representante_legal || 'N/A'}</div>
+                            <div class="text-[11px] text-slate-400 pt-1 border-t border-slate-800/80">Estado actual: ${estadoClave}</div>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-slate-300 mb-1">Nueva Contraseña de Acceso:</label>
+                            <div class="relative">
+                                <input id="swal-nueva-clave" type="text" class="w-full bg-slate-950 border border-slate-700 text-slate-100 rounded-xl px-3 py-2 text-xs font-mono outline-none focus:border-sky-500 pr-20" value="${claveSugerida}">
+                                <button type="button" onclick="document.getElementById('swal-nueva-clave').value = 'Guaribe' + Math.floor(1000 + Math.random() * 9000) + '!'" class="absolute right-2 top-1.5 px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-[10px] text-sky-400 font-bold rounded-lg transition">
+                                    Generar
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="text-[11px] text-slate-400 italic">
+                            Nota: Esta clave le permitirá al comercio iniciar sesión en el portal municipal para autoliquidar patentes y emitir solvencias.
+                        </div>
+                    </div>
+                `,
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: 'Guardar Contraseña',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#0284c7',
+                cancelButtonColor: '#475569',
+                preConfirm: () => {
+                    const pass = document.getElementById('swal-nueva-clave')?.value.trim();
+                    if (!pass || pass.length < 6) {
+                        Swal.showValidationMessage('La contraseña debe tener al menos 6 caracteres.');
+                        return false;
+                    }
+                    return pass;
+                }
+            });
+
+            if (formValues) {
+                let hash = null;
+                if (global.HaciendaAuth && typeof global.HaciendaAuth.hashPassword === 'function') {
+                    hash = await global.HaciendaAuth.hashPassword(formValues);
+                } else {
+                    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(formValues));
+                    hash = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+                }
+
+                c.clave = hash;
+                c.updated_at = new Date().toISOString();
+                await store.set('hacienda_contribuyentes', c);
+
+                this.filtrarTabla();
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Contraseña Asignada',
+                    html: `
+                        <div class="text-xs space-y-2 text-slate-300">
+                            <p>Se actualizó la contraseña para <strong>${c.razon_social}</strong>.</p>
+                            <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl font-mono text-sm text-sky-400 select-all font-bold">
+                                ${formValues}
+                            </div>
+                            <p class="text-[11px] text-slate-400">Entregue o comunique esta contraseña al representante legal del comercio.</p>
+                        </div>
+                    `,
+                    confirmButtonColor: '#0284c7',
+                    confirmButtonText: 'Listo'
+                });
             }
         }
     };
