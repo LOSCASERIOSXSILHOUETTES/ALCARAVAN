@@ -300,85 +300,33 @@
                 this._cache[table] = Array.isArray(data) ? data : [];
             }
 
-            // Sembrar cuentas recaudadoras por defecto si está vacío
-            if (!this._cache['hacienda_cuentas'] || this._cache['hacienda_cuentas'].length === 0) {
-                const cuentasIniciales = [
-                    { id: 'cta_01', banco: 'Banco de Venezuela', numero: '0102-0544-21-0000012345', tipo: 'Corriente', concepto: 'Recaudación Tributaria SATRIMG', saldo_inicial: 0.00, saldo_actual: 0.00, estado: 'activa' },
-                    { id: 'cta_02', banco: 'Banesco', numero: '0134-0371-82-0000098765', tipo: 'Corriente', concepto: 'Ingresos Propios e Impuestos Locales', saldo_inicial: 0.00, saldo_actual: 0.00, estado: 'activa' }
-                ];
-                this._cache['hacienda_cuentas'] = cuentasIniciales;
-                if (this._localStore) {
-                    await this._localStore.setItem('tbl_hacienda_cuentas', cuentasIniciales);
+            // Purgar de memoria y LocalForage cualquier cuenta bancaria mockeada residual de prueba
+            const mockCuentasIds = new Set(['cta_01', 'cta_02']);
+            const mockCuentasNums = new Set(['01020544210000012345', '01340371820000098765']);
+            if (Array.isArray(this._cache['hacienda_cuentas'])) {
+                const cuentasLimpias = this._cache['hacienda_cuentas'].filter(c => {
+                    const cleanNum = String(c.numero || '').replace(/\D/g, '');
+                    return !mockCuentasIds.has(String(c.id)) && !mockCuentasNums.has(cleanNum);
+                });
+                if (cuentasLimpias.length !== this._cache['hacienda_cuentas'].length) {
+                    this._cache['hacienda_cuentas'] = cuentasLimpias;
+                    if (this._localStore) {
+                        await this._localStore.setItem('tbl_hacienda_cuentas', cuentasLimpias);
+                    }
                 }
             }
 
-            // Sembrar métodos de pago oficiales afiliados a cuentas bancarias si está vacío
-            if (!this._cache['hacienda_metodos_pago'] || this._cache['hacienda_metodos_pago'].length === 0) {
-                const metodosIniciales = [
-                    {
-                        id: 'met_pm_bdv',
-                        cuenta_id: 'cta_01',
-                        tipo: 'pago_movil',
-                        nombre: 'Pago Móvil Banco de Venezuela',
-                        banco: 'Banco de Venezuela',
-                        telefono: '0412-1234567',
-                        identificacion: 'G-20000123-4',
-                        titular: 'Alcaldía del Municipio San José de Guaribe',
-                        instrucciones: 'Indicar el número de RIF del comercio en la descripción del pago móvil.',
-                        activo: true,
-                        orden: 1,
-                        created_at: new Date().toISOString(),
-                        updated_at: new Date().toISOString()
-                    },
-                    {
-                        id: 'met_tr_bdv',
-                        cuenta_id: 'cta_01',
-                        tipo: 'transferencia',
-                        nombre: 'Transferencia Bancaria Banco de Venezuela',
-                        banco: 'Banco de Venezuela',
-                        telefono: '',
-                        identificacion: 'G-20000123-4',
-                        titular: 'Alcaldía del Municipio San José de Guaribe',
-                        instrucciones: 'Cuenta Corriente oficial para entero de autoliquidaciones LOCAT.',
-                        activo: true,
-                        orden: 2,
-                        created_at: new Date().toISOString(),
-                        updated_at: new Date().toISOString()
-                    },
-                    {
-                        id: 'met_tr_banesco',
-                        cuenta_id: 'cta_02',
-                        tipo: 'transferencia',
-                        nombre: 'Transferencia Bancaria Banesco',
-                        banco: 'Banesco Banco Universal',
-                        telefono: '',
-                        identificacion: 'G-20000123-4',
-                        titular: 'Alcaldía del Municipio San José de Guaribe',
-                        instrucciones: 'Cuenta de Ingresos Propios y Tasas Administrativas.',
-                        activo: true,
-                        orden: 3,
-                        created_at: new Date().toISOString(),
-                        updated_at: new Date().toISOString()
-                    },
-                    {
-                        id: 'met_pos_taquilla',
-                        cuenta_id: 'cta_01',
-                        tipo: 'punto_venta',
-                        nombre: 'Punto de Venta / Tarjeta en Taquilla Central',
-                        banco: 'Banco de Venezuela',
-                        telefono: '',
-                        identificacion: 'G-20000123-4',
-                        titular: 'Taquilla de Recaudación Alcaldía',
-                        instrucciones: 'Disponible en la sede de Administración Tributaria en horario de taquilla.',
-                        activo: true,
-                        orden: 4,
-                        created_at: new Date().toISOString(),
-                        updated_at: new Date().toISOString()
+            // Purgar de memoria y LocalForage cualquier método de pago mockeado residual
+            const mockMetodosIds = new Set(['met_pm_bdv', 'met_tr_bdv', 'met_tr_banesco', 'met_pos_taquilla']);
+            if (Array.isArray(this._cache['hacienda_metodos_pago'])) {
+                const metodosLimpios = this._cache['hacienda_metodos_pago'].filter(m => {
+                    return !mockMetodosIds.has(String(m.id)) && !mockCuentasIds.has(String(m.cuenta_id));
+                });
+                if (metodosLimpios.length !== this._cache['hacienda_metodos_pago'].length) {
+                    this._cache['hacienda_metodos_pago'] = metodosLimpios;
+                    if (this._localStore) {
+                        await this._localStore.setItem('tbl_hacienda_metodos_pago', metodosLimpios);
                     }
-                ];
-                this._cache['hacienda_metodos_pago'] = metodosIniciales;
-                if (this._localStore) {
-                    await this._localStore.setItem('tbl_hacienda_metodos_pago', metodosIniciales);
                 }
             }
 

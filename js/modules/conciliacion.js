@@ -29,7 +29,12 @@
                 return;
             }
 
-            const cuentas = store.get('hacienda_cuentas') || [];
+            const mockCtaIds = new Set(['cta_01', 'cta_02']);
+            const mockCtaNums = new Set(['01020544210000012345', '01340371820000098765']);
+            const cuentas = (store.get('hacienda_cuentas') || []).filter(c => {
+                const cleanNum = String(c.numero || '').replace(/\D/g, '');
+                return !mockCtaIds.has(String(c.id)) && !mockCtaNums.has(cleanNum);
+            });
             const conciliaciones = store.get('hacienda_conciliacion') || [];
             const desgloses = store.get('hacienda_conciliacion_desglose') || [];
             const ramos = store.get('hacienda_ramos_ingreso') || [];
@@ -558,7 +563,12 @@
 
             const conciliaciones = store.get('hacienda_conciliacion') || [];
             const desgloses = store.get('hacienda_conciliacion_desglose') || [];
-            const cuentas = store.get('hacienda_cuentas') || [];
+            const mockCtaIds = new Set(['cta_01', 'cta_02']);
+            const mockCtaNums = new Set(['01020544210000012345', '01340371820000098765']);
+            const cuentas = (store.get('hacienda_cuentas') || []).filter(c => {
+                const cleanNum = String(c.numero || '').replace(/\D/g, '');
+                return !mockCtaIds.has(String(c.id)) && !mockCtaNums.has(cleanNum);
+            });
             const ramos = store.get('hacienda_ramos_ingreso') || [];
 
             const dia = conciliaciones.find(c => String(c.id) === String(conciliacionId));

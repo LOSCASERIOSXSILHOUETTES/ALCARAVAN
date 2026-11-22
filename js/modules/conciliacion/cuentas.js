@@ -56,14 +56,36 @@
             return (store.get('hacienda_cuentas') || []).filter(c => c.estado !== 'inactiva');
         },
 
-        // Todas las cuentas (activas e inactivas)
+        // Todas las cuentas (activas e inactivas, filtrando cualquier mock residual)
         getAll: function() {
             const store = global.HaciendaStore;
-            return store ? (store.get('hacienda_cuentas') || []) : [];
+            const cuentas = store ? (store.get('hacienda_cuentas') || []) : [];
+            const mockIds = new Set(['cta_01', 'cta_02']);
+            const mockNums = new Set(['01020544210000012345', '01340371820000098765']);
+            return cuentas.filter(c => {
+                const cleanNum = String(c.numero || '').replace(/\D/g, '');
+                return !mockIds.has(String(c.id)) && !mockNums.has(cleanNum);
+            });
         },
 
         // Abre el modal principal de gestión de cuentas
         abrirModalGestion: function() {
+            // Purgar de inmediato de store si hubiese cuentas mockeadas en memoria
+            const store = global.HaciendaStore;
+            if (store && Array.isArray(store._cache?.['hacienda_cuentas'])) {
+                const mockIds = new Set(['cta_01', 'cta_02']);
+                const mockNums = new Set(['01020544210000012345', '01340371820000098765']);
+                const prev = store._cache['hacienda_cuentas'];
+                const limpias = prev.filter(c => {
+                    const cleanNum = String(c.numero || '').replace(/\D/g, '');
+                    return !mockIds.has(String(c.id)) && !mockNums.has(cleanNum);
+                });
+                if (limpias.length !== prev.length) {
+                    store._cache['hacienda_cuentas'] = limpias;
+                    if (store._localStore) store._localStore.setItem('tbl_hacienda_cuentas', limpias);
+                }
+            }
+
             let modal = document.getElementById('modal-gestion-cuentas-bancarias');
             if (!modal) {
                 modal = document.createElement('div');

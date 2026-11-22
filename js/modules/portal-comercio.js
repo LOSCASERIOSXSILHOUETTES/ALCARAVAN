@@ -907,7 +907,13 @@
             const vehiculos = (store.get('hacienda_vehiculos') || []).filter(v => String(v.contribuyente_id) === String(c.id));
             const publicidades = (store.get('hacienda_publicidad') || []).filter(p => String(p.contribuyente_id) === String(c.id));
             const pagos = (store.get('hacienda_pagos') || []).filter(p => String(p.contribuyente_id) === String(c.id));
-            const cuentas = (store.get('hacienda_cuentas') || []).filter(cta => cta.estado !== 'inactiva');
+            const mockCtaIds = new Set(['cta_01', 'cta_02']);
+            const mockCtaNums = new Set(['01020544210000012345', '01340371820000098765']);
+            const cuentas = (store.get('hacienda_cuentas') || []).filter(cta => {
+                if (cta.estado === 'inactiva') return false;
+                const cleanNum = String(cta.numero || cta.numero_cuenta || '').replace(/\D/g, '');
+                return !mockCtaIds.has(String(cta.id)) && !mockCtaNums.has(cleanNum);
+            });
 
             container.innerHTML = `
                 <div class="max-w-5xl mx-auto space-y-8 py-6">
@@ -1362,8 +1368,10 @@
                     </div>
                 `;
             } else if (tab === 'pagar') {
+                const mockMetodoIds = new Set(['met_pm_bdv', 'met_tr_bdv', 'met_tr_banesco', 'met_pos_taquilla']);
+                const mockCtaIdsPagar = new Set(['cta_01', 'cta_02']);
                 const metodosPago = (global.HaciendaStore ? global.HaciendaStore.get('hacienda_metodos_pago') : [])
-                    .filter(m => m.activo !== false);
+                    .filter(m => m.activo !== false && !mockMetodoIds.has(String(m.id)) && !mockCtaIdsPagar.has(String(m.cuenta_id)));
                 const cuentasList = cuentas || [];
                 const cuentasMap = new Map(cuentasList.map(cta => [String(cta.id), cta]));
 

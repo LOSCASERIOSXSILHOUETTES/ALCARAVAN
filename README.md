@@ -140,6 +140,13 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.10.3 — 22/11/2026
+- **Erradicación Total de Semillas y Cuentas Bancarias Mockeadas (Limpieza Definitiva para Producción):**
+  - **Eliminación de Siembra Automática en `store.js`:** Suprimido de raíz el bloque que inyectaba por defecto las cuentas de prueba `cta_01` (0102-0544-21-0000012345) y `cta_02` (0134-0371-82-0000098765), así como los métodos de pago mockeados asociados (`met_pm_bdv`, `met_tr_bdv`, etc.).
+  - **Rutina de Purga Inmediata en Memoria y LocalForage:** En la inicialización del almacén (`store.init()`), se agregó una rutina automática que detecta y borra permanentemente cualquier cuenta o método mockeado remanente en el navegador del usuario, persistiendo la tabla limpia en `LocalForage`.
+  - **Blindaje en Módulos de Cuentas, Métodos de Pago, Taquilla y Portal:** Modificados `HaciendaCuentas.getAll()`, `MetodosPagoModule.getAll()`, `taquilla.js`, `conciliacion.js` y `portal-comercio.js` para filtrar activamente cualquier residuo de prueba, garantizando que el modal de Cuentas Bancarias y el Portal del Contribuyente muestren exclusivamente las cuentas oficiales creadas por el usuario en el ERP.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.10.3` con 355 pruebas automatizadas al 100% en verde.
+
 ### Version 3.10.2 — 22/11/2026
 - **Módulo ERP de Métodos de Pago Afiliados a Cuentas Bancarias y Tarjetas Interactivas en Portal:**
   - **Nueva Sección ERP "Métodos de Pago" (`MetodosPagoModule` - `js/modules/caja/metodos-pago.js`):**

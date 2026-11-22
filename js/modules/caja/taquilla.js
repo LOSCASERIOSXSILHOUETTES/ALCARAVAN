@@ -10,10 +10,13 @@
             const pagos = global.HaciendaStore ? global.HaciendaStore.get('hacienda_pagos') : [];
             const contribuyentes = global.HaciendaStore ? global.HaciendaStore.get('hacienda_contribuyentes') : [];
             const declaraciones = global.HaciendaStore ? global.HaciendaStore.get('hacienda_declaraciones') : [];
+            const mockCtaIds = new Set(['cta_01', 'cta_02']);
+            const mockCtaNums = new Set(['01020544210000012345', '01340371820000098765']);
             const cuentasBancarias = (global.HaciendaStore ? global.HaciendaStore.get('hacienda_cuentas') : [])
-                .filter(c => c.estado !== 'inactiva');
+                .filter(c => c.estado !== 'inactiva' && !mockCtaIds.has(String(c.id)) && !mockCtaNums.has(String(c.numero || '').replace(/\D/g, '')));
+            const mockMetodoIds = new Set(['met_pm_bdv', 'met_tr_bdv', 'met_tr_banesco', 'met_pos_taquilla']);
             const metodosPago = (global.HaciendaStore ? global.HaciendaStore.get('hacienda_metodos_pago') : [])
-                .filter(m => m.activo !== false);
+                .filter(m => m.activo !== false && !mockMetodoIds.has(String(m.id)) && !mockCtaIds.has(String(m.cuenta_id)));
 
             const totalRecaudado = pagos
                 .filter(p => p.estado === 'conciliado')

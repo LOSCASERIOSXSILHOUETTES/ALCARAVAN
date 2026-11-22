@@ -22,7 +22,10 @@
 
         getAll: function() {
             const store = global.HaciendaStore;
-            return store ? (store.get('hacienda_metodos_pago') || []) : [];
+            const metodos = store ? (store.get('hacienda_metodos_pago') || []) : [];
+            const mockIds = new Set(['met_pm_bdv', 'met_tr_bdv', 'met_tr_banesco', 'met_pos_taquilla']);
+            const mockCuentas = new Set(['cta_01', 'cta_02']);
+            return metodos.filter(m => !mockIds.has(String(m.id)) && !mockCuentas.has(String(m.cuenta_id)));
         },
 
         getActivos: function() {
