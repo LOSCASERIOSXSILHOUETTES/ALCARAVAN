@@ -120,10 +120,28 @@
         { codigo: "FIN-003", categoria: "Telecomunicaciones y Finanzas", nombre: "Compañías de seguros, reaseguros y sociedades de corretaje", alicuota: 0.0300, minimo_tcmmv: 2.00 }
     ];
 
+    function getItems() {
+        const store = (typeof window !== 'undefined' && window.HaciendaStore) || global.HaciendaStore;
+        if (store && typeof store.get === 'function') {
+            const dbItems = store.get('hacienda_actividades_locat');
+            if (Array.isArray(dbItems) && dbItems.length > 0) {
+                return dbItems.filter(i => i.activo !== false);
+            }
+        }
+        return CATALOGO;
+    }
+
     global.CatalogoLocat = {
-        getAll: () => [...CATALOGO],
-        getByCodigo: (codigo) => CATALOGO.find(item => item.codigo === codigo) || null,
-        getCategorias: () => [...new Set(CATALOGO.map(i => i.categoria))],
-        getByCategoria: (cat) => CATALOGO.filter(i => i.categoria === cat)
+        SEEDS: CATALOGO,
+        getAll: () => [...getItems()],
+        getByCodigo: (codigo) => getItems().find(item => item.codigo === codigo) || null,
+        getCategorias: () => [...new Set(getItems().map(i => i.categoria))],
+        getByCategoria: (cat) => getItems().filter(i => i.categoria === cat)
     };
+
+    // Auto-sembrado en HaciendaStore si ya esta inicializado y la tabla esta vacia
+    const store = (typeof window !== 'undefined' && window.HaciendaStore) || global.HaciendaStore;
+    if (store && typeof store.sembrarActividadesLocat === 'function') {
+        store.sembrarActividadesLocat(CATALOGO);
+    }
 })(typeof window !== 'undefined' ? window : this);

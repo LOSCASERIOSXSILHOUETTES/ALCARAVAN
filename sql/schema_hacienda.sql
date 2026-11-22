@@ -254,6 +254,19 @@ CREATE TABLE IF NOT EXISTS "public"."user_profiles" (
     "updated_at" TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- 17. TABLA: hacienda_actividades_locat (Catálogo Armonizado Nacional LOCAT)
+CREATE TABLE IF NOT EXISTS "public"."hacienda_actividades_locat" (
+    "id" TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    "codigo" TEXT NOT NULL,
+    "categoria" TEXT NOT NULL,
+    "nombre" TEXT NOT NULL,
+    "alicuota" NUMERIC(6,4) NOT NULL DEFAULT 0.0100,
+    "minimo_tcmmv" NUMERIC(6,2) NOT NULL DEFAULT 0.30,
+    "activo" BOOLEAN NOT NULL DEFAULT true,
+    "created_at" TIMESTAMPTZ DEFAULT NOW(),
+    "updated_at" TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- ============================================================================
 -- ACTIVACION DE ROW LEVEL SECURITY (RLS) EN TODAS LAS TABLAS
 -- ============================================================================
@@ -274,6 +287,7 @@ ALTER TABLE "public"."hacienda_publicidad" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."hacienda_popups" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."hacienda_carrusel" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."user_profiles" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."hacienda_actividades_locat" ENABLE ROW LEVEL SECURITY;
 
 -- ============================================================================
 -- POLITICAS PERMISIVAS (ARQUITECTURA SGB 0MS OFFLINE-FIRST)
@@ -327,6 +341,9 @@ CREATE POLICY "Permisivo hacienda_carrusel" ON "public"."hacienda_carrusel" FOR 
 DROP POLICY IF EXISTS "Permisivo user_profiles" ON "public"."user_profiles";
 CREATE POLICY "Permisivo user_profiles" ON "public"."user_profiles" FOR ALL USING (true) WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Permisivo hacienda_actividades_locat" ON "public"."hacienda_actividades_locat";
+CREATE POLICY "Permisivo hacienda_actividades_locat" ON "public"."hacienda_actividades_locat" FOR ALL USING (true) WITH CHECK (true);
+
 -- ============================================================================
 -- OTORGAR PRIVILEGIOS COMPLETOS A LOS ROLES DE SUPABASE
 -- ============================================================================
@@ -347,6 +364,7 @@ GRANT ALL ON "public"."hacienda_publicidad" TO "anon", "authenticated", "service
 GRANT ALL ON "public"."hacienda_popups" TO "anon", "authenticated", "service_role";
 GRANT ALL ON "public"."hacienda_carrusel" TO "anon", "authenticated", "service_role";
 GRANT ALL ON "public"."user_profiles" TO "anon", "authenticated", "service_role";
+GRANT ALL ON "public"."hacienda_actividades_locat" TO "anon", "authenticated", "service_role";
 
 -- ============================================================================
 -- PUBLICACION PARA SUPABASE REALTIME (POSTGRES CHANGES)
@@ -370,7 +388,8 @@ BEGIN
             "public"."hacienda_publicidad",
             "public"."hacienda_popups",
             "public"."hacienda_carrusel",
-            "public"."user_profiles";
+            "public"."user_profiles",
+            "public"."hacienda_actividades_locat";
     EXCEPTION WHEN duplicate_object THEN
         -- Ya estaban agregadas a la publicacion
     END;

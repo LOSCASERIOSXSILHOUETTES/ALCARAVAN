@@ -29,7 +29,8 @@
         'hacienda_publicidad',
         'hacienda_popups',
         'hacienda_carrusel',
-        'user_profiles'
+        'user_profiles',
+        'hacienda_actividades_locat'
     ];
 
     const TABLE_SCHEMAS = {
@@ -96,6 +97,9 @@
         ],
         'user_profiles': [
             'user_id', 'email', 'nombre', 'cargo', 'rol', 'permisos', 'activo', 'created_at', 'updated_at'
+        ],
+        'hacienda_actividades_locat': [
+            'id', 'codigo', 'categoria', 'nombre', 'alicuota', 'minimo_tcmmv', 'activo', 'created_at', 'updated_at'
         ]
     };
 
@@ -364,6 +368,14 @@
                 }
             }
 
+            // Sembrar catálogo de actividades LOCAT si está vacío
+            if (!this._cache['hacienda_actividades_locat'] || this._cache['hacienda_actividades_locat'].length === 0) {
+                const locatMod = (typeof window !== 'undefined' && window.CatalogoLocat) || global.CatalogoLocat;
+                if (locatMod && Array.isArray(locatMod.SEEDS)) {
+                    await this.sembrarActividadesLocat(locatMod.SEEDS);
+                }
+            }
+
             console.log('[HaciendaStore] Inicializado a 0ms en LocalForage');
             this.syncPendingAll();
             return true;
@@ -376,6 +388,34 @@
 
         getTableSync: function(table) {
             return this.get(table);
+        },
+
+        sembrarActividadesLocat: async function(semillas) {
+            if (!semillas || !Array.isArray(semillas) || semillas.length === 0) return;
+            if (this._cache['hacienda_actividades_locat'] && this._cache['hacienda_actividades_locat'].length > 0) {
+                return;
+            }
+            const ahora = new Date().toISOString();
+            const actividadesIniciales = semillas.map(s => ({
+                id: s.id || ('locat_' + String(s.codigo).toLowerCase().replace(/[^a-z0-9]/g, '_')),
+                codigo: s.codigo,
+                categoria: s.categoria,
+                nombre: s.nombre,
+                alicuota: Number(s.alicuota) || 0.0100,
+                minimo_tcmmv: Number(s.minimo_tcmmv) || 0.30,
+                activo: s.activo !== false,
+                created_at: s.created_at || ahora,
+                updated_at: s.updated_at || ahora
+            }));
+            this._cache['hacienda_actividades_locat'] = actividadesIniciales;
+            if (this._localStore) {
+                try {
+                    await this._localStore.setItem('tbl_hacienda_actividades_locat', actividadesIniciales);
+                } catch (e) {}
+            }
+            if (typeof window !== 'undefined' && window.supabaseClient && navigator.onLine) {
+                this.syncRecordsBatch('hacienda_actividades_locat', actividadesIniciales).catch(() => {});
+            }
         },
 
         // Guardar o actualizar registro (Offline-First a 0ms)

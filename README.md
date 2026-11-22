@@ -140,6 +140,15 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.9.6 — 22/11/2026
+- **Migración del Catálogo LOCAT a Base de Datos SGB y Desacoplamiento de Código Duro:**
+  - **Tabla `hacienda_actividades_locat` (17ma Tabla del Sistema Tributario):** Creación del modelo relacional en `sql/schema_hacienda.sql` con campos `id`, `codigo`, `categoria`, `nombre`, `alicuota`, `minimo_tcmmv`, `activo`, `created_at` y `updated_at`, con RLS, política permisiva y publicación en `supabase_realtime`.
+  - **Ciclo Inquebrantable de Datos a 0ms:** Registro en `TABLES` y `TABLE_SCHEMAS` de `js/core/store.js` y en `SYNCABLE_TABLES` / `PUBLIC_PORTAL_TABLES` de `js/core/realtime-sync.js`.
+  - **Auto-Sembrado Dinámico y Sincronización:** Mecanismo de siembra automática en `HaciendaStore.init()` y método auxiliar `sembrarActividadesLocat()` a partir de las 66 actividades armonizadas si la tabla está vacía, con persistencia en LocalForage y batch sync hacia Supabase.
+  - **Refactorización Reactiva de `catalogo-locat.js`:** Lectura desacoplada desde `HaciendaStore.get('hacienda_actividades_locat')`, permitiendo que cualquier cambio de alícuotas o creación de nuevos ramos en la base de datos se refleje en tiempo real en la autoliquidación del portal sin tocar código.
+  - **Auditoría SGB de 17 Tablas:** Actualización de `test-cycle-audit.js` pasando las 324 pruebas automatizadas con 0 fallos.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.9.6`.
+
 ### Version 3.9.5 — 22/11/2026
 - **Clasificador Nacional Ampliado LOCAT y Agrupación por Sectores:**
   - **Expansión a 66 Actividades Económicas Armonizadas:** Ampliación integral de `catalogo-locat.js` con todas las actividades comerciales, de servicios, industriales, salud, educación, licores, construcción y telecomunicaciones según la LOCAT y Gaceta Oficial N° 6.755.

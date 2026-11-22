@@ -9,7 +9,7 @@
  *   2. Verificación y existencia de todos los STATIC_ASSETS del Service Worker.
  *   3. Chequeo sintáctico estricto (0 tolerancia a SyntaxError) en todos los .js del proyecto.
  *   4. Ejecución e instanciación en sandbox VM (Cero TypeError / ReferenceError al exportar).
- *   5. Auditoría del Ciclo Inquebrantable de Datos a 0ms (16 tablas en store, realtime y SQL).
+ *   5. Auditoría del Ciclo Inquebrantable de Datos a 0ms (17 tablas en store, realtime y SQL).
  *   6. Consistencia de la matriz de permisos ACL (data-perm de admin.html vs ROSTER_PERMISOS).
  */
 
@@ -250,6 +250,7 @@ const expectedModules = [
     { name: 'HaciendaRealtime', methods: ['init', 'broadcastMutation', 'SYNCABLE_TABLES'] },
     { name: 'HaciendaAuth', methods: ['init', 'loginFuncionario', 'registrarFuncionario', 'hasPermission', 'updateSidebarAcl'] },
     { name: 'TasasBCV', methods: ['init', 'getTasas', 'getTCMMV', 'fetchEnVivo'] },
+    { name: 'CatalogoLocat', methods: ['getAll', 'getByCodigo', 'getCategorias', 'getByCategoria'] },
     { name: 'HaciendaRIF', methods: ['parse', 'format', 'handleInput', 'findMatch'] },
     { name: 'HaciendaCedula', methods: ['parse', 'format', 'handleInput'] },
     { name: 'HaciendaTelefono', methods: ['sanitizar', 'handleInput'] },
@@ -278,9 +279,9 @@ expectedModules.forEach(mod => {
 });
 
 // ============================================================================
-// PRUEBA 5: AUDITORIA DEL CICLO SGB A 0MS (16 TABLAS EN STORE, REALTIME Y SQL)
+// PRUEBA 5: AUDITORIA DEL CICLO SGB A 0MS (17 TABLAS EN STORE, REALTIME Y SQL)
 // ============================================================================
-console.log("\n--- 5. AUDITORIA DEL CICLO INQUEBRANTABLE SGB (16 TABLAS) ---");
+console.log("\n--- 5. AUDITORIA DEL CICLO INQUEBRANTABLE SGB (17 TABLAS) ---");
 
 const storeFileContent = fs.readFileSync(path.join(ROOT_DIR, 'js/core/store.js'), 'utf8');
 const realtimeFileContent = fs.readFileSync(path.join(ROOT_DIR, 'js/core/realtime-sync.js'), 'utf8');
@@ -302,10 +303,11 @@ const SYSTEM_TABLES = [
     'hacienda_publicidad',
     'hacienda_popups',
     'hacienda_carrusel',
-    'user_profiles'
+    'user_profiles',
+    'hacienda_actividades_locat'
 ];
 
-assert(SYSTEM_TABLES.length === 16, "Catálogo completo de 16 tablas del sistema tributario");
+assert(SYSTEM_TABLES.length === 17, "Catálogo completo de 17 tablas del sistema tributario");
 
 SYSTEM_TABLES.forEach(tbl => {
     // 1. En TABLES de store.js
