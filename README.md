@@ -140,6 +140,12 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.9.5 — 22/11/2026
+- **Clasificador Nacional Ampliado LOCAT y Agrupación por Sectores:**
+  - **Expansión a 66 Actividades Económicas Armonizadas:** Ampliación integral de `catalogo-locat.js` con todas las actividades comerciales, de servicios, industriales, salud, educación, licores, construcción y telecomunicaciones según la LOCAT y Gaceta Oficial N° 6.755.
+  - **Agrupación Semántica por Optgroups:** Organización jerárquica en el selector de autoliquidación clasificada en 8 sectores económicos con etiquetas destacadas (`getCategorias()` y `getByCategoria()`), facilitando una búsqueda rápida y visual para el contribuyente.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.9.5` con 312 pruebas automatizadas en verde.
+
 ### Version 3.9.4 — 22/11/2026
 - **Autoliquidación Dinámica LOCAT, Selector de Actividad Económica y Anti-Autofill:**
   - **Integración del Catálogo Armonizado LOCAT:** Selector interactivo de actividad económica en el módulo de autoliquidación del portal (`dec-actividad-locat`), permitiendo seleccionar entre las actividades del clasificador oficial (alícuotas del 1.00% al 5.00% y mínimos de 0.30 a 3.00 MMAV).

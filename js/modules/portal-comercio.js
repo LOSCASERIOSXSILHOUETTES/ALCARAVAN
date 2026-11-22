@@ -1197,7 +1197,19 @@
                             <label class="text-[11px] font-medium text-neutral-400 uppercase tracking-wider block">Actividad Económica / Ramo LOCAT</label>
                             <select id="dec-actividad-locat" onchange="window.PortalComercio.cambiarActividadLocat()" 
                                     class="w-full bg-[#18181b] border border-white/10 text-white text-xs font-medium rounded-2xl px-4 py-3.5 outline-none focus:border-white/30 transition cursor-pointer">
-                                ${catalogo.map(item => `
+                                ${(global.CatalogoLocat && typeof global.CatalogoLocat.getCategorias === 'function' ? global.CatalogoLocat.getCategorias() : []).map(cat => `
+                                    <optgroup label="${cat}" class="bg-[#18181b] text-neutral-400 font-bold">
+                                        ${global.CatalogoLocat.getByCategoria(cat).map(item => `
+                                            <option value="${item.codigo}" 
+                                                    data-alicuota="${item.alicuota}" 
+                                                    data-minimo="${item.minimo_tcmmv}"
+                                                    class="text-white"
+                                                    ${item.codigo === (codPatente || actividadSeleccionada.codigo) ? 'selected' : ''}>
+                                                [${item.codigo}] ${item.nombre} — ${(item.alicuota * 100).toFixed(2)}% (Mín. ${item.minimo_tcmmv.toFixed(2)} MMAV)
+                                            </option>
+                                        `).join('')}
+                                    </optgroup>
+                                `).join('') || catalogo.map(item => `
                                     <option value="${item.codigo}" 
                                             data-alicuota="${item.alicuota}" 
                                             data-minimo="${item.minimo_tcmmv}"
