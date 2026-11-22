@@ -64,11 +64,23 @@
                         </div>
                         <form id="form-solvencia" onsubmit="window.SolvenciasModule.guardar(event)" class="p-6 space-y-4">
                             <div>
-                                <label class="block text-xs font-bold text-slate-400 mb-1">Seleccionar Contribuyente</label>
-                                <select id="solv-contribuyente-id" onchange="window.SolvenciasModule.verificarEstadoDeuda()" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 text-xs outline-none focus:border-sky-500">
-                                    <option value="">Seleccione el contribuyente...</option>
-                                    ${contribuyentes.map(c => `<option value="${c.id}">${c.rif} - ${c.razon_social}</option>`).join('')}
-                                </select>
+                                <label class="block text-xs font-bold text-slate-400 mb-1">Contribuyente / Comercio Solicitante</label>
+                                <input type="hidden" id="solv-contribuyente-id" required>
+                                <div id="solv-contribuyente-box" onclick="window.SolvenciasModule.abrirSelector()" 
+                                     class="p-3 bg-slate-950 border border-dashed border-slate-800 hover:border-sky-500/60 rounded-xl cursor-pointer transition flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center text-xs">
+                                            <i class="fas fa-search"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs font-bold text-slate-200">Seleccionar Contribuyente</p>
+                                            <p class="text-[10px] text-slate-500">Haga clic para abrir el catálogo con tarjetas y buscador</p>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-sky-400 text-xs font-bold rounded-lg transition">
+                                        Buscar
+                                    </button>
+                                </div>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 mb-1">Tipo de Solvencia</label>
@@ -125,8 +137,73 @@
             }).join('');
         },
 
+        abrirSelector: function() {
+            if (global.SelectorContribuyenteModal) {
+                global.SelectorContribuyenteModal.abrir({
+                    onSelect: (c) => this.setContribuyente(c)
+                });
+            }
+        },
+
+        setContribuyente: function(c) {
+            if (!c) return;
+            const inputId = document.getElementById('solv-contribuyente-id');
+            if (inputId) inputId.value = c.id;
+
+            const box = document.getElementById('solv-contribuyente-box');
+            if (box) {
+                box.className = "p-3 bg-slate-950 border border-sky-500/40 rounded-xl flex items-center justify-between";
+                box.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-mono font-bold text-sky-400">[${c.rif}]</span>
+                                <span class="text-xs font-bold text-slate-100">${c.razon_social}</span>
+                            </div>
+                            <p class="text-[10px] text-slate-400">${c.denominacion_comercial ? c.denominacion_comercial + ' · ' : ''}Rep: ${c.representante_legal || 'N/A'}</p>
+                        </div>
+                    </div>
+                    <button type="button" onclick="window.SolvenciasModule.abrirSelector()" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded-lg transition">
+                        Cambiar
+                    </button>
+                `;
+            }
+
+            this.verificarEstadoDeuda();
+        },
+
+        resetContribuyenteBox: function() {
+            const inputId = document.getElementById('solv-contribuyente-id');
+            if (inputId) inputId.value = '';
+
+            const box = document.getElementById('solv-contribuyente-box');
+            if (box) {
+                box.className = "p-3 bg-slate-950 border border-dashed border-slate-800 hover:border-sky-500/60 rounded-xl cursor-pointer transition flex items-center justify-between";
+                box.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center text-xs">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-200">Seleccionar Contribuyente</p>
+                            <p class="text-[10px] text-slate-500">Haga clic para abrir el catálogo con tarjetas y buscador</p>
+                        </div>
+                    </div>
+                    <button type="button" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-sky-400 text-xs font-bold rounded-lg transition">
+                        Buscar
+                    </button>
+                `;
+            }
+
+            const panel = document.getElementById('panel-auditoria-deuda');
+            if (panel) panel.classList.add('hidden');
+        },
+
         verificarEstadoDeuda: function() {
-            const cId = parseInt(document.getElementById('solv-contribuyente-id')?.value, 10);
+            const cId = document.getElementById('solv-contribuyente-id')?.value;
             const panel = document.getElementById('panel-auditoria-deuda');
             const btn = document.getElementById('btn-emitir-solvencia');
             if (!cId || !panel) return;
@@ -168,19 +245,38 @@
             }
         },
 
-        abrirModalSolvencia: function() {
+        abrirModalSolvencia: function(contribuyenteId = null) {
+            if (contribuyenteId) {
+                const store = global.HaciendaStore;
+                const contribuyentes = store ? store.get('hacienda_contribuyentes') : [];
+                const c = contribuyentes.find(item => String(item.id) === String(contribuyenteId));
+                if (c) {
+                    this.setContribuyente(c);
+                } else {
+                    this.resetContribuyenteBox();
+                }
+            } else {
+                this.resetContribuyenteBox();
+            }
+
             document.getElementById('modal-emitir-solvencia')?.classList.remove('hidden');
         },
 
         cerrarModalSolvencia: function() {
             document.getElementById('modal-emitir-solvencia')?.classList.add('hidden');
             document.getElementById('form-solvencia')?.reset();
-            document.getElementById('panel-auditoria-deuda')?.classList.add('hidden');
+            this.resetContribuyenteBox();
         },
 
         guardar: async function(e) {
             e.preventDefault();
-            const contribuyenteId = parseInt(document.getElementById('solv-contribuyente-id').value, 10);
+            const contribuyenteId = document.getElementById('solv-contribuyente-id')?.value;
+            if (!contribuyenteId) {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({ icon: 'warning', title: 'Atención', text: 'Debe seleccionar un contribuyente.', confirmButtonColor: '#0284c7' });
+                }
+                return;
+            }
             const tipo = document.getElementById('solv-tipo').value;
 
             const solvencias = global.HaciendaStore ? global.HaciendaStore.get('hacienda_solvencias') : [];

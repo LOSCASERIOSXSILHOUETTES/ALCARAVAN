@@ -758,8 +758,225 @@
             } finally {
                 if (btn) { btn.disabled = false; btn.innerText = 'Guardar Cambios'; }
             }
+        },
+
+        abrirSelectorModal: function(options) {
+            if (global.SelectorContribuyenteModal) {
+                global.SelectorContribuyenteModal.abrir(options);
+            }
         }
     };
 
+    /**
+     * Modal Selector Inteligente de Contribuyentes con Cards y Paginación (SGB Silhouettes)
+     * Resuelve de raíz la sobrecarga del DOM con 15.000+ registros.
+     */
+    let _selectorCallback = null;
+    let _selectorPagina = 1;
+    const _selectorPorPagina = 8;
+    let _selectorQuery = '';
+
+    const SelectorContribuyenteModal = {
+        abrir: function(options) {
+            _selectorCallback = (options && typeof options.onSelect === 'function') ? options.onSelect : null;
+            _selectorPagina = 1;
+            _selectorQuery = (options && options.initialQuery) ? String(options.initialQuery).trim() : '';
+
+            let modalEl = document.getElementById('modal-selector-contribuyente');
+            if (!modalEl) {
+                this.crearEstructura();
+                modalEl = document.getElementById('modal-selector-contribuyente');
+            }
+
+            const inputBuscar = document.getElementById('sel-contrib-buscar');
+            if (inputBuscar) {
+                inputBuscar.value = _selectorQuery;
+            }
+
+            modalEl.classList.remove('hidden');
+            this.renderizar();
+            setTimeout(() => {
+                if (inputBuscar) inputBuscar.focus();
+            }, 100);
+        },
+
+        cerrar: function() {
+            const modalEl = document.getElementById('modal-selector-contribuyente');
+            if (modalEl) modalEl.classList.add('hidden');
+            _selectorCallback = null;
+        },
+
+        seleccionar: function(id) {
+            const store = global.HaciendaStore;
+            const contribuyentes = store ? store.get('hacienda_contribuyentes') : [];
+            const c = contribuyentes.find(item => String(item.id) === String(id));
+            if (c && typeof _selectorCallback === 'function') {
+                _selectorCallback(c);
+            }
+            this.cerrar();
+        },
+
+        filtrar: function(texto) {
+            _selectorQuery = String(texto || '').trim().toLowerCase();
+            _selectorPagina = 1;
+            this.renderizar();
+        },
+
+        cambiarPagina: function(p) {
+            _selectorPagina = p;
+            this.renderizar();
+        },
+
+        crearEstructura: function() {
+            if (typeof document === 'undefined') return;
+            const div = document.createElement('div');
+            div.id = 'modal-selector-contribuyente';
+            div.className = 'fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden';
+            div.innerHTML = `
+                <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-fade-in">
+                    <!-- Cabecera -->
+                    <div class="px-6 py-5 border-b border-slate-800 flex justify-between items-center bg-slate-950/60">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-2xl bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center">
+                                <i class="fas fa-address-book text-base"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-bold text-slate-100 flex items-center gap-2">
+                                    Catálogo de Contribuyentes
+                                </h3>
+                                <p class="text-xs text-slate-400">Seleccione el comercio o empresa con el que desea operar</p>
+                            </div>
+                        </div>
+                        <button type="button" onclick="window.SelectorContribuyenteModal.cerrar()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition">
+                            <i class="fas fa-times text-xs"></i>
+                        </button>
+                    </div>
+
+                    <!-- Buscador en tiempo real -->
+                    <div class="p-5 border-b border-slate-800/80 bg-slate-900/50 flex flex-col sm:flex-row gap-3 items-center justify-between">
+                        <div class="relative w-full">
+                            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                            <input type="text" id="sel-contrib-buscar" oninput="window.SelectorContribuyenteModal.filtrar(this.value)" 
+                                   placeholder="Buscar por RIF, Razón Social, Nombre Comercial o Cédula..." 
+                                   class="w-full bg-slate-950 border border-slate-800 rounded-2xl pl-10 pr-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 outline-none focus:border-sky-500 transition">
+                        </div>
+                        <span id="sel-contrib-contador" class="shrink-0 text-xs font-mono text-slate-400 bg-slate-950 px-3 py-2 rounded-xl border border-slate-800">
+                            Cargando...
+                        </span>
+                    </div>
+
+                    <!-- Contenedor Grid de Cards -->
+                    <div id="sel-contrib-grid" class="p-6 overflow-y-auto flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Inyectado dinámicamente -->
+                    </div>
+
+                    <!-- Paginación -->
+                    <div class="px-6 py-4 border-t border-slate-800 bg-slate-950/60 flex items-center justify-between">
+                        <button type="button" id="sel-contrib-prev" onclick="window.SelectorContribuyenteModal.cambiarPagina(_selectorPagina - 1)" 
+                                class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 font-bold transition disabled:opacity-40 disabled:cursor-not-allowed">
+                            <i class="fas fa-chevron-left mr-1"></i> Anterior
+                        </button>
+                        <span id="sel-contrib-pag-info" class="text-xs font-mono text-slate-400">
+                            Página 1 de 1
+                        </span>
+                        <button type="button" id="sel-contrib-next" onclick="window.SelectorContribuyenteModal.cambiarPagina(_selectorPagina + 1)" 
+                                class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 font-bold transition disabled:opacity-40 disabled:cursor-not-allowed">
+                            Siguiente <i class="fas fa-chevron-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(div);
+        },
+
+        renderizar: function() {
+            if (typeof document === 'undefined') return;
+            const grid = document.getElementById('sel-contrib-grid');
+            const contador = document.getElementById('sel-contrib-contador');
+            const pagInfo = document.getElementById('sel-contrib-pag-info');
+            const btnPrev = document.getElementById('sel-contrib-prev');
+            const btnNext = document.getElementById('sel-contrib-next');
+            if (!grid) return;
+
+            const store = global.HaciendaStore;
+            let list = store ? store.get('hacienda_contribuyentes') : [];
+
+            // Filtrado por query
+            if (_selectorQuery) {
+                list = list.filter(c => {
+                    const rif = String(c.rif || '').toLowerCase();
+                    const razon = String(c.razon_social || '').toLowerCase();
+                    const fantasia = String(c.denominacion_comercial || '').toLowerCase();
+                    const rep = String(c.representante_legal || '').toLowerCase();
+                    const ced = String(c.representante_cedula || '').toLowerCase();
+                    return rif.includes(_selectorQuery) || razon.includes(_selectorQuery) || fantasia.includes(_selectorQuery) || rep.includes(_selectorQuery) || ced.includes(_selectorQuery);
+                });
+            }
+
+            const total = list.length;
+            const totalPaginas = Math.ceil(total / _selectorPorPagina) || 1;
+            if (_selectorPagina > totalPaginas) _selectorPagina = totalPaginas;
+            if (_selectorPagina < 1) _selectorPagina = 1;
+
+            const inicio = (_selectorPagina - 1) * _selectorPorPagina;
+            const fin = inicio + _selectorPorPagina;
+            const paginaItems = list.slice(inicio, fin);
+
+            if (contador) contador.innerText = `${total} contribuyente(s)`;
+            if (pagInfo) pagInfo.innerText = `Página ${_selectorPagina} de ${totalPaginas}`;
+            if (btnPrev) btnPrev.disabled = (_selectorPagina <= 1);
+            if (btnNext) btnNext.disabled = (_selectorPagina >= totalPaginas);
+
+            if (paginaItems.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full py-12 text-center text-slate-500">
+                        <i class="fas fa-store-slash text-3xl mb-2 block"></i>
+                        <p class="text-xs">No se encontraron contribuyentes que coincidan con la búsqueda.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = paginaItems.map(c => `
+                <div onclick="window.SelectorContribuyenteModal.seleccionar('${c.id}')" 
+                     class="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 hover:border-sky-500/60 hover:bg-slate-800/40 transition cursor-pointer flex flex-col justify-between gap-3 group shadow-sm">
+                    <div class="space-y-1.5">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-sky-500/10 border border-sky-500/20 text-sky-400 font-mono text-xs font-bold">
+                                ${c.rif}
+                            </span>
+                            <span class="text-[10px] font-medium px-2 py-0.5 rounded-full ${c.estado === 'activo' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-800 text-slate-400'}">
+                                ${c.estado || 'activo'}
+                            </span>
+                        </div>
+                        <h4 class="text-xs font-bold text-slate-100 group-hover:text-sky-300 transition line-clamp-1 leading-snug">
+                            ${c.razon_social}
+                        </h4>
+                        ${c.denominacion_comercial ? `
+                            <p class="text-[11px] text-slate-400 italic line-clamp-1">
+                                <i class="fas fa-store text-[9px] mr-1 text-slate-500"></i>${c.denominacion_comercial}
+                            </p>
+                        ` : ''}
+                        <div class="pt-1 space-y-0.5 text-[10px] text-slate-500 font-mono">
+                            ${c.representante_legal ? `
+                                <p class="line-clamp-1"><i class="fas fa-user-tie text-[9px] mr-1"></i>Rep: <span class="text-slate-400">${c.representante_legal}</span> ${c.representante_cedula ? `(${c.representante_cedula})` : ''}</p>
+                            ` : ''}
+                            ${c.telefono ? `
+                                <p><i class="fas fa-phone text-[9px] mr-1"></i>${c.telefono}</p>
+                            ` : ''}
+                        </div>
+                    </div>
+                    <div class="pt-2 border-t border-slate-800/60 flex items-center justify-between">
+                        <span class="text-[10px] text-slate-500 font-mono">ID: ${String(c.id).substring(0, 8)}...</span>
+                        <span class="text-xs font-bold text-sky-400 group-hover:translate-x-1 transition flex items-center gap-1">
+                            Seleccionar <i class="fas fa-arrow-right text-[10px]"></i>
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+    };
+
+    global.SelectorContribuyenteModal = SelectorContribuyenteModal;
     global.ContribuyentesModule = Contribuyentes;
 })(typeof window !== 'undefined' ? window : this);

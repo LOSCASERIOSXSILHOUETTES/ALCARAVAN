@@ -140,6 +140,14 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.9.8 — 22/11/2026
+- **Selector Inteligente de Contribuyentes con Cards, Live Search y Paginación:**
+  - **Componente Reutilizable `SelectorContribuyenteModal`:** Sustitución de los `<select>` estáticos con sobrecarga de DOM en el ERP por un modal interactivo con grid de tarjetas (cards) y paginación en bloques de 8 registros a 0ms, eliminando la congelación del navegador ante padrones de 15.000+ registros.
+  - **Filtro Reactivo Multi-Criterio:** Buscador en vivo que filtra instantáneamente por RIF, Razón Social, Denominación Comercial o Cédula/Nombre del Representante Legal.
+  - **Diseño de Cards Informativas:** Cada tarjeta exhibe RIF con badge formal, razón social, nombre de fantasía, representante con cédula, teléfono, estado y botón de selección en 1 clic.
+  - **Integración en Módulos Clave:** Implementado en el modal de emisión de **Patentes Comerciales** (`PatentesModule`) y en el de **Solvencias Municipales** (`SolvenciasModule`) con tarjeta interactiva de estado seleccionado y botón "Cambiar".
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.9.8` con 330 pruebas unitarias automatizadas en verde.
+
 ### Version 3.9.7 — 22/11/2026
 - **Blindaje Fiscal en Autoliquidación: Bloqueo de Ramo y Vinculación Estricta a Licencia Municipal:**
   - **Bloqueo de Actividad Económica por Licencia:** Sustitución del selector libre de 80 actividades por una tarjeta oficial de solo lectura que bloquea el ramo económico y la alícuota a la Patente de Industria y Comercio formalmente aprobada por los fiscales de la Alcaldía en `hacienda_patentes`.

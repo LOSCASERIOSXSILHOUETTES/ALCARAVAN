@@ -255,6 +255,7 @@ const expectedModules = [
     { name: 'HaciendaCedula', methods: ['parse', 'format', 'handleInput'] },
     { name: 'HaciendaTelefono', methods: ['sanitizar', 'handleInput'] },
     { name: 'ContribuyentesModule', methods: ['render'] },
+    { name: 'SelectorContribuyenteModal', methods: ['abrir', 'cerrar', 'seleccionar', 'filtrar', 'cambiarPagina'] },
     { name: 'PatentesModule', methods: ['render'] },
     { name: 'DeclaracionesModule', methods: ['render'] },
     { name: 'CajaModule', methods: ['render'] },
