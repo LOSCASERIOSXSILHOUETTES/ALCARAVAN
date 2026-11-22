@@ -995,6 +995,17 @@ html.sgb-light #portal-main-content .text-neutral-300 {
     color: #475569 !important;
 }
 
+/* Botones oscuros y negros siempre mantienen texto blanco puro de alto contraste */
+html.sgb-light button.bg-black,
+html.sgb-light button.bg-black *,
+html.sgb-light button.bg-neutral-900,
+html.sgb-light button.bg-neutral-900 *,
+html.sgb-light #portal-main-content button.bg-black,
+html.sgb-light #portal-main-content button.bg-black *,
+html.sgb-light #portal-main-content button.bg-black span {
+    color: #FFFFFF !important;
+}
+
 
 
 

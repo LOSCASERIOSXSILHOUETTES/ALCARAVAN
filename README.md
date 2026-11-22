@@ -140,6 +140,12 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.9.2 — 22/11/2026
+- **Visibilidad de Contraseñas (Ojito) y Corrección de Contraste en Botones de Acción:**
+  - **Alternador Universal de Contraseñas (`toggleInputClave`):** Integración de botones interactivos con icono de ojo (`fa-eye` / `fa-eye-slash`) en todos los campos de contraseña: modal de Primer Ingreso (`pi-clave`, `pi-clave-confirm`), modal de Recuperación de Clave (`rec-nueva-clave`, `rec-confirm-clave`) e Inscripción de Comercio (`ins-clave`, `ins-clave-confirm`).
+  - **Corrección de Contraste en Botones Negros:** Ajuste en `styles.css` y adición de estilos de alta prioridad para garantizar que los botones de fondo negro (`bg-black`, `bg-neutral-900`) mantengan siempre su texto en blanco puro (`#FFFFFF !important`), resolviendo el problema donde el tema claro pintaba el texto del botón en negro.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.9.2` con 312 pruebas automatizadas en verde.
+
 ### Version 3.9.1 — 22/11/2026
 - **Blanqueo de Contraseña a Estado "Primer Ingreso" para Autogestión del Contribuyente:**
   - **Función de Blanqueo (`blanquearClaveContribuyente`):** Permite a los administradores borrar la contraseña asignada de un comercio para regresarlo al estado de Primer Ingreso.

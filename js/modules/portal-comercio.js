@@ -860,9 +860,10 @@
                         </div>
 
                         <button onclick="window.PortalComercio.ejecutarConsultaRif()" 
-                                class="w-full bg-black hover:bg-neutral-800 text-white font-medium text-sm rounded-xl py-3 transition flex items-center justify-center gap-2 shadow-sm">
-                            <span>Ingresar</span>
-                            <span>→</span>
+                                class="w-full bg-black hover:bg-neutral-800 text-white font-medium text-sm rounded-xl py-3 transition flex items-center justify-center gap-2 shadow-sm"
+                                style="background-color: #000000 !important; color: #ffffff !important;">
+                            <span style="color: #ffffff !important;">Ingresar</span>
+                            <span style="color: #ffffff !important;">→</span>
                         </button>
 
                         <div class="text-center pt-1">
@@ -1719,9 +1720,9 @@
             }
         },
 
-        toggleVerClave: function() {
-            const input = document.getElementById('pc-login-clave');
-            const icon = document.getElementById('pc-clave-eye');
+        toggleInputClave: function(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
             if (!input) return;
             if (input.type === 'password') {
                 input.type = 'text';
@@ -1730,6 +1731,10 @@
                 input.type = 'password';
                 if (icon) icon.className = 'fas fa-eye';
             }
+        },
+
+        toggleVerClave: function() {
+            this.toggleInputClave('pc-login-clave', 'pc-clave-eye');
         },
 
         ejecutarConsultaRif: async function() {
@@ -2329,11 +2334,21 @@
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
                                     <label class="text-[11px] font-medium text-neutral-400 uppercase block mb-1">Contraseña de Acceso</label>
-                                    <input type="password" id="ins-clave" placeholder="Mínimo 6 caracteres" class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none focus:border-white/30 text-xs">
+                                    <div class="flex items-center border border-white/10 rounded-xl bg-[#18181b] focus-within:border-white/30 transition overflow-hidden px-3">
+                                        <input type="password" id="ins-clave" placeholder="Mínimo 6 caracteres" class="w-full bg-transparent text-white text-xs py-2.5 outline-none placeholder:text-neutral-500">
+                                        <button type="button" onclick="window.PortalComercio.toggleInputClave('ins-clave', 'ins-clave-eye')" class="text-neutral-400 hover:text-white transition pl-2 text-xs" title="Mostrar u ocultar contraseña">
+                                            <i id="ins-clave-eye" class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
                                 </div>
                                 <div>
                                     <label class="text-[11px] font-medium text-neutral-400 uppercase block mb-1">Confirmar Contraseña</label>
-                                    <input type="password" id="ins-clave-confirm" placeholder="Repite la contraseña" class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none focus:border-white/30 text-xs">
+                                    <div class="flex items-center border border-white/10 rounded-xl bg-[#18181b] focus-within:border-white/30 transition overflow-hidden px-3">
+                                        <input type="password" id="ins-clave-confirm" placeholder="Repite la contraseña" class="w-full bg-transparent text-white text-xs py-2.5 outline-none placeholder:text-neutral-500">
+                                        <button type="button" onclick="window.PortalComercio.toggleInputClave('ins-clave-confirm', 'ins-clave-confirm-eye')" class="text-neutral-400 hover:text-white transition pl-2 text-xs" title="Mostrar u ocultar contraseña">
+                                            <i id="ins-clave-confirm-eye" class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -2386,22 +2401,34 @@
 
                             <div>
                                 <label class="text-[11px] font-medium text-slate-600 uppercase block mb-1">Nueva Contraseña (Mínimo 6 caracteres)</label>
-                                <input type="password" id="pi-clave" placeholder="••••••••" 
-                                       class="w-full bg-white border border-slate-200 text-slate-800 rounded-xl px-3 py-2.5 outline-none focus:border-slate-400 text-xs">
+                                <div class="flex items-center border border-slate-200 rounded-xl bg-white focus-within:border-slate-400 transition overflow-hidden px-3">
+                                    <input type="password" id="pi-clave" placeholder="••••••••" 
+                                           class="w-full bg-transparent text-slate-800 text-xs py-2.5 outline-none placeholder:text-slate-400">
+                                    <button type="button" onclick="window.PortalComercio.toggleInputClave('pi-clave', 'pi-clave-eye')" class="text-slate-400 hover:text-slate-600 transition pl-2 text-xs" title="Mostrar u ocultar contraseña">
+                                        <i id="pi-clave-eye" class="fas fa-eye"></i>
+                                    </button>
+                                </div>
                             </div>
 
                             <div>
                                 <label class="text-[11px] font-medium text-slate-600 uppercase block mb-1">Confirmar Nueva Contraseña</label>
-                                <input type="password" id="pi-clave-confirm" placeholder="••••••••" 
-                                       class="w-full bg-white border border-slate-200 text-slate-800 rounded-xl px-3 py-2.5 outline-none focus:border-slate-400 text-xs">
+                                <div class="flex items-center border border-slate-200 rounded-xl bg-white focus-within:border-slate-400 transition overflow-hidden px-3">
+                                    <input type="password" id="pi-clave-confirm" placeholder="••••••••" 
+                                           class="w-full bg-transparent text-slate-800 text-xs py-2.5 outline-none placeholder:text-slate-400">
+                                    <button type="button" onclick="window.PortalComercio.toggleInputClave('pi-clave-confirm', 'pi-clave-confirm-eye')" class="text-slate-400 hover:text-slate-600 transition pl-2 text-xs" title="Mostrar u ocultar contraseña">
+                                        <i id="pi-clave-confirm-eye" class="fas fa-eye"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
                         <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
                             <button onclick="window.PortalComercio.cerrarModalPrimerIngreso()" class="px-4 py-2.5 text-xs text-slate-500 hover:text-black">Cancelar</button>
                             <button onclick="window.PortalComercio.guardarPrimerIngreso()" 
-                                    class="bg-black hover:bg-neutral-800 text-white text-xs font-semibold rounded-xl px-5 py-2.5 transition">
-                                Activar Acceso →
+                                    class="bg-black hover:bg-neutral-800 text-white text-xs font-semibold rounded-xl px-5 py-2.5 transition flex items-center justify-center gap-1.5 shadow-sm"
+                                    style="background-color: #000000 !important; color: #ffffff !important;">
+                                <span style="color: #ffffff !important;">Activar Acceso</span>
+                                <span style="color: #ffffff !important;">→</span>
                             </button>
                         </div>
                     </div>
@@ -2447,22 +2474,34 @@
 
                             <div>
                                 <label class="text-[11px] font-medium text-slate-600 uppercase block mb-1">Nueva Contraseña (Mínimo 6 caracteres)</label>
-                                <input type="password" id="rec-nueva-clave" placeholder="••••••••" 
-                                       class="w-full bg-white border border-slate-200 text-slate-800 rounded-xl px-3 py-2.5 outline-none focus:border-slate-400 text-xs">
+                                <div class="flex items-center border border-slate-200 rounded-xl bg-white focus-within:border-slate-400 transition overflow-hidden px-3">
+                                    <input type="password" id="rec-nueva-clave" placeholder="••••••••" 
+                                           class="w-full bg-transparent text-slate-800 text-xs py-2.5 outline-none placeholder:text-slate-400">
+                                    <button type="button" onclick="window.PortalComercio.toggleInputClave('rec-nueva-clave', 'rec-nueva-clave-eye')" class="text-slate-400 hover:text-slate-600 transition pl-2 text-xs" title="Mostrar u ocultar contraseña">
+                                        <i id="rec-nueva-clave-eye" class="fas fa-eye"></i>
+                                    </button>
+                                </div>
                             </div>
 
                             <div>
                                 <label class="text-[11px] font-medium text-slate-600 uppercase block mb-1">Confirmar Nueva Contraseña</label>
-                                <input type="password" id="rec-confirm-clave" placeholder="••••••••" 
-                                       class="w-full bg-white border border-slate-200 text-slate-800 rounded-xl px-3 py-2.5 outline-none focus:border-slate-400 text-xs">
+                                <div class="flex items-center border border-slate-200 rounded-xl bg-white focus-within:border-slate-400 transition overflow-hidden px-3">
+                                    <input type="password" id="rec-confirm-clave" placeholder="••••••••" 
+                                           class="w-full bg-transparent text-slate-800 text-xs py-2.5 outline-none placeholder:text-slate-400">
+                                    <button type="button" onclick="window.PortalComercio.toggleInputClave('rec-confirm-clave', 'rec-confirm-clave-eye')" class="text-slate-400 hover:text-slate-600 transition pl-2 text-xs" title="Mostrar u ocultar contraseña">
+                                        <i id="rec-confirm-clave-eye" class="fas fa-eye"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
                         <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
                             <button onclick="window.PortalComercio.cerrarModalRecuperarClave()" class="px-4 py-2.5 text-xs text-slate-500 hover:text-black">Cancelar</button>
                             <button onclick="window.PortalComercio.guardarRecuperarClave()" 
-                                    class="bg-black hover:bg-neutral-800 text-white text-xs font-semibold rounded-xl px-5 py-2.5 transition">
-                                Restablecer Clave →
+                                    class="bg-black hover:bg-neutral-800 text-white text-xs font-semibold rounded-xl px-5 py-2.5 transition flex items-center justify-center gap-1.5 shadow-sm"
+                                    style="background-color: #000000 !important; color: #ffffff !important;">
+                                <span style="color: #ffffff !important;">Restablecer Clave</span>
+                                <span style="color: #ffffff !important;">→</span>
                             </button>
                         </div>
                     </div>
