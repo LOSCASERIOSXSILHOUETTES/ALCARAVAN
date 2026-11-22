@@ -140,6 +140,14 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.9.0 — 22/11/2026
+- **Edicion Integral de Contribuyentes Protegida por Matriz ACL (`contribuyentes_editar`):**
+  - **Boton de Accion "Editar" en Padrón RUC:** Integrado en la columna de acciones de cada comercio para funcionarios con permisos correspondientes.
+  - **Modal Completo de Modificacion:** Permite actualizar RIF, Razón Social, Denominación Comercial, Tipo de Persona, Correo, Teléfono sanitizado, Dirección Fiscal, Representante Legal, Cédula del Representante, Estado del Contribuyente (`activo`, `en_revision`, `bloqueado`) y Fotografía de Fachada.
+  - **Protección Criptográfica y de Permisos:** Verificación estricta del permiso granular `contribuyentes_editar` vía `HaciendaAuth.hasPermission('contribuyentes_editar')`, bloqueando cualquier intento no autorizado.
+  - **Persistencia Inmediata:** Actualización atómica en LocalForage a 0ms y sincronización inmediata con Supabase.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.9.0` con 312 pruebas unitarias automatizadas superadas al 100%.
+
 ### Version 3.8.9 — 22/11/2026
 - **Asignacion Administrativa de Contraseñas a Contribuyentes en Panel ERP:**
   - **Accion Directa en Padrón RUC:** Boton "Clave" en cada fila de la tabla de contribuyentes con indicador visual de estado (llave verde si tiene clave, gris si esta pendiente de primer ingreso).
