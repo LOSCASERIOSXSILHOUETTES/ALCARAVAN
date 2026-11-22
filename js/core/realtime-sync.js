@@ -26,7 +26,8 @@
         'hacienda_popups',
         'hacienda_carrusel',
         'user_profiles',
-        'hacienda_actividades_locat'
+        'hacienda_actividades_locat',
+        'hacienda_metodos_pago'
     ]);
 
     function isPortal() {
@@ -42,7 +43,7 @@
 
         // En el portal público, bloquear recargas masivas de tablas privadas/administrativas
         if (isPortal()) {
-            const PUBLIC_PORTAL_TABLES = new Set(['hacienda_popups', 'hacienda_carrusel', 'hacienda_actividades_locat', 'hacienda_cuentas']);
+            const PUBLIC_PORTAL_TABLES = new Set(['hacienda_popups', 'hacienda_carrusel', 'hacienda_actividades_locat', 'hacienda_cuentas', 'hacienda_metodos_pago']);
             if (!PUBLIC_PORTAL_TABLES.has(table)) {
                 // Si el contribuyente tiene su sesión abierta, sincronizar solo sus registros de forma quirúrgica
                 const activeC = global.PortalComercio && typeof global.PortalComercio.getActiveContribuyente === 'function'

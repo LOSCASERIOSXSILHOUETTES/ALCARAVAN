@@ -12,6 +12,8 @@
             const declaraciones = global.HaciendaStore ? global.HaciendaStore.get('hacienda_declaraciones') : [];
             const cuentasBancarias = (global.HaciendaStore ? global.HaciendaStore.get('hacienda_cuentas') : [])
                 .filter(c => c.estado !== 'inactiva');
+            const metodosPago = (global.HaciendaStore ? global.HaciendaStore.get('hacienda_metodos_pago') : [])
+                .filter(m => m.activo !== false);
 
             const totalRecaudado = pagos
                 .filter(p => p.estado === 'conciliado')
@@ -129,23 +131,35 @@
                                     }).join('')}
                                 </select>
                             </div>
+                            <div class="mb-4">
+                                <label class="block text-xs font-bold text-slate-400 mb-1">Método de Pago Oficial (Alcaldía)</label>
+                                <select id="pago-metodo-id" onchange="window.CajaModule.alSeleccionarMetodoPago(this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 text-xs outline-none focus:border-amber-500">
+                                    <option value="">Seleccione canal de cobro...</option>
+                                    ${metodosPago.map(m => {
+                                        const cta = cuentasBancarias.find(c => String(c.id) === String(m.cuenta_id));
+                                        const ctaInfo = cta ? ` (${cta.banco} ····${(cta.numero || cta.numero_cuenta || '').slice(-4)})` : '';
+                                        return `<option value="${m.id}" data-cuenta-id="${m.cuenta_id || ''}" data-canal="${m.canal || 'transferencia'}">${m.nombre}${ctaInfo}</option>`;
+                                    }).join('')}
+                                </select>
+                            </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-xs font-bold text-slate-400 mb-1">Banco Destino (Alcaldía)</label>
                                     <select id="pago-banco-destino" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 text-xs outline-none">
                                         ${cuentasBancarias.length === 0 ? `
-                                            <option value="Banco de Venezuela - Cta Recaudadora">Banco de Venezuela (Cta. Recaudadora)</option>
+                                            <option value="Banco de Venezuela - Cta Recaudadora" data-cuenta-id="">Banco de Venezuela (Cta. Recaudadora)</option>
                                         ` : cuentasBancarias.map(c => `
-                                            <option value="${c.banco} (${c.numero ? c.numero.slice(-4) : ''})">
+                                            <option value="${c.banco} (${c.numero ? c.numero.slice(-4) : ''})" data-cuenta-id="${c.id}">
                                                 ${c.banco} (${c.numero ? c.numero.slice(-4) : ''}) — ${c.concepto || 'Recaudación'}
                                             </option>
                                         `).join('')}
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-400 mb-1">Método de Pago</label>
+                                    <label class="block text-xs font-bold text-slate-400 mb-1">Modalidad de Pago</label>
                                     <select id="pago-metodo" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 text-xs outline-none">
                                         <option value="transferencia">Transferencia Bancaria</option>
+                                        <option value="pago_movil">Pago Móvil C2P / P2P</option>
                                         <option value="punto_venta">Punto de Venta / Tarjeta</option>
                                         <option value="biopago">BioPago BDV</option>
                                         <option value="efectivo">Efectivo en Taquilla</option>
@@ -234,6 +248,34 @@
             document.getElementById('pago-monto').value = monto.toFixed(2);
         },
 
+        alSeleccionarMetodoPago: function(metodoId) {
+            const store = global.HaciendaStore;
+            if (!store) return;
+            const metodos = store.get('hacienda_metodos_pago') || [];
+            const m = metodos.find(item => String(item.id) === String(metodoId));
+            if (!m) return;
+
+            const selectMetodo = document.getElementById('pago-metodo');
+            if (selectMetodo && m.canal) {
+                if (m.canal === 'pago_movil') selectMetodo.value = 'pago_movil';
+                else if (m.canal === 'transferencia') selectMetodo.value = 'transferencia';
+                else if (m.canal === 'punto_venta') selectMetodo.value = 'punto_venta';
+                else if (m.canal === 'efectivo_bs') selectMetodo.value = 'efectivo';
+            }
+
+            if (m.cuenta_id) {
+                const selectDestino = document.getElementById('pago-banco-destino');
+                if (selectDestino) {
+                    for (let i = 0; i < selectDestino.options.length; i++) {
+                        if (String(selectDestino.options[i].dataset?.cuentaId) === String(m.cuenta_id)) {
+                            selectDestino.selectedIndex = i;
+                            break;
+                        }
+                    }
+                }
+            }
+        },
+
         abrirModalPago: function(declaracionId = null) {
             if (declaracionId) {
                 const select = document.getElementById('pago-declaracion-id');
@@ -270,11 +312,22 @@
                 const pagos = global.HaciendaStore ? global.HaciendaStore.get('hacienda_pagos') : [];
                 const numRecibo = 'REC-' + new Date().getFullYear() + '-' + String(pagos.length + 1).padStart(5, '0');
 
+                const metodoId = document.getElementById('pago-metodo-id')?.value;
+                const metodos = global.HaciendaStore ? (global.HaciendaStore.get('hacienda_metodos_pago') || []) : [];
+                const metodoObj = metodos.find(m => String(m.id) === String(metodoId));
+
+                const selectDestino = document.getElementById('pago-banco-destino');
+                const optDestino = selectDestino && selectDestino.selectedIndex >= 0 ? selectDestino.options[selectDestino.selectedIndex] : null;
+                const cuentaIdDestino = optDestino?.dataset?.cuentaId ? parseInt(optDestino.dataset.cuentaId, 10) : null;
+                const cuentaIdFinal = (metodoObj && metodoObj.cuenta_id) ? metodoObj.cuenta_id : (cuentaIdDestino || null);
+
                 const nuevoPago = {
                     numero_recibo: numRecibo,
                     contribuyente_id: contribuyenteId,
                     declaracion_id: declaracionId,
-                    banco_origen: 'Transferencia Bancaria',
+                    metodo_pago_id: metodoObj ? metodoObj.id : (metodoId ? parseInt(metodoId, 10) : null),
+                    cuenta_id: cuentaIdFinal,
+                    banco_origen: 'Taquilla / Transferencia',
                     banco_destino: document.getElementById('pago-banco-destino').value,
                     referencia_bancaria: document.getElementById('pago-referencia').value.trim(),
                     fecha_pago: document.getElementById('pago-fecha').value,

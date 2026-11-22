@@ -242,6 +242,8 @@
         const pagos = store ? store.get('hacienda_pagos') : [];
         const contribuyentes = store ? store.get('hacienda_contribuyentes') : [];
         const verifHeuristica = global.HaciendaConcilParsers ? global.HaciendaConcilParsers.verificarMatchHeuristico : null;
+        const slCuenta = document.getElementById('sl-cuenta-select');
+        const currentCuentaId = slCuenta ? slCuenta.value : '';
 
         let emparejados = 0;
         let transferidos = 0;
@@ -259,6 +261,10 @@
                 // Intentar Auto-Pareo con hacienda_pagos pendientes si es ingreso
                 if (esEntrada && verifHeuristica) {
                     const match = pagos.find(p => {
+                        if (p.estado === 'conciliado') return false;
+                        if (p.cuenta_id && currentCuentaId && currentCuentaId !== 'all' && String(p.cuenta_id) !== String(currentCuentaId)) {
+                            return false;
+                        }
                         const v = verifHeuristica(rawItem, p);
                         return v.perfectMatch || (v.isMontoMatch && v.isRefMatch);
                     });

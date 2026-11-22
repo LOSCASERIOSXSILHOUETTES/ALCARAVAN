@@ -267,6 +267,27 @@ CREATE TABLE IF NOT EXISTS "public"."hacienda_actividades_locat" (
     "updated_at" TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- 18. TABLA: hacienda_metodos_pago (Canales de Pago Afiliados a Cuentas Bancarias)
+CREATE TABLE IF NOT EXISTS "public"."hacienda_metodos_pago" (
+    "id" TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    "cuenta_id" TEXT REFERENCES "public"."hacienda_cuentas"("id") ON DELETE SET NULL,
+    "tipo" TEXT NOT NULL DEFAULT 'transferencia', -- 'pago_movil', 'transferencia', 'punto_venta', 'efectivo'
+    "nombre" TEXT NOT NULL,
+    "banco" TEXT,
+    "telefono" TEXT,
+    "identificacion" TEXT,
+    "titular" TEXT,
+    "instrucciones" TEXT,
+    "activo" BOOLEAN DEFAULT true,
+    "orden" INTEGER DEFAULT 0,
+    "created_at" TIMESTAMPTZ DEFAULT NOW(),
+    "updated_at" TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Campos de enlace en pagos hacia la cuenta y canal exacto
+ALTER TABLE "public"."hacienda_pagos" ADD COLUMN IF NOT EXISTS "cuenta_id" TEXT;
+ALTER TABLE "public"."hacienda_pagos" ADD COLUMN IF NOT EXISTS "metodo_pago_id" TEXT;
+
 -- ============================================================================
 -- ACTIVACION DE ROW LEVEL SECURITY (RLS) EN TODAS LAS TABLAS
 -- ============================================================================
@@ -344,6 +365,10 @@ CREATE POLICY "Permisivo user_profiles" ON "public"."user_profiles" FOR ALL USIN
 DROP POLICY IF EXISTS "Permisivo hacienda_actividades_locat" ON "public"."hacienda_actividades_locat";
 CREATE POLICY "Permisivo hacienda_actividades_locat" ON "public"."hacienda_actividades_locat" FOR ALL USING (true) WITH CHECK (true);
 
+ALTER TABLE "public"."hacienda_metodos_pago" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Permisivo hacienda_metodos_pago" ON "public"."hacienda_metodos_pago";
+CREATE POLICY "Permisivo hacienda_metodos_pago" ON "public"."hacienda_metodos_pago" FOR ALL USING (true) WITH CHECK (true);
+
 -- ============================================================================
 -- OTORGAR PRIVILEGIOS COMPLETOS A LOS ROLES DE SUPABASE
 -- ============================================================================
@@ -365,6 +390,7 @@ GRANT ALL ON "public"."hacienda_popups" TO "anon", "authenticated", "service_rol
 GRANT ALL ON "public"."hacienda_carrusel" TO "anon", "authenticated", "service_role";
 GRANT ALL ON "public"."user_profiles" TO "anon", "authenticated", "service_role";
 GRANT ALL ON "public"."hacienda_actividades_locat" TO "anon", "authenticated", "service_role";
+GRANT ALL ON "public"."hacienda_metodos_pago" TO "anon", "authenticated", "service_role";
 
 -- ============================================================================
 -- PUBLICACION PARA SUPABASE REALTIME (POSTGRES CHANGES)
@@ -389,7 +415,8 @@ BEGIN
             "public"."hacienda_popups",
             "public"."hacienda_carrusel",
             "public"."user_profiles",
-            "public"."hacienda_actividades_locat";
+            "public"."hacienda_actividades_locat",
+            "public"."hacienda_metodos_pago";
     EXCEPTION WHEN duplicate_object THEN
         -- Ya estaban agregadas a la publicacion
     END;

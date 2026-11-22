@@ -73,6 +73,10 @@
                         <i class="fas fa-cash-register text-amber-400 text-sm"></i>
                         <span>Caja y Recaudación</span>
                     </button>
+                    <button onclick="window.App.switchTab('metodos_pago')" id="nav-metodos_pago" data-perm="caja_ver" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
+                        <i class="fas fa-wallet text-emerald-400 text-sm"></i>
+                        <span>Métodos de Pago</span>
+                    </button>
                     <button onclick="window.App.switchTab('conciliacion')" id="nav-conciliacion" data-perm="conciliacion_ver" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
                         <i class="fas fa-balance-scale text-teal-400 text-sm"></i>
                         <span>Conciliación Bancaria</span>
@@ -260,6 +264,7 @@
     <script src="js/modules/patentes/comercial.js"></script>
     <script src="js/modules/declaraciones/formulario.js"></script>
     <script src="js/modules/caja/taquilla.js"></script>
+    <script src="js/modules/caja/metodos-pago.js"></script>
     <script src="js/modules/conciliacion/parsers.js"></script>
     <script src="js/modules/conciliacion/smart-ledger.js"></script>
     <script src="js/modules/conciliacion/cuentas.js"></script>
@@ -548,6 +553,7 @@
                     'patentes': 'Licencias y Patentes Municipales (LOCAT)',
                     'declaraciones': 'Autoliquidaciones de Actividades Económicas',
                     'caja': 'Taquilla de Recaudación y Caja',
+                    'metodos_pago': 'Métodos de Pago y Canales de Recaudación',
                     'conciliacion': 'Conciliación Bancaria y Smart Ledger',
                     'solvencias': 'Solvencias Municipales Automatizadas con QR',
                     'comunicacion': 'Comunicación Oficial y Contenidos de Portada',
@@ -571,6 +577,8 @@
                     window.DeclaracionesModule.render(container);
                 } else if (this.currentTab === 'caja' && window.CajaModule) {
                     window.CajaModule.render(container);
+                } else if (this.currentTab === 'metodos_pago' && window.MetodosPagoModule) {
+                    window.MetodosPagoModule.render(container);
                 } else if (this.currentTab === 'conciliacion' && window.HaciendaConciliacion) {
                     window.HaciendaConciliacion.render(container);
                 } else if (this.currentTab === 'solvencias' && window.SolvenciasModule) {

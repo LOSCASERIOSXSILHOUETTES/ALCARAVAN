@@ -30,7 +30,8 @@
         'hacienda_popups',
         'hacienda_carrusel',
         'user_profiles',
-        'hacienda_actividades_locat'
+        'hacienda_actividades_locat',
+        'hacienda_metodos_pago'
     ];
 
     const TABLE_SCHEMAS = {
@@ -55,8 +56,8 @@
         'hacienda_pagos': [
             'id', 'numero_recibo', 'contribuyente_id', 'declaracion_id',
             'banco_origen', 'banco_destino', 'referencia_bancaria', 'fecha_pago',
-            'monto_bs', 'comprobante_url', 'metodo', 'estado', 'verificado_por',
-            'fecha_verificacion', 'created_at', 'updated_at'
+            'monto_bs', 'comprobante_url', 'metodo', 'cuenta_id', 'metodo_pago_id',
+            'estado', 'verificado_por', 'fecha_verificacion', 'created_at', 'updated_at'
         ],
         'hacienda_solvencias': [
             'id', 'numero_solvencia', 'contribuyente_id', 'tipo', 'codigo_qr',
@@ -100,6 +101,9 @@
         ],
         'hacienda_actividades_locat': [
             'id', 'codigo', 'categoria', 'nombre', 'alicuota', 'minimo_tcmmv', 'activo', 'created_at', 'updated_at'
+        ],
+        'hacienda_metodos_pago': [
+            'id', 'cuenta_id', 'tipo', 'nombre', 'banco', 'telefono', 'identificacion', 'titular', 'instrucciones', 'activo', 'orden', 'created_at', 'updated_at'
         ]
     };
 
@@ -305,6 +309,76 @@
                 this._cache['hacienda_cuentas'] = cuentasIniciales;
                 if (this._localStore) {
                     await this._localStore.setItem('tbl_hacienda_cuentas', cuentasIniciales);
+                }
+            }
+
+            // Sembrar métodos de pago oficiales afiliados a cuentas bancarias si está vacío
+            if (!this._cache['hacienda_metodos_pago'] || this._cache['hacienda_metodos_pago'].length === 0) {
+                const metodosIniciales = [
+                    {
+                        id: 'met_pm_bdv',
+                        cuenta_id: 'cta_01',
+                        tipo: 'pago_movil',
+                        nombre: 'Pago Móvil Banco de Venezuela',
+                        banco: 'Banco de Venezuela',
+                        telefono: '0412-1234567',
+                        identificacion: 'G-20000123-4',
+                        titular: 'Alcaldía del Municipio San José de Guaribe',
+                        instrucciones: 'Indicar el número de RIF del comercio en la descripción del pago móvil.',
+                        activo: true,
+                        orden: 1,
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString()
+                    },
+                    {
+                        id: 'met_tr_bdv',
+                        cuenta_id: 'cta_01',
+                        tipo: 'transferencia',
+                        nombre: 'Transferencia Bancaria Banco de Venezuela',
+                        banco: 'Banco de Venezuela',
+                        telefono: '',
+                        identificacion: 'G-20000123-4',
+                        titular: 'Alcaldía del Municipio San José de Guaribe',
+                        instrucciones: 'Cuenta Corriente oficial para entero de autoliquidaciones LOCAT.',
+                        activo: true,
+                        orden: 2,
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString()
+                    },
+                    {
+                        id: 'met_tr_banesco',
+                        cuenta_id: 'cta_02',
+                        tipo: 'transferencia',
+                        nombre: 'Transferencia Bancaria Banesco',
+                        banco: 'Banesco Banco Universal',
+                        telefono: '',
+                        identificacion: 'G-20000123-4',
+                        titular: 'Alcaldía del Municipio San José de Guaribe',
+                        instrucciones: 'Cuenta de Ingresos Propios y Tasas Administrativas.',
+                        activo: true,
+                        orden: 3,
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString()
+                    },
+                    {
+                        id: 'met_pos_taquilla',
+                        cuenta_id: 'cta_01',
+                        tipo: 'punto_venta',
+                        nombre: 'Punto de Venta / Tarjeta en Taquilla Central',
+                        banco: 'Banco de Venezuela',
+                        telefono: '',
+                        identificacion: 'G-20000123-4',
+                        titular: 'Taquilla de Recaudación Alcaldía',
+                        instrucciones: 'Disponible en la sede de Administración Tributaria en horario de taquilla.',
+                        activo: true,
+                        orden: 4,
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString()
+                    }
+                ];
+                this._cache['hacienda_metodos_pago'] = metodosIniciales;
+                if (this._localStore) {
+                    await this._localStore.setItem('tbl_hacienda_metodos_pago', metodosIniciales);
                 }
             }
 
@@ -655,7 +729,7 @@
             if (!global.supabaseClient || !navigator.onLine) return;
             // En el portal público, bloquear descargas masivas de tablas privadas/administrativas
             if (this.isPortal()) {
-                const PUBLIC_PORTAL_TABLES = ['hacienda_popups', 'hacienda_carrusel', 'hacienda_actividades_locat', 'hacienda_cuentas'];
+                const PUBLIC_PORTAL_TABLES = ['hacienda_popups', 'hacienda_carrusel', 'hacienda_actividades_locat', 'hacienda_cuentas', 'hacienda_metodos_pago'];
                 if (!PUBLIC_PORTAL_TABLES.includes(table)) {
                     return;
                 }

@@ -62,6 +62,7 @@ const coreFiles = [
     'js/modules/patentes/comercial.js',
     'js/modules/declaraciones/formulario.js',
     'js/modules/caja/taquilla.js',
+    'js/modules/caja/metodos-pago.js',
     'js/modules/conciliacion/parsers.js',
     'js/modules/conciliacion/smart-ledger.js',
     'js/modules/conciliacion/cuentas.js',
@@ -221,6 +222,7 @@ const scriptsToExecute = [
     'js/modules/patentes/comercial.js',
     'js/modules/declaraciones/formulario.js',
     'js/modules/caja/taquilla.js',
+    'js/modules/caja/metodos-pago.js',
     'js/modules/conciliacion/parsers.js',
     'js/modules/conciliacion/smart-ledger.js',
     'js/modules/conciliacion/cuentas.js',
@@ -261,6 +263,7 @@ const expectedModules = [
     { name: 'PatentesModule', methods: ['render'] },
     { name: 'DeclaracionesModule', methods: ['render'] },
     { name: 'CajaModule', methods: ['render'] },
+    { name: 'MetodosPagoModule', methods: ['render', 'abrirModal', 'cerrarModal', 'guardar', 'toggleActivo', 'eliminar'] },
     { name: 'HaciendaConciliacion', methods: ['render'] },
     { name: 'SolvenciasModule', methods: ['render'] },
     { name: 'ComunicacionModule', methods: ['render'] },
@@ -307,10 +310,11 @@ const SYSTEM_TABLES = [
     'hacienda_popups',
     'hacienda_carrusel',
     'user_profiles',
-    'hacienda_actividades_locat'
+    'hacienda_actividades_locat',
+    'hacienda_metodos_pago'
 ];
 
-assert(SYSTEM_TABLES.length === 17, "Catálogo completo de 17 tablas del sistema tributario");
+assert(SYSTEM_TABLES.length === 18, "Catálogo completo de 18 tablas del sistema tributario");
 
 SYSTEM_TABLES.forEach(tbl => {
     // 1. En TABLES de store.js

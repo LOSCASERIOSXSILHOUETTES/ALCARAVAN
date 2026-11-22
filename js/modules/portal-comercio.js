@@ -1362,21 +1362,127 @@
                     </div>
                 `;
             } else if (tab === 'pagar') {
+                const metodosPago = (global.HaciendaStore ? global.HaciendaStore.get('hacienda_metodos_pago') : [])
+                    .filter(m => m.activo !== false);
+                const cuentasList = cuentas || [];
+                const cuentasMap = new Map(cuentasList.map(cta => [String(cta.id), cta]));
+
                 return `
                     <div class="space-y-6">
-                        <!-- Tarjetas de Cuentas Bancarias -->
+                        <!-- Tarjetas de Métodos de Pago y Canales Oficiales -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            ${cuentas.length === 0 ? `
+                            ${metodosPago.length > 0 ? metodosPago.map(m => {
+                                const cta = m.cuenta_id ? cuentasMap.get(String(m.cuenta_id)) : null;
+                                const isPagoMovil = m.canal === 'pago_movil';
+                                const isTransferencia = m.canal === 'transferencia';
+                                const isPuntoVenta = m.canal === 'punto_venta';
+
+                                const badgeColor = isPagoMovil ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                                    : isTransferencia ? 'bg-sky-500/10 text-sky-400 border-sky-500/20'
+                                    : isPuntoVenta ? 'bg-purple-500/10 text-purple-400 border-purple-500/20'
+                                    : 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+
+                                const canalLabel = isPagoMovil ? 'Pago Móvil C2P / P2P'
+                                    : isTransferencia ? 'Transferencia Bancaria'
+                                    : isPuntoVenta ? 'Punto de Venta Taquilla'
+                                    : (m.canal || 'Canal de Pago').toUpperCase();
+
+                                const numCuenta = cta ? (cta.numero || cta.numero_cuenta || '') : '';
+                                const bancoNombre = cta ? (cta.banco || cta.banco_nombre || '') : (m.banco_origen_permitido || 'Bancario');
+                                const tlf = m.telefono_pago_movil || '';
+                                const doc = m.documento_pago_movil || (cta ? cta.rif_titular : 'G-20000163-9') || '';
+
+                                return `
+                                    <div class="p-6 rounded-3xl bg-gradient-to-br from-[#1c1c1e] to-[#121214] border border-white/10 shadow-xl space-y-4 relative group">
+                                        <div class="flex items-center justify-between">
+                                            <div class="text-xs font-bold text-white uppercase tracking-wider">${m.nombre}</div>
+                                            <span class="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full border ${badgeColor}">
+                                                ${canalLabel}
+                                            </span>
+                                        </div>
+
+                                        <div class="space-y-2 text-xs">
+                                            ${isPagoMovil ? `
+                                                <div class="p-3 rounded-2xl bg-white/[0.03] border border-white/5 space-y-1.5 font-mono">
+                                                    <div class="flex justify-between items-center text-neutral-400">
+                                                        <span>Banco:</span>
+                                                        <span class="text-white font-bold">${bancoNombre}</span>
+                                                    </div>
+                                                    <div class="flex justify-between items-center text-neutral-400">
+                                                        <span>Teléfono:</span>
+                                                        <span class="text-white font-bold select-all">${tlf || 'No registrado'}</span>
+                                                    </div>
+                                                    <div class="flex justify-between items-center text-neutral-400">
+                                                        <span>RIF / C.I.:</span>
+                                                        <span class="text-white font-bold select-all">${doc || 'G-20000163-9'}</span>
+                                                    </div>
+                                                    ${cta ? `
+                                                        <div class="flex justify-between items-center text-neutral-500 text-[11px] pt-1 border-t border-white/5">
+                                                            <span>Cta. Afiliada:</span>
+                                                            <span class="text-neutral-300">····${numCuenta.slice(-4)}</span>
+                                                        </div>
+                                                    ` : ''}
+                                                </div>
+                                                <div class="grid grid-cols-2 gap-2">
+                                                    <button onclick="window.PortalComercio.copiarAlPortapapeles('${tlf}', 'Teléfono copiado.')" 
+                                                            class="py-2 bg-white/[0.06] hover:bg-white/[0.12] text-neutral-300 hover:text-white text-[11px] font-medium rounded-xl transition flex items-center justify-center gap-1.5 border border-white/5">
+                                                        <i class="fas fa-copy text-[10px]"></i>
+                                                        <span>Copiar Teléfono</span>
+                                                    </button>
+                                                    <button onclick="window.PortalComercio.copiarAlPortapapeles('${doc}', 'RIF copiado.')" 
+                                                            class="py-2 bg-white/[0.06] hover:bg-white/[0.12] text-neutral-300 hover:text-white text-[11px] font-medium rounded-xl transition flex items-center justify-center gap-1.5 border border-white/5">
+                                                        <i class="fas fa-copy text-[10px]"></i>
+                                                        <span>Copiar RIF</span>
+                                                    </button>
+                                                </div>
+                                            ` : isTransferencia ? `
+                                                <div class="p-3 rounded-2xl bg-white/[0.03] border border-white/5 space-y-1.5 font-mono">
+                                                    <div class="flex justify-between items-center text-neutral-400">
+                                                        <span>Banco:</span>
+                                                        <span class="text-white font-bold">${bancoNombre}</span>
+                                                    </div>
+                                                    <div class="flex justify-between items-center text-neutral-400">
+                                                        <span>N° Cuenta:</span>
+                                                        <span class="text-white font-bold text-xs select-all">${numCuenta || 'No registrada'}</span>
+                                                    </div>
+                                                    <div class="flex justify-between items-center text-neutral-400">
+                                                        <span>RIF / Titular:</span>
+                                                        <span class="text-white font-bold select-all">${doc}</span>
+                                                    </div>
+                                                </div>
+                                                <button onclick="window.PortalComercio.copiarAlPortapapeles('${numCuenta}', 'Número de cuenta copiado.')" 
+                                                        class="w-full py-2 bg-white/[0.06] hover:bg-white/[0.12] text-neutral-300 hover:text-white text-xs font-medium rounded-xl transition flex items-center justify-center gap-1.5 border border-white/5">
+                                                    <i class="fas fa-copy text-[10px]"></i>
+                                                    <span>Copiar Número de Cuenta</span>
+                                                </button>
+                                            ` : isPuntoVenta ? `
+                                                <div class="p-3 rounded-2xl bg-white/[0.03] border border-white/5 space-y-1 text-neutral-300">
+                                                    <p class="font-medium">Disponible en Taquilla de Hacienda Municipal.</p>
+                                                    <p class="text-[11px] text-neutral-400">Tarjetas de Débito y Crédito nacionales.</p>
+                                                    ${cta ? `<p class="text-[11px] text-neutral-500 font-mono">Liquidación: ${cta.banco} (····${numCuenta.slice(-4)})</p>` : ''}
+                                                </div>
+                                                <div class="text-[11px] text-neutral-400 italic text-center py-1">
+                                                    Presenta tu referencia o recibo de punto en taquilla.
+                                                </div>
+                                            ` : `
+                                                <div class="p-3 rounded-2xl bg-white/[0.03] border border-white/5 text-neutral-300">
+                                                    <p>${m.instrucciones || 'Canal habilitado para recaudación tributaria municipal.'}</p>
+                                                </div>
+                                            `}
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('') : (cuentasList.length === 0 ? `
                                 <div class="col-span-full p-8 rounded-3xl bg-[#18181b] border border-amber-500/20 text-center space-y-2">
                                     <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center mx-auto text-lg">
                                         <i class="fas fa-university"></i>
                                     </div>
-                                    <h4 class="text-xs font-bold text-white uppercase tracking-wider">Sin Cuentas Recaudadoras Disponibles</h4>
+                                    <h4 class="text-xs font-bold text-white uppercase tracking-wider">Sin Métodos de Pago Disponibles</h4>
                                     <p class="text-xs text-neutral-400 max-w-md mx-auto">
-                                        No hay cuentas bancarias activas registradas en la Tesorería Municipal en este momento. Comuníquese con la Dirección de Administración Tributaria.
+                                        No hay canales de pago activos registrados en la Tesorería Municipal en este momento. Comuníquese con la Dirección de Administración Tributaria.
                                     </p>
                                 </div>
-                            ` : cuentas.map(cta => `
+                            ` : cuentasList.map(cta => `
                                 <div class="p-6 rounded-3xl bg-gradient-to-br from-[#1c1c1e] to-[#121214] border border-white/10 shadow-xl space-y-4 relative group">
                                     <div class="flex items-center justify-between">
                                         <div class="text-xs font-bold text-white uppercase tracking-wider">${cta.banco || cta.banco_nombre}</div>
@@ -1386,20 +1492,20 @@
                                         <div class="text-base font-mono font-bold text-white tracking-wider select-all">${cta.numero || cta.numero_cuenta}</div>
                                         <div class="text-xs text-neutral-400">${cta.concepto || 'Recaudación Tributaria Municipal'}</div>
                                     </div>
-                                    <button onclick="window.PortalComercio.copiarAlPortapapeles('${cta.numero || cta.numero_cuenta}')" 
+                                    <button onclick="window.PortalComercio.copiarAlPortapapeles('${cta.numero || cta.numero_cuenta}', 'Número de cuenta copiado.')" 
                                             class="w-full py-2 bg-white/[0.06] hover:bg-white/[0.12] text-neutral-300 hover:text-white text-xs font-medium rounded-xl transition flex items-center justify-center gap-1.5 border border-white/5">
                                         <i class="fas fa-copy text-[10px]"></i>
                                         <span>Copiar Número de Cuenta</span>
                                     </button>
                                 </div>
-                            `).join('')}
+                            `).join(''))}
                         </div>
 
                         <!-- Formulario de Consignación -->
                         <div class="p-8 sm:p-10 rounded-3xl bg-[#121214] border border-white/[0.08] shadow-2xl space-y-6">
                             <div class="space-y-1">
-                                <h3 class="text-lg font-semibold text-white">Reportar Transferencia de Impuesto</h3>
-                                <p class="text-xs text-neutral-400">Ingresa la referencia bancaria para su verificación y conciliación en taquilla.</p>
+                                <h3 class="text-lg font-semibold text-white">Reportar Pago de Impuesto Municipal</h3>
+                                <p class="text-xs text-neutral-400">Selecciona el método de pago utilizado e ingresa la referencia bancaria para su verificación y conciliación en taquilla.</p>
                             </div>
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1414,24 +1520,38 @@
                                     </select>
                                 </div>
                                 <div class="space-y-1.5">
+                                    <label class="text-[11px] font-medium text-neutral-400 uppercase tracking-wider block">Método de Pago Empleado (Alcaldía)</label>
+                                    <select id="pago-metodo-id" onchange="window.PortalComercio.alCambiarMetodoPago(this.value)" class="w-full bg-[#18181b] border border-white/10 text-white text-xs font-medium rounded-2xl px-4 py-3 outline-none focus:border-white/30 transition">
+                                        ${metodosPago.length === 0 ? `
+                                            <option value="" data-cuenta-id="">Transferencia Bancaria Tradicional</option>
+                                        ` : metodosPago.map(m => {
+                                            const cta = m.cuenta_id ? cuentasMap.get(String(m.cuenta_id)) : null;
+                                            const ctaInfo = cta ? ` (${cta.banco} ····${(cta.numero || cta.numero_cuenta || '').slice(-4)})` : '';
+                                            return `<option value="${m.id}" data-cuenta-id="${m.cuenta_id || ''}" data-canal="${m.canal || 'transferencia'}" data-banco="${cta ? (cta.banco || cta.banco_nombre) : ''}">
+                                                ${m.nombre}${ctaInfo}
+                                            </option>`;
+                                        }).join('')}
+                                    </select>
+                                </div>
+                                <div class="space-y-1.5">
                                     <label class="text-[11px] font-medium text-neutral-400 uppercase tracking-wider block">Banco de Origen (Tu Banco)</label>
-                                    <input type="text" id="pago-banco-origen" placeholder="Ej: Banesco, Mercantil, BDV" 
+                                    <input type="text" id="pago-banco-origen" placeholder="Ej: Banesco, Mercantil, BDV, Provincial" 
                                            class="w-full bg-[#18181b] border border-white/10 text-white text-xs font-medium rounded-2xl px-4 py-3 outline-none focus:border-white/30 transition">
                                 </div>
                                 <div class="space-y-1.5">
-                                    <label class="text-[11px] font-medium text-neutral-400 uppercase tracking-wider block">Banco Receptor (Alcaldía)</label>
+                                    <label class="text-[11px] font-medium text-neutral-400 uppercase tracking-wider block">Cuenta / Banco Receptor (Alcaldía)</label>
                                     <select id="pago-banco-destino" class="w-full bg-[#18181b] border border-white/10 text-white text-xs font-medium rounded-2xl px-4 py-3 outline-none focus:border-white/30 transition">
-                                        ${cuentas.length === 0 ? `
+                                        ${cuentasList.length === 0 ? `
                                             <option value="">No hay cuentas activas registradas</option>
-                                        ` : cuentas.map(cta => `
-                                            <option value="${cta.banco || cta.banco_nombre}">
+                                        ` : cuentasList.map(cta => `
+                                            <option value="${cta.id}" data-banco-nombre="${cta.banco || cta.banco_nombre}">
                                                 ${cta.banco || cta.banco_nombre} (${(cta.numero || cta.numero_cuenta || '').slice(-4)})
                                             </option>
                                         `).join('')}
                                     </select>
                                 </div>
                                 <div class="space-y-1.5">
-                                    <label class="text-[11px] font-medium text-neutral-400 uppercase tracking-wider block">Número de Referencia Bancaria</label>
+                                    <label class="text-[11px] font-medium text-neutral-400 uppercase tracking-wider block">Número de Referencia Bancaria / Comprobante</label>
                                     <input type="text" id="pago-referencia" placeholder="Ej: 000987654321" 
                                            class="w-full bg-[#18181b] border border-white/10 text-white font-mono text-xs font-medium rounded-2xl px-4 py-3 outline-none focus:border-white/30 transition">
                                 </div>
@@ -1440,7 +1560,7 @@
                                     <input type="number" step="0.01" id="pago-monto" placeholder="0,00" 
                                            class="w-full bg-[#18181b] border border-white/10 text-white font-mono text-xs font-medium rounded-2xl px-4 py-3 outline-none focus:border-white/30 transition">
                                 </div>
-                                <div class="space-y-1.5">
+                                <div class="space-y-1.5 sm:col-span-2">
                                     <label class="text-[11px] font-medium text-neutral-400 uppercase tracking-wider block">Fecha de Pago</label>
                                     <input type="date" id="pago-fecha" value="${new Date().toISOString().split('T')[0]}" 
                                            class="w-full bg-[#18181b] border border-white/10 text-white text-xs font-medium rounded-2xl px-4 py-3 outline-none focus:border-white/30 transition">
@@ -2346,16 +2466,39 @@
             this.cambiarEmpresaTab('pagar');
         },
 
+        alCambiarMetodoPago: function(metodoId) {
+            const store = global.HaciendaStore;
+            if (!store) return;
+            const metodos = store.get('hacienda_metodos_pago') || [];
+            const m = metodos.find(item => String(item.id) === String(metodoId));
+            if (!m) return;
+
+            const selectDestino = document.getElementById('pago-banco-destino');
+            if (selectDestino && m.cuenta_id) {
+                selectDestino.value = String(m.cuenta_id);
+            }
+        },
+
         guardarPago: async function() {
             const store = global.HaciendaStore;
             if (!store || !activeContribuyente) return;
 
-            const decId = document.getElementById('pago-declaracion-id').value;
-            const bancoOrigen = document.getElementById('pago-banco-origen').value.trim();
-            const bancoDestino = document.getElementById('pago-banco-destino').value.trim();
-            const referencia = document.getElementById('pago-referencia').value.trim();
-            const monto = parseFloat(document.getElementById('pago-monto').value || 0);
-            const fecha = document.getElementById('pago-fecha').value;
+            const decId = document.getElementById('pago-declaracion-id')?.value;
+            const metodoSelect = document.getElementById('pago-metodo-id');
+            const metodoId = metodoSelect ? metodoSelect.value : null;
+            const optMetodo = metodoSelect && metodoSelect.selectedIndex >= 0 ? metodoSelect.options[metodoSelect.selectedIndex] : null;
+            const cuentaIdDesdeMetodo = optMetodo?.dataset?.cuentaId ? parseInt(optMetodo.dataset.cuentaId, 10) : null;
+            const canalMetodo = optMetodo?.dataset?.canal || 'transferencia';
+
+            const bancoDestinoSelect = document.getElementById('pago-banco-destino');
+            const optDestino = bancoDestinoSelect && bancoDestinoSelect.selectedIndex >= 0 ? bancoDestinoSelect.options[bancoDestinoSelect.selectedIndex] : null;
+            const cuentaIdDesdeDestino = bancoDestinoSelect && bancoDestinoSelect.value ? parseInt(bancoDestinoSelect.value, 10) : null;
+            const bancoDestinoNombre = optDestino?.dataset?.bancoNombre || (optDestino ? optDestino.text.trim() : 'Tesorería Municipal');
+
+            const bancoOrigen = document.getElementById('pago-banco-origen')?.value.trim() || 'No especificado';
+            const referencia = document.getElementById('pago-referencia')?.value.trim();
+            const monto = parseFloat(document.getElementById('pago-monto')?.value || 0);
+            const fecha = document.getElementById('pago-fecha')?.value;
 
             if (!decId || !referencia || monto <= 0) {
                 if (typeof Swal !== 'undefined') {
@@ -2369,17 +2512,23 @@
                 return;
             }
 
+            const metodos = store.get('hacienda_metodos_pago') || [];
+            const metodoObj = metodos.find(m => String(m.id) === String(metodoId));
+            const cuentaIdFinal = (metodoObj && metodoObj.cuenta_id) ? metodoObj.cuenta_id : (cuentaIdDesdeMetodo || cuentaIdDesdeDestino || null);
+
             const nuevoPago = {
                 id: Date.now(),
                 numero_recibo: 'REC-' + new Date().getFullYear() + '-' + String(Date.now()).slice(-4),
                 contribuyente_id: activeContribuyente.id,
                 declaracion_id: decId,
+                metodo_pago_id: metodoObj ? metodoObj.id : (metodoId ? parseInt(metodoId, 10) : null),
+                cuenta_id: cuentaIdFinal,
                 banco_origen: bancoOrigen,
-                banco_destino: bancoDestino,
+                banco_destino: bancoDestinoNombre,
                 referencia_bancaria: referencia,
                 fecha_pago: fecha,
                 monto_bs: monto,
-                metodo: 'transferencia',
+                metodo: canalMetodo,
                 estado: 'pendiente',
                 verificado_por: null
             };
@@ -3025,14 +3174,15 @@
             this.navegarModulo('publicidad');
         },
 
-        copiarAlPortapapeles: function(texto) {
+        copiarAlPortapapeles: function(texto, label = 'Dato copiado.') {
+            if (!texto) return;
             navigator.clipboard.writeText(texto).then(() => {
                 if (typeof Swal !== 'undefined') {
                     Swal.fire({
                         icon: 'success',
                         title: 'Copiado',
-                        text: 'Número de cuenta copiado.',
-                        timer: 1000,
+                        text: label,
+                        timer: 1200,
                         showConfirmButton: false
                     });
                 }

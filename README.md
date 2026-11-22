@@ -140,6 +140,29 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.10.2 — 22/11/2026
+- **Módulo ERP de Métodos de Pago Afiliados a Cuentas Bancarias y Tarjetas Interactivas en Portal:**
+  - **Nueva Sección ERP "Métodos de Pago" (`MetodosPagoModule` - `js/modules/caja/metodos-pago.js`):**
+    - Sección administrativa dedicada bajo la suite de Caja (`data-perm="caja_ver"`), accesible desde el sidebar con botón `#nav-metodos_pago`.
+    - Permite registrar y configurar los canales oficiales de cobro de la Alcaldía: **Pago Móvil C2P / P2P**, **Transferencia Bancaria**, **Punto de Venta / Débito**, **Efectivo en Taquilla (Bs.)** y **Divisas Taquilla (USD)**.
+    - Cada método de cobro se afilia directamente a una cuenta bancaria recaudadora oficial (`cuenta_id` en `hacienda_cuentas`).
+    - Para Pago Móvil: configuración de teléfono, RIF/Cédula y banco receptor permitido.
+    - Para Transferencia: vinculación automática con el número de cuenta de 20 dígitos y titular.
+    - Filtros por canal y cuenta, switch reactivo de activación/desactivación y validación de borrado seguro (impide eliminar canales que tengan pagos registrados).
+  - **Tarjetas Dinámicas e Interactivas de Pago en el Portal del Contribuyente (`portal-comercio.js`):**
+    - La pestaña "Pagar" ahora lee en vivo a 0ms los métodos de pago activos de la Alcaldía (`hacienda_metodos_pago`), sustituyendo las tarjetas fijas/mockeadas.
+    - Tarjetas estilo Apple con insignias por canal y botones de un solo toque: "Copiar Teléfono", "Copiar RIF", "Copiar Número de Cuenta".
+    - El formulario de consignación de pagos incorpora el selector de método de pago empleado, auto-seleccionando y vinculando la cuenta receptora de la Alcaldía.
+    - El registro de pago (`hacienda_pagos`) almacena ahora `metodo_pago_id` y `cuenta_id`.
+  - **Caja de Taquilla y Conciliación Bancaria Refinada:**
+    - En taquilla municipal (`taquilla.js`), el formulario modal permite elegir el canal oficial, auto-completando la modalidad y la cuenta destino.
+    - En el motor de conciliación y pareo inteligente (`smart-ledger.js`), el auto-pareo con `hacienda_pagos` valida la correspondencia de `cuenta_id`, impidiendo cruces accidentales entre extractos de cuentas distintas.
+  - **Ciclo Inquebrantable de Datos a 0ms (18 Tablas):**
+    - Registro de la 18va tabla `hacienda_metodos_pago` y nuevas columnas `cuenta_id` y `metodo_pago_id` en `hacienda_pagos`.
+    - Registro en `store.js` (`TABLES`, `TABLE_SCHEMAS`, `PUBLIC_PORTAL_TABLES`) y `realtime-sync.js` (`SYNCABLE_TABLES`, `PUBLIC_PORTAL_TABLES`).
+    - Script DDL completo en `sql/schema_hacienda.sql`.
+    - Bump de Service Worker a `alcaravan-v3-cache-v3.10.2` con 355 pruebas automatizadas al 100% en verde.
+
 ### Version 3.10.1 — 22/11/2026
 - **Ampliación Integral del Catálogo SUDEBAN y Detección Automática Inteligente de Cuentas:**
   - **Catálogo Completo de 28 Entidades Bancarias Nacionales:** Inclusión de todos los bancos universales, públicos, privados y microfinancieros de Venezuela: BANFANB (`0177`), Banco Agrícola de Venezuela (`0166`), Banco Venezolano de Crédito / BDT (`0104`), BFC Banco Fondo Común (`0151`), Banco Caroní (`0128`), Banco Activo (`0171`), DelSur (`0157`), Banco Sofitasa (`0137`), Bancrecer (`0168`), Mi Banco (`0169`), Bangente (`0146`), N58 Banco Digital (`0178`), Instituto Municipal de Crédito Popular IMCP (`0601`), BID (`0173`) y BOD (`0116`).
