@@ -176,7 +176,8 @@
                     ` : `
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             ${metodosFiltrados.map(m => {
-                                const canalInfo = CANALES.find(c => c.id === m.tipo) || CANALES[1];
+                                const canalTipo = m.tipo || m.canal || 'transferencia';
+                                const canalInfo = CANALES.find(c => c.id === canalTipo) || CANALES[1];
                                 const cuentaAsoc = cuentas.find(c => String(c.id) === String(m.cuenta_id));
                                 const esActivo = m.activo !== false;
 
@@ -204,14 +205,14 @@
                                                     <span class="font-bold text-slate-200">${m.banco || (cuentaAsoc ? cuentaAsoc.banco : 'No asignado')}</span>
                                                 </div>
 
-                                                ${m.tipo === 'pago_movil' ? `
+                                                ${canalTipo === 'pago_movil' ? `
                                                     <div class="flex items-center justify-between">
                                                         <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Teléfono PM</span>
-                                                        <span class="font-mono font-bold text-purple-400 select-all">${m.telefono || 'Sin teléfono'}</span>
+                                                        <span class="font-mono font-bold text-purple-400 select-all">${m.telefono || m.telefono_pago_movil || 'Sin teléfono'}</span>
                                                     </div>
                                                 ` : ''}
 
-                                                ${m.tipo === 'transferencia' ? `
+                                                ${canalTipo === 'transferencia' ? `
                                                     <div class="space-y-0.5">
                                                         <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Cuenta Receptora</span>
                                                         <span class="font-mono font-bold text-sky-400 block select-all text-[11px]">
@@ -220,10 +221,10 @@
                                                     </div>
                                                 ` : ''}
 
-                                                ${m.identificacion ? `
+                                                ${(m.identificacion || m.documento_pago_movil) ? `
                                                     <div class="flex items-center justify-between">
                                                         <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">RIF / Cédula</span>
-                                                        <span class="font-mono font-bold text-slate-300 select-all">${m.identificacion}</span>
+                                                        <span class="font-mono font-bold text-slate-300 select-all">${m.identificacion || m.documento_pago_movil}</span>
                                                     </div>
                                                 ` : ''}
 
@@ -310,11 +311,11 @@
             const metodo = metodoId ? metodos.find(m => String(m.id) === String(metodoId)) : null;
             const esEdicion = !!metodo;
 
-            const tipoDefault = metodo ? metodo.tipo : 'pago_movil';
+            const tipoDefault = metodo ? (metodo.tipo || metodo.canal || 'pago_movil') : 'pago_movil';
             const cuentaIdDefault = metodo ? metodo.cuenta_id : (cuentas[0] ? cuentas[0].id : '');
             const nombreDefault = metodo ? metodo.nombre : 'Pago Móvil Banco de Venezuela';
-            const telefonoDefault = metodo ? (metodo.telefono || '') : '0412-';
-            const rifDefault = metodo ? (metodo.identificacion || '') : 'G-20000123-4';
+            const telefonoDefault = metodo ? (metodo.telefono || metodo.telefono_pago_movil || '') : '0412-';
+            const rifDefault = metodo ? (metodo.identificacion || metodo.documento_pago_movil || '') : 'G-20000123-4';
             const titularDefault = metodo ? (metodo.titular || '') : 'Alcaldía del Municipio San José de Guaribe';
             const instruccionesDefault = metodo ? (metodo.instrucciones || '') : 'Indicar el número de RIF del comercio en la descripción.';
             const ordenDefault = metodo ? (metodo.orden || 1) : 1;

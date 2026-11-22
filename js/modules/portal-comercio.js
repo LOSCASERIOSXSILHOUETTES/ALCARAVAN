@@ -1388,24 +1388,29 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             ${metodosPago.length > 0 ? metodosPago.map(m => {
                                 const cta = m.cuenta_id ? cuentasMap.get(String(m.cuenta_id)) : null;
-                                const isPagoMovil = m.canal === 'pago_movil';
-                                const isTransferencia = m.canal === 'transferencia';
-                                const isPuntoVenta = m.canal === 'punto_venta';
+                                const tipoCanal = m.tipo || m.canal || 'transferencia';
+                                const isPagoMovil = tipoCanal === 'pago_movil';
+                                const isTransferencia = tipoCanal === 'transferencia';
+                                const isPuntoVenta = tipoCanal === 'punto_venta';
+                                const isEfectivo = tipoCanal === 'efectivo';
 
                                 const badgeColor = isPagoMovil ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
                                     : isTransferencia ? 'bg-sky-500/10 text-sky-400 border-sky-500/20'
                                     : isPuntoVenta ? 'bg-purple-500/10 text-purple-400 border-purple-500/20'
-                                    : 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+                                    : isEfectivo ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                                    : 'bg-neutral-500/10 text-neutral-400 border-neutral-500/20';
 
                                 const canalLabel = isPagoMovil ? 'Pago Móvil C2P / P2P'
                                     : isTransferencia ? 'Transferencia Bancaria'
                                     : isPuntoVenta ? 'Punto de Venta Taquilla'
-                                    : (m.canal || 'Canal de Pago').toUpperCase();
+                                    : isEfectivo ? 'Efectivo en Taquilla'
+                                    : (tipoCanal || 'Canal de Pago').toUpperCase();
 
-                                const numCuenta = cta ? (cta.numero || cta.numero_cuenta || '') : '';
-                                const bancoNombre = cta ? (cta.banco || cta.banco_nombre || '') : (m.banco_origen_permitido || 'Bancario');
-                                const tlf = m.telefono_pago_movil || '';
-                                const doc = m.documento_pago_movil || (cta ? cta.rif_titular : 'G-20000163-9') || '';
+                                const numCuenta = cta ? (cta.numero || cta.numero_cuenta || '') : (m.numero || '');
+                                const bancoNombre = m.banco || (cta ? (cta.banco || cta.banco_nombre || '') : 'Bancario');
+                                const tlf = m.telefono || m.telefono_pago_movil || '';
+                                const doc = m.identificacion || m.documento_pago_movil || (cta ? cta.rif_titular : 'G-20000163-9') || '';
+                                const titular = m.titular || (cta ? (cta.titular || cta.beneficiario) : '') || '';
 
                                 return `
                                     <div class="p-6 rounded-3xl bg-gradient-to-br from-[#1c1c1e] to-[#121214] border border-white/10 shadow-xl space-y-4 relative group">
@@ -1431,6 +1436,12 @@
                                                         <span>RIF / C.I.:</span>
                                                         <span class="text-white font-bold select-all">${doc || 'G-20000163-9'}</span>
                                                     </div>
+                                                    ${titular ? `
+                                                        <div class="flex justify-between items-center text-neutral-400">
+                                                            <span>Titular:</span>
+                                                            <span class="text-white font-medium select-all truncate max-w-[180px]">${titular}</span>
+                                                        </div>
+                                                    ` : ''}
                                                     ${cta ? `
                                                         <div class="flex justify-between items-center text-neutral-500 text-[11px] pt-1 border-t border-white/5">
                                                             <span>Cta. Afiliada:</span>
@@ -1438,6 +1449,11 @@
                                                         </div>
                                                     ` : ''}
                                                 </div>
+                                                ${m.instrucciones ? `
+                                                    <div class="p-2.5 rounded-xl bg-white/[0.02] border border-white/5 text-[11px] text-neutral-300">
+                                                        <i class="fas fa-info-circle text-neutral-500 mr-1"></i> ${m.instrucciones}
+                                                    </div>
+                                                ` : ''}
                                                 <div class="grid grid-cols-2 gap-2">
                                                     <button onclick="window.PortalComercio.copiarAlPortapapeles('${tlf}', 'Teléfono copiado.')" 
                                                             class="py-2 bg-white/[0.06] hover:bg-white/[0.12] text-neutral-300 hover:text-white text-[11px] font-medium rounded-xl transition flex items-center justify-center gap-1.5 border border-white/5">
@@ -1462,23 +1478,41 @@
                                                     </div>
                                                     <div class="flex justify-between items-center text-neutral-400">
                                                         <span>RIF / Titular:</span>
-                                                        <span class="text-white font-bold select-all">${doc}</span>
+                                                        <span class="text-white font-bold select-all">${doc}${titular ? ` (${titular})` : ''}</span>
                                                     </div>
                                                 </div>
-                                                <button onclick="window.PortalComercio.copiarAlPortapapeles('${numCuenta}', 'Número de cuenta copiado.')" 
-                                                        class="w-full py-2 bg-white/[0.06] hover:bg-white/[0.12] text-neutral-300 hover:text-white text-xs font-medium rounded-xl transition flex items-center justify-center gap-1.5 border border-white/5">
-                                                    <i class="fas fa-copy text-[10px]"></i>
-                                                    <span>Copiar Número de Cuenta</span>
-                                                </button>
+                                                ${m.instrucciones ? `
+                                                    <div class="p-2.5 rounded-xl bg-white/[0.02] border border-white/5 text-[11px] text-neutral-300">
+                                                        <i class="fas fa-info-circle text-neutral-500 mr-1"></i> ${m.instrucciones}
+                                                    </div>
+                                                ` : ''}
+                                                <div class="grid grid-cols-2 gap-2">
+                                                    <button onclick="window.PortalComercio.copiarAlPortapapeles('${numCuenta}', 'Número de cuenta copiado.')" 
+                                                            class="py-2 bg-white/[0.06] hover:bg-white/[0.12] text-neutral-300 hover:text-white text-[11px] font-medium rounded-xl transition flex items-center justify-center gap-1.5 border border-white/5">
+                                                        <i class="fas fa-copy text-[10px]"></i>
+                                                        <span>Copiar Cuenta</span>
+                                                    </button>
+                                                    <button onclick="window.PortalComercio.copiarAlPortapapeles('${doc}', 'RIF copiado.')" 
+                                                            class="py-2 bg-white/[0.06] hover:bg-white/[0.12] text-neutral-300 hover:text-white text-[11px] font-medium rounded-xl transition flex items-center justify-center gap-1.5 border border-white/5">
+                                                        <i class="fas fa-copy text-[10px]"></i>
+                                                        <span>Copiar RIF</span>
+                                                    </button>
+                                                </div>
                                             ` : isPuntoVenta ? `
                                                 <div class="p-3 rounded-2xl bg-white/[0.03] border border-white/5 space-y-1 text-neutral-300">
                                                     <p class="font-medium">Disponible en Taquilla de Hacienda Municipal.</p>
                                                     <p class="text-[11px] text-neutral-400">Tarjetas de Débito y Crédito nacionales.</p>
-                                                    ${cta ? `<p class="text-[11px] text-neutral-500 font-mono">Liquidación: ${cta.banco} (····${numCuenta.slice(-4)})</p>` : ''}
+                                                    ${cta ? `<p class="text-[11px] text-neutral-500 font-mono">Liquidación: ${bancoNombre} (····${numCuenta.slice(-4)})</p>` : ''}
                                                 </div>
-                                                <div class="text-[11px] text-neutral-400 italic text-center py-1">
-                                                    Presenta tu referencia o recibo de punto en taquilla.
-                                                </div>
+                                                ${m.instrucciones ? `
+                                                    <div class="p-2.5 rounded-xl bg-white/[0.02] border border-white/5 text-[11px] text-neutral-300">
+                                                        <i class="fas fa-info-circle text-neutral-500 mr-1"></i> ${m.instrucciones}
+                                                    </div>
+                                                ` : `
+                                                    <div class="text-[11px] text-neutral-400 italic text-center py-1">
+                                                        Presenta tu referencia o recibo de punto en taquilla.
+                                                    </div>
+                                                `}
                                             ` : `
                                                 <div class="p-3 rounded-2xl bg-white/[0.03] border border-white/5 text-neutral-300">
                                                     <p>${m.instrucciones || 'Canal habilitado para recaudación tributaria municipal.'}</p>
@@ -1542,7 +1576,7 @@
                                         ` : metodosPago.map(m => {
                                             const cta = m.cuenta_id ? cuentasMap.get(String(m.cuenta_id)) : null;
                                             const ctaInfo = cta ? ` (${cta.banco} ····${(cta.numero || cta.numero_cuenta || '').slice(-4)})` : '';
-                                            return `<option value="${m.id}" data-cuenta-id="${m.cuenta_id || ''}" data-canal="${m.canal || 'transferencia'}" data-banco="${cta ? (cta.banco || cta.banco_nombre) : ''}">
+                                            return `<option value="${m.id}" data-cuenta-id="${m.cuenta_id || ''}" data-canal="${m.canal || m.tipo || 'transferencia'}" data-banco="${cta ? (cta.banco || cta.banco_nombre) : (m.banco || '')}">
                                                 ${m.nombre}${ctaInfo}
                                             </option>`;
                                         }).join('')}
@@ -3191,7 +3225,7 @@
 
         copiarAlPortapapeles: function(texto, label = 'Dato copiado.') {
             if (!texto) return;
-            navigator.clipboard.writeText(texto).then(() => {
+            const notificar = () => {
                 if (typeof Swal !== 'undefined') {
                     Swal.fire({
                         icon: 'success',
@@ -3201,7 +3235,30 @@
                         showConfirmButton: false
                     });
                 }
-            });
+            };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(texto).then(notificar).catch(() => {
+                    try {
+                        const ta = document.createElement('textarea');
+                        ta.value = texto;
+                        document.body.appendChild(ta);
+                        ta.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(ta);
+                        notificar();
+                    } catch (e) {}
+                });
+            } else {
+                try {
+                    const ta = document.createElement('textarea');
+                    ta.value = texto;
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    notificar();
+                } catch (e) {}
+            }
         }
     };
 

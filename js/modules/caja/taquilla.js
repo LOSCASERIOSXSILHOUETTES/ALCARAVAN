@@ -259,11 +259,12 @@
             if (!m) return;
 
             const selectMetodo = document.getElementById('pago-metodo');
-            if (selectMetodo && m.canal) {
-                if (m.canal === 'pago_movil') selectMetodo.value = 'pago_movil';
-                else if (m.canal === 'transferencia') selectMetodo.value = 'transferencia';
-                else if (m.canal === 'punto_venta') selectMetodo.value = 'punto_venta';
-                else if (m.canal === 'efectivo_bs') selectMetodo.value = 'efectivo';
+            const canalTipo = m.tipo || m.canal;
+            if (selectMetodo && canalTipo) {
+                if (canalTipo === 'pago_movil') selectMetodo.value = 'pago_movil';
+                else if (canalTipo === 'transferencia') selectMetodo.value = 'transferencia';
+                else if (canalTipo === 'punto_venta') selectMetodo.value = 'punto_venta';
+                else if (canalTipo === 'efectivo' || canalTipo === 'efectivo_bs') selectMetodo.value = 'efectivo';
             }
 
             if (m.cuenta_id) {

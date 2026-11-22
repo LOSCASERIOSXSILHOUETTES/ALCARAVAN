@@ -140,6 +140,14 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.10.5 — 22/11/2026
+- **Normalización de Campos y Renderizado Completo de Tarjetas de Métodos de Pago en Portal del Contribuyente:**
+  - **Mapeo de Propiedades SGB en Tarjetas de Pago:** Se corrigió la discrepancia de nombres de atributos entre el almacén relacional (`hacienda_metodos_pago`: `tipo`, `telefono`, `identificacion`, `titular`, `banco`) y el módulo de visualización del portal (`portal-comercio.js`), donde se consultaban propiedades desalineadas (`m.canal`, `m.telefono_pago_movil`, `m.documento_pago_movil`).
+  - **Visualización Integral de Pago Móvil y Transferencias:** Ahora las tarjetas en la pestaña "Pagar" despliegan inmediatamente todos los datos requeridos por el contribuyente: Nombre de Entidad Bancaria, Teléfono con botón "Copiar Teléfono", RIF / Cédula con botón "Copiar RIF", Número de Cuenta de 20 dígitos con botón "Copiar Cuenta", Nombre del Titular y las Instrucciones adicionales ("Indicar RIF en descripción").
+  - **Fallback Robusto de Portapapeles:** Se reforzó `copiarAlPortapapeles` con respaldo síncrono mediante `document.execCommand('copy')` para garantizar copia exitosa tanto en conexiones HTTPS como HTTP o navegadores móviles sin permisos de portapapeles.
+  - **Sincronización Bidireccional en Selectores:** Sincronizados los atributos `data-canal` y `data-banco` en el selector de consignación de pagos y en el módulo de Taquilla del ERP.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.10.5` con 355 pruebas automatizadas al 100% en verde.
+
 ### Version 3.10.4 — 22/11/2026
 - **Corrección de Visibilidad Universal y Despliegue de Opciones en Select de RIF (`index.html`):**
   - **Resolución de Conflicto de Modo Oscuro del Sistema:** Se identificó que en navegadores basados en Chromium con tema oscuro del sistema operativo, los menús desplegables nativos de `<select>` renderizaban las opciones con texto oscuro sobre fondo oscuro o fondos transparentes al carecer de `color-scheme: light` explícito.
