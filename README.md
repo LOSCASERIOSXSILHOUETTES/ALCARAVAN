@@ -140,6 +140,31 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.8.5 — 22/11/2026
+- **Simplificacion del Landing del Portal (`index.html`) y Pantalla de Inicio de Sesion Directa:**
+  - Rediseño enfocado en usabilidad para comerciantes y adultos mayores: eliminacion de la sobrecarga visual inicial en el primer viewport.
+  - Pantalla principal (Bloque 1) dedicada exclusivamente al Inicio de Sesion / Consulta de RIF:
+    - Tarjeta centralizada de autogestion con alta legibilidad y contraste.
+    - Selector desplegable de documento (`J`, `V`, `G`, `E`, `C`, `P`) y campo de texto numérico de gran tamaño con sanitizacion en tiempo real (`HaciendaRIF.handleInput`).
+    - Boton de ingreso de alto impacto visual con degradado morado corporativo SGB (`#4F46E5` -> `#7C3AED`).
+    - Enlace directo a solicitud de censo comercial para negocios no registrados y caja de asistencia presencial en Taquilla Municipal (Plaza Bolivar).
+    - Boton indicador para desplazamiento suave hacia el contenido informativo secundario.
+  - Reubicacion del contenido secundario (Bloque 2, abajo del fold):
+    - Mesa de Cambio Oficial BCV (TCMMV para LOCAT Art. 30, Dolar USD, Euro EUR, Yuan CNY).
+    - Carrusel de comunicados y avisos institucionales.
+    - Bento Grid de modulos y servicios tributarios municipales.
+    - Centro oficial de descarga de Gacetas y Ordenanzas en PDF.
+  - Identidad visual corporativa SACCFAG V3 (SGB Light):
+    - Fondo institucional suave `#F8FAFC`, tarjetas blancas `#FFFFFF`, bordes `#E2E8F0` y tipografias de alto contraste `#0F172A` y `#475569`.
+    - Adaptacion de navbar, topbar y ticker tape a la estetica clara corporativa.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.8.5` con 312 pruebas unitarias automatizadas superadas al 100%.
+
+### Version 3.8.4 — 21/11/2026
+- **Sanitizacion Estricta de Telefonos y Cedulas + Identidad Cromatica SGB Light:**
+  - Sanitizacion universal de telefonos a digitos puros (`replace(/\D/g, '')`) en registro y portal.
+  - Selector de documento (`V`, `E`, `P`) para cedula del representante legal.
+  - Portabilidad del motor de estilos `styles.css` con acentos morados e indigo de SACCFAG V3.
+
 ### Version 3.7.0 — 19/11/2026
 - **Transicion a "Administracion Tributaria", Carrusel de Avisos, Centro de Ordenanzas Descargables y Popups Oficiales:**
   - **Renombramiento Oficial:** Sustitucion formal del termino arcaico "Hacienda" por **"Administracion Tributaria"** (SATRIMG / Direccion de Administracion Tributaria Municipal) en toda la interfaz de usuario, headers, modales y panel administrativo.
@@ -246,6 +271,31 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
   - Registro de la 14ta tabla `hacienda_popups` en `store.js` (`TABLE_SCHEMAS`), `realtime-sync.js` (`SYNCABLE_TABLES`) y `sql/schema_hacienda.sql`.
   - Consumo dinamico en `js/modules/portal-comercio.js`: lectura directa a 0ms desde LocalForage con filtrado por destino (`portal`, `ambos`) y control de visualizacion diaria (`localStorage`).
   - Bump de Service Worker a `alcaravan-v3-cache-v3.7.1`.
+
+### Version 3.8.5 — 22/11/2026
+- **Simplificacion del Landing del Portal (`index.html`) y Pantalla de Inicio de Sesion Directa:**
+  - Rediseño enfocado en usabilidad para comerciantes y adultos mayores: eliminacion de la sobrecarga visual inicial en el primer viewport.
+  - Pantalla principal (Bloque 1) dedicada exclusivamente al Inicio de Sesion / Consulta de RIF:
+    - Tarjeta centralizada de autogestion con alta legibilidad y contraste.
+    - Selector desplegable de documento (`J`, `V`, `G`, `E`, `C`, `P`) y campo de texto numérico de gran tamaño con sanitizacion en tiempo real (`HaciendaRIF.handleInput`).
+    - Boton de ingreso de alto impacto visual con degradado morado corporativo SGB (`#4F46E5` -> `#7C3AED`).
+    - Enlace directo a solicitud de censo comercial para negocios no registrados y caja de asistencia presencial en Taquilla Municipal (Plaza Bolivar).
+    - Boton indicador para desplazamiento suave hacia el contenido informativo secundario.
+  - Reubicacion del contenido secundario (Bloque 2, abajo del fold):
+    - Mesa de Cambio Oficial BCV (TCMMV para LOCAT Art. 30, Dolar USD, Euro EUR, Yuan CNY).
+    - Carrusel de comunicados y avisos institucionales.
+    - Bento Grid de modulos y servicios tributarios municipales.
+    - Centro oficial de descarga de Gacetas y Ordenanzas en PDF.
+  - Identidad visual corporativa SACCFAG V3 (SGB Light):
+    - Fondo institucional suave `#F8FAFC`, tarjetas blancas `#FFFFFF`, bordes `#E2E8F0` y tipografias de alto contraste `#0F172A` y `#475569`.
+    - Adaptacion de navbar, topbar y ticker tape a la estetica clara corporativa.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.8.5` con 312 pruebas unitarias automatizadas superadas al 100%.
+
+### Version 3.8.4 — 21/11/2026
+- **Sanitizacion Estricta de Telefonos y Cedulas + Identidad Cromatica SGB Light:**
+  - Sanitizacion universal de telefonos a digitos puros (`replace(/\D/g, '')`) en registro y portal.
+  - Selector de documento (`V`, `E`, `P`) para cedula del representante legal.
+  - Portabilidad del motor de estilos `styles.css` con acentos morados e indigo de SACCFAG V3.
 
 ### Version 3.7.0 — 19/11/2026
 - **Modernizacion Institucional del Portal (`index.html`) y Reemplazo de Terminologia:**

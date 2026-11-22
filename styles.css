@@ -918,14 +918,81 @@ html.sgb-light .fixed.inset-0.bg-slate-950\/95 {
     backdrop-filter: blur(6px) !important;
 }
 
-/* Portal index.html en tema claro */
-html.sgb-light body.portal-light {
+/* Portal index.html en tema claro SACCFAG V3 */
+html.sgb-light body.portal-light,
+html.sgb-light body {
     background-color: #F8FAFC !important;
     background-image: 
-        radial-gradient(ellipse 90% 60% at 50% -20%, rgba(124, 58, 237, 0.08), transparent),
-        radial-gradient(circle at 12% 25%, rgba(79, 70, 229, 0.05), transparent 45%),
-        radial-gradient(circle at 88% 35%, rgba(16, 185, 129, 0.05), transparent 45%) !important;
+        radial-gradient(ellipse 90% 60% at 50% -20%, rgba(124, 58, 237, 0.05), transparent),
+        radial-gradient(circle at 12% 25%, rgba(79, 70, 229, 0.03), transparent 45%),
+        radial-gradient(circle at 88% 35%, rgba(16, 185, 129, 0.03), transparent 45%) !important;
     color: #0F172A !important;
+}
+
+/* Carrusel de Avisos en SGB Light */
+html.sgb-light #avisos-carousel-track > div {
+    background: linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4338CA 100%) !important;
+    color: #FFFFFF !important;
+    border-radius: 1.5rem !important;
+}
+html.sgb-light #avisos-carousel-track h2 {
+    color: #FFFFFF !important;
+}
+html.sgb-light #avisos-carousel-track p {
+    color: #E0E7FF !important;
+}
+html.sgb-light #avisos-carousel-track button {
+    background-color: #FFFFFF !important;
+    color: #312E81 !important;
+    font-weight: 700 !important;
+}
+html.sgb-light #avisos-carousel-track button:hover {
+    background-color: #F8FAFC !important;
+    color: #1E1B4B !important;
+}
+
+/* Centro de Ordenanzas en SGB Light */
+html.sgb-light #ordenanzas-grid-container > div {
+    background-color: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.05) !important;
+}
+html.sgb-light #ordenanzas-grid-container h3 {
+    color: #0F172A !important;
+}
+html.sgb-light #ordenanzas-grid-container p {
+    color: #475569 !important;
+}
+html.sgb-light #seccion-ordenanzas h2 {
+    color: #0F172A !important;
+}
+html.sgb-light #seccion-ordenanzas .ord-filter-pill {
+    background-color: #F1F5F9;
+    color: #475569;
+    border: 1px solid #E2E8F0;
+}
+html.sgb-light #seccion-ordenanzas .ord-filter-pill.bg-white {
+    background-color: #7C3AED !important;
+    color: #FFFFFF !important;
+}
+
+/* Dashboard Suite en SGB Light */
+html.sgb-light #portal-main-content .bg-gradient-to-r[class*="from-[#121216]"],
+html.sgb-light #portal-main-content .bg-gradient-to-b[class*="to-[#111114]"] {
+    background: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04) !important;
+}
+html.sgb-light #portal-main-content h2,
+html.sgb-light #portal-main-content h3 {
+    color: #0F172A !important;
+}
+html.sgb-light #portal-main-content span.text-white {
+    color: #0F172A !important;
+}
+html.sgb-light #portal-main-content .text-neutral-400,
+html.sgb-light #portal-main-content .text-neutral-300 {
+    color: #475569 !important;
 }
 
 
