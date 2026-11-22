@@ -140,6 +140,14 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.9.4 — 22/11/2026
+- **Autoliquidación Dinámica LOCAT, Selector de Actividad Económica y Anti-Autofill:**
+  - **Integración del Catálogo Armonizado LOCAT:** Selector interactivo de actividad económica en el módulo de autoliquidación del portal (`dec-actividad-locat`), permitiendo seleccionar entre las actividades del clasificador oficial (alícuotas del 1.00% al 5.00% y mínimos de 0.30 a 3.00 MMAV).
+  - **Cálculo Tributario en Vivo:** Funciones reactivas `cambiarActividadLocat` y `calcularEnVivo` que recalculan instantáneamente el impuesto por alícuota y el mínimo en bolívares según la TCMMV oficial del día.
+  - **Corrección de Formato Decimal de Moneda:** Normalización estricta de formato a dos decimales (`minimumFractionDigits: 2, maximumFractionDigits: 2`), eliminando la confusión visual de tres decimales en el mínimo tributable.
+  - **Protección Anti-Autofill de Navegador:** Desactivación de autocompletado en el campo de facturación mensual (`autocomplete="off"`, `data-lpignore="true"`), evitando que administradores de contraseñas de navegadores inyecten números de cédula o claves guardadas en el campo de ventas.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.9.4` con 312 pruebas automatizadas en verde.
+
 ### Version 3.9.3 — 22/11/2026
 - **Blindaje del Portal Público y Consultas Quirúrgicas Anti-Fuga de Datos:**
   - **Bloqueo de Descarga Masiva en Portal (`index.html`):** Restricción arquitectónica en `store.js` y `realtime-sync.js` que impide que el portal público descargue o sincronice el padrón municipal completo o tablas administrativas privadas (`user_profiles`, `hacienda_conciliacion`, `hacienda_cuentas`, desgloses bancarios).

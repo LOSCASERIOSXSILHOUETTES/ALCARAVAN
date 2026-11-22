@@ -1174,14 +1174,38 @@
         },
 
         renderContenidoEmpresa: function(tab, c, patenteActiva, alicuota, minimoTcmmv, minimoBs, declaraciones, declaracionesPendientes, totalDeudaBs, esSolvente, pagos, cuentas) {
+            const catalogo = global.CatalogoLocat ? global.CatalogoLocat.getAll() : [];
+            const codPatente = patenteActiva ? (patenteActiva.codigo_locat || '') : '';
+            const actividadSeleccionada = catalogo.find(item => item.codigo === codPatente) || catalogo[0] || { codigo: 'COM-001', alicuota: 0.01, minimo_tcmmv: 0.30 };
+            const aliActual = patenteActiva ? Number(patenteActiva.alicuota || actividadSeleccionada.alicuota) : actividadSeleccionada.alicuota;
+            const minTcmmvActual = patenteActiva ? Number(patenteActiva.minimo_tributable_tcmmv || patenteActiva.minimo_tcmmv || actividadSeleccionada.minimo_tcmmv) : actividadSeleccionada.minimo_tcmmv;
+            const tasaActual = getTasaMMAV();
+            const minBsActual = minTcmmvActual * tasaActual;
+
             if (tab === 'declarar') {
                 return `
                     <div class="p-8 sm:p-10 rounded-3xl bg-[#121214] border border-white/[0.08] shadow-2xl space-y-8">
                         <div class="space-y-1">
                             <h3 class="text-lg font-semibold text-white">Autoliquidación Mensual (LOCAT)</h3>
-                            <p class="text-xs text-neutral-400">
-                                Alícuota aplicable: <strong class="text-white">${(alicuota * 100).toFixed(2)}%</strong> · Mínimo tributable: <strong class="text-white">${minimoTcmmv.toFixed(2)} MMAV (${minimoBs.toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs.)</strong>
+                            <p id="dec-locat-info" class="text-xs text-neutral-400">
+                                Alícuota aplicable: <strong class="text-white">${(aliActual * 100).toFixed(2)}%</strong> · Mínimo tributable: <strong class="text-white">${minTcmmvActual.toFixed(2)} MMAV (${minBsActual.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Bs.)</strong>
                             </p>
+                        </div>
+
+                        <!-- Selector de Actividad Económica LOCAT -->
+                        <div class="space-y-1.5">
+                            <label class="text-[11px] font-medium text-neutral-400 uppercase tracking-wider block">Actividad Económica / Ramo LOCAT</label>
+                            <select id="dec-actividad-locat" onchange="window.PortalComercio.cambiarActividadLocat()" 
+                                    class="w-full bg-[#18181b] border border-white/10 text-white text-xs font-medium rounded-2xl px-4 py-3.5 outline-none focus:border-white/30 transition cursor-pointer">
+                                ${catalogo.map(item => `
+                                    <option value="${item.codigo}" 
+                                            data-alicuota="${item.alicuota}" 
+                                            data-minimo="${item.minimo_tcmmv}"
+                                            ${item.codigo === (codPatente || actividadSeleccionada.codigo) ? 'selected' : ''}>
+                                        [${item.codigo}] ${item.nombre} — ${(item.alicuota * 100).toFixed(2)}% (Mín. ${item.minimo_tcmmv.toFixed(2)} MMAV)
+                                    </option>
+                                `).join('')}
+                            </select>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -1198,11 +1222,14 @@
                             </div>
                         </div>
 
-                        <!-- Input Protagónico de Ventas -->
+                        <!-- Input Protagónico de Ventas (anti-autofill) -->
                         <div class="space-y-2 p-6 rounded-2xl bg-[#0a0a0c] border border-white/[0.06]">
                             <label class="text-[11px] font-medium text-neutral-400 uppercase tracking-wider block">Ingresos Brutos Facturados del Mes (Bs)</label>
                             <input type="number" step="0.01" id="dec-base-imponible" placeholder="0,00" 
-                                   oninput="window.PortalComercio.calcularEnVivo(${alicuota}, ${minimoBs})"
+                                   name="ingresos_facturados_monto_sin_autofill"
+                                   autocomplete="off"
+                                   data-lpignore="true"
+                                   oninput="window.PortalComercio.calcularEnVivo()"
                                    class="w-full bg-transparent text-white text-3xl sm:text-4xl font-semibold tracking-tight outline-none placeholder:text-neutral-700 font-mono">
                             <span class="text-[11px] text-neutral-500 block">Monto total facturado en el mes para el cálculo de la autoliquidación.</span>
                         </div>
@@ -1215,16 +1242,16 @@
                             </div>
                             <div class="p-5 rounded-2xl bg-[#161618] border border-white/5 space-y-1">
                                 <span class="text-[11px] text-neutral-500 uppercase tracking-wider block font-medium">Mínimo MMAV</span>
-                                <div id="calc-min-tributable" class="text-base font-semibold text-neutral-300 font-mono">${minimoBs.toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs.</div>
+                                <div id="calc-min-tributable" class="text-base font-semibold text-neutral-300 font-mono">${minBsActual.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Bs.</div>
                             </div>
                             <div class="p-5 rounded-2xl bg-[#161618] border border-white/10 space-y-1">
                                 <span class="text-[11px] text-white uppercase tracking-wider block font-semibold">Total Determinado</span>
-                                <div id="calc-total-pagar" class="text-xl font-bold text-white font-mono">0,00 Bs.</div>
+                                <div id="calc-total-pagar" class="text-xl font-bold text-white font-mono">${minBsActual.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Bs.</div>
                             </div>
                         </div>
 
                         <div class="flex justify-end pt-2">
-                            <button onclick="window.PortalComercio.presentarDeclaracion(${alicuota}, ${minimoBs})" 
+                            <button onclick="window.PortalComercio.presentarDeclaracion()" 
                                     class="bg-white hover:bg-neutral-200 text-black text-xs font-semibold rounded-full px-8 py-3.5 transition shadow-lg flex items-center gap-2">
                                 <span>Presentar Declaración</span>
                                 <i class="fas fa-arrow-right text-[10px]"></i>
@@ -2058,19 +2085,55 @@
             if (container) this.render(container);
         },
 
-        calcularEnVivo: function(alicuota, minimoBs) {
-            const baseImponible = parseFloat(document.getElementById('dec-base-imponible').value || 0);
+        cambiarActividadLocat: function() {
+            const selectLocat = document.getElementById('dec-actividad-locat');
+            if (!selectLocat) return;
+            const opt = selectLocat.options[selectLocat.selectedIndex];
+            const alicuota = parseFloat(opt?.dataset.alicuota || 0.01);
+            const minTcmmv = parseFloat(opt?.dataset.minimo || 0.30);
+            const tasaActual = getTasaMMAV();
+            const minBs = minTcmmv * tasaActual;
+
+            const infoEl = document.getElementById('dec-locat-info');
+            if (infoEl) {
+                infoEl.innerHTML = `Alícuota aplicable: <strong class="text-white">${(alicuota * 100).toFixed(2)}%</strong> · Mínimo tributable: <strong class="text-white">${minTcmmv.toFixed(2)} MMAV (${minBs.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Bs.)</strong>`;
+            }
+
+            const minBox = document.getElementById('calc-min-tributable');
+            if (minBox) {
+                minBox.innerText = minBs.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' Bs.';
+            }
+
+            this.calcularEnVivo();
+        },
+
+        calcularEnVivo: function(alicuotaParam, minimoBsParam) {
+            const selectLocat = document.getElementById('dec-actividad-locat');
+            let alicuota = alicuotaParam;
+            let minimoBs = minimoBsParam;
+
+            if (selectLocat && selectLocat.selectedIndex >= 0) {
+                const opt = selectLocat.options[selectLocat.selectedIndex];
+                alicuota = parseFloat(opt?.dataset.alicuota || alicuota || 0.01);
+                const minTcmmv = parseFloat(opt?.dataset.minimo || 0.30);
+                minimoBs = minTcmmv * getTasaMMAV();
+            }
+            if (!alicuota) alicuota = 0.01;
+            if (!minimoBs) minimoBs = 0.30 * getTasaMMAV();
+
+            const baseInput = document.getElementById('dec-base-imponible');
+            const baseImponible = parseFloat(baseInput?.value || 0) || 0;
             const impAlicuota = baseImponible * alicuota;
             const totalPagar = Math.max(impAlicuota, minimoBs);
 
             const elImp = document.getElementById('calc-imp-alicuota');
             const elTot = document.getElementById('calc-total-pagar');
 
-            if (elImp) elImp.innerText = impAlicuota.toLocaleString('es-VE', { minimumFractionDigits: 2 }) + ' Bs.';
-            if (elTot) elTot.innerText = totalPagar.toLocaleString('es-VE', { minimumFractionDigits: 2 }) + ' Bs.';
+            if (elImp) elImp.innerText = impAlicuota.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' Bs.';
+            if (elTot) elTot.innerText = totalPagar.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' Bs.';
         },
 
-        presentarDeclaracion: async function(alicuota, minimoBs) {
+        presentarDeclaracion: async function() {
             const store = global.HaciendaStore;
             if (!store || !activeContribuyente) return;
 
@@ -2079,9 +2142,26 @@
             const baseImponible = parseFloat(document.getElementById('dec-base-imponible').value || 0);
 
             if (isNaN(baseImponible) || baseImponible < 0) {
-                if (typeof Swal !== 'undefined') Swal.fire({ icon: 'warning', title: 'Monto inválido', text: 'Ingresa un monto de ventas válido.', confirmButtonColor: '#000000' });
+                if (typeof Swal !== 'undefined') Swal.fire({ icon: 'warning', title: 'Monto inválido', text: 'Ingresa un monto de facturación válido.', confirmButtonColor: '#000000' });
                 return;
             }
+
+            const selectLocat = document.getElementById('dec-actividad-locat');
+            let alicuota = 0.01;
+            let minTcmmv = 0.30;
+            let codigoLocat = 'COM-001';
+            let descActividad = 'Venta al por menor de víveres, alimentos y abarrotes';
+            if (selectLocat && selectLocat.selectedIndex >= 0) {
+                const opt = selectLocat.options[selectLocat.selectedIndex];
+                codigoLocat = opt.value;
+                descActividad = opt.text.split('] ')[1]?.split(' —')[0] || opt.text;
+                alicuota = parseFloat(opt.dataset.alicuota || 0.01);
+                minTcmmv = parseFloat(opt.dataset.minimo || 0.30);
+            }
+            const tasaActual = getTasaMMAV();
+            const minimoBs = minTcmmv * tasaActual;
+            const impAlicuota = baseImponible * alicuota;
+            const totalPagar = Math.max(impAlicuota, minimoBs);
 
             const declaraciones = store.get('hacienda_declaraciones') || [];
             const yaExiste = declaraciones.some(d => String(d.contribuyente_id) === String(activeContribuyente.id) && d.mes === mes && d.anio === anio);
@@ -2092,16 +2172,28 @@
                 return;
             }
 
-            const impAlicuota = baseImponible * alicuota;
-            const totalPagar = Math.max(impAlicuota, minimoBs);
-
             const patentes = (store.get('hacienda_patentes') || []).filter(p => String(p.contribuyente_id) === String(activeContribuyente.id));
-            const p = patentes[0] || null;
+            let p = patentes[0] || null;
+            if (!p) {
+                p = {
+                    id: Date.now(),
+                    contribuyente_id: activeContribuyente.id,
+                    numero_patente: 'PAT-' + anio + '-' + String(Date.now()).slice(-4),
+                    tipo: 'comercial',
+                    codigo_locat: codigoLocat,
+                    descripcion_actividad: descActividad,
+                    alicuota: alicuota,
+                    minimo_tributable_tcmmv: minTcmmv,
+                    estado: 'activa',
+                    fecha_emision: new Date().toISOString().split('T')[0]
+                };
+                await store.set('hacienda_patentes', p);
+            }
 
             const nuevaDeclaracion = {
                 id: Date.now(),
                 contribuyente_id: activeContribuyente.id,
-                patente_id: p ? p.id : 1,
+                patente_id: p.id,
                 anio: anio,
                 mes: mes,
                 base_imponible_bs: baseImponible,
@@ -2109,7 +2201,7 @@
                 impuesto_alicuota_bs: impAlicuota,
                 minimo_tributable_bs: minimoBs,
                 impuesto_determinado_bs: totalPagar,
-                tasa_bcv_aplicada: getTasaMMAV(),
+                tasa_bcv_aplicada: tasaActual,
                 estado: 'pendiente',
                 fecha_declaracion: new Date().toISOString()
             };
@@ -2120,7 +2212,7 @@
                 Swal.fire({
                     icon: 'success',
                     title: 'Declaración Registrada',
-                    text: `Monto determinado: ${totalPagar.toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs. Procede a reportar el pago.`,
+                    text: `Monto determinado: ${totalPagar.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Bs. Procede a reportar el pago.`,
                     confirmButtonColor: '#000000'
                 });
             }
