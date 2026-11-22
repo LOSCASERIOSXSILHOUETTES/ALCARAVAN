@@ -140,6 +140,13 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.10.1 — 22/11/2026
+- **Ampliación Integral del Catálogo SUDEBAN y Detección Automática Inteligente de Cuentas:**
+  - **Catálogo Completo de 28 Entidades Bancarias Nacionales:** Inclusión de todos los bancos universales, públicos, privados y microfinancieros de Venezuela: BANFANB (`0177`), Banco Agrícola de Venezuela (`0166`), Banco Venezolano de Crédito / BDT (`0104`), BFC Banco Fondo Común (`0151`), Banco Caroní (`0128`), Banco Activo (`0171`), DelSur (`0157`), Banco Sofitasa (`0137`), Bancrecer (`0168`), Mi Banco (`0169`), Bangente (`0146`), N58 Banco Digital (`0178`), Instituto Municipal de Crédito Popular IMCP (`0601`), BID (`0173`) y BOD (`0116`).
+  - **Soporte de "Otro Banco / Entidad Personalizada":** Opción abierta con input dinámico para registrar cualquier institución financiera o cooperativa sin restricciones.
+  - **Auto-Detección Inteligente al Escribir o Pegar:** Al ingresar o pegar los 20 dígitos de una cuenta bancaria, el sistema analiza en vivo los primeros 4 dígitos y selecciona automáticamente la entidad bancaria correspondiente en el formulario.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.10.1` con 335 pruebas automatizadas en verde.
+
 ### Version 3.10.0 — 22/11/2026
 - **Módulo ERP de Gestión de Cuentas Bancarias Recaudadoras y Reactividad en Portal:**
   - **Módulo Integral `HaciendaCuentas` (`js/modules/conciliacion/cuentas.js`):** Interfaz para administración de las cuentas bancarias oficiales de la Alcaldía con soporte para entidades bancarias nacionales según SUDEBAN (Banco de Venezuela, Banesco, BNC, Mercantil, Provincial, Banco del Tesoro, Bancamiga, etc.).

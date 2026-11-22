@@ -6,7 +6,7 @@
 (function defineCuentasBancariasModule(global) {
     "use strict";
 
-    // Catálogo oficial de entidades bancarias nacionales (SUDEBAN / República Bolivariana de Venezuela)
+    // Catálogo oficial completo de entidades bancarias nacionales (SUDEBAN / República Bolivariana de Venezuela)
     const BANCOS_VENEZUELA = [
         { codigo: '0102', nombre: 'Banco de Venezuela', corto: 'BDV', badgeColor: 'bg-rose-500/10 text-rose-400 border-rose-500/20' },
         { codigo: '0134', nombre: 'Banesco Banco Universal', corto: 'Banesco', badgeColor: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
@@ -15,13 +15,28 @@
         { codigo: '0108', nombre: 'BBVA Banco Provincial', corto: 'Provincial', badgeColor: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' },
         { codigo: '0163', nombre: 'Banco del Tesoro', corto: 'Tesoro', badgeColor: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
         { codigo: '0172', nombre: 'Bancamiga Banco Universal', corto: 'Bancamiga', badgeColor: 'bg-teal-500/10 text-teal-400 border-teal-500/20' },
-        { codigo: '0175', nombre: 'Banco Bicentenario', corto: 'Bicentenario', badgeColor: 'bg-red-500/10 text-red-400 border-red-500/20' },
-        { codigo: '0104', nombre: 'Banco Digital de los Trabajadores', corto: 'BDT', badgeColor: 'bg-purple-500/10 text-purple-400 border-purple-500/20' },
+        { codigo: '0175', nombre: 'Banco Bicentenario del Pueblo', corto: 'Bicentenario', badgeColor: 'bg-red-500/10 text-red-400 border-red-500/20' },
+        { codigo: '0177', nombre: 'Banco de la Fuerza Armada Nacional Bolivariana (BANFANB)', corto: 'BANFANB', badgeColor: 'bg-emerald-600/10 text-emerald-300 border-emerald-600/20' },
+        { codigo: '0166', nombre: 'Banco Agrícola de Venezuela', corto: 'BAV', badgeColor: 'bg-lime-500/10 text-lime-400 border-lime-500/20' },
+        { codigo: '0104', nombre: 'Banco Venezolano de Crédito (BVC) / BDT', corto: 'BVC / BDT', badgeColor: 'bg-purple-500/10 text-purple-400 border-purple-500/20' },
         { codigo: '0174', nombre: 'Banplus Banco Universal', corto: 'Banplus', badgeColor: 'bg-orange-500/10 text-orange-400 border-orange-500/20' },
         { codigo: '0138', nombre: 'Banco Plaza', corto: 'Plaza', badgeColor: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20' },
-        { codigo: '0115', nombre: 'Banco Exterior', corto: 'Exterior', badgeColor: 'bg-slate-500/10 text-slate-400 border-slate-500/20' },
+        { codigo: '0151', nombre: 'BFC Banco Fondo Común', corto: 'BFC', badgeColor: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20' },
         { codigo: '0114', nombre: 'Bancaribe', corto: 'Bancaribe', badgeColor: 'bg-sky-500/10 text-sky-400 border-sky-500/20' },
-        { codigo: '0156', nombre: '100% Banco', corto: '100% Banco', badgeColor: 'bg-neutral-500/10 text-neutral-400 border-neutral-500/20' }
+        { codigo: '0115', nombre: 'Banco Exterior', corto: 'Exterior', badgeColor: 'bg-slate-500/10 text-slate-400 border-slate-500/20' },
+        { codigo: '0128', nombre: 'Banco Caroní', corto: 'Caroní', badgeColor: 'bg-violet-500/10 text-violet-400 border-violet-500/20' },
+        { codigo: '0156', nombre: '100% Banco', corto: '100% Banco', badgeColor: 'bg-neutral-500/10 text-neutral-400 border-neutral-500/20' },
+        { codigo: '0171', nombre: 'Banco Activo', corto: 'Activo', badgeColor: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
+        { codigo: '0157', nombre: 'DelSur Banco Universal', corto: 'DelSur', badgeColor: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
+        { codigo: '0137', nombre: 'Banco Sofitasa', corto: 'Sofitasa', badgeColor: 'bg-blue-500/10 text-blue-400 border-blue-500/20' },
+        { codigo: '0168', nombre: 'Bancrecer Banco Microfinanciero', corto: 'Bancrecer', badgeColor: 'bg-teal-500/10 text-teal-400 border-teal-500/20' },
+        { codigo: '0169', nombre: 'Mi Banco Banco Microfinanciero', corto: 'Mi Banco', badgeColor: 'bg-sky-500/10 text-sky-400 border-sky-500/20' },
+        { codigo: '0146', nombre: 'Bangente', corto: 'Bangente', badgeColor: 'bg-rose-500/10 text-rose-400 border-rose-500/20' },
+        { codigo: '0178', nombre: 'N58 Banco Digital', corto: 'N58', badgeColor: 'bg-fuchsia-500/10 text-fuchsia-400 border-fuchsia-500/20' },
+        { codigo: '0601', nombre: 'Instituto Municipal de Crédito Popular (IMCP)', corto: 'IMCP', badgeColor: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' },
+        { codigo: '0173', nombre: 'Banco Internacional de Desarrollo', corto: 'BID', badgeColor: 'bg-slate-500/10 text-slate-400 border-slate-500/20' },
+        { codigo: '0116', nombre: 'Banco Occidental de Descuento (BOD)', corto: 'BOD', badgeColor: 'bg-green-500/10 text-green-400 border-green-500/20' },
+        { codigo: '0000', nombre: 'Otro Banco / Entidad Financiera', corto: 'Otro', badgeColor: 'bg-slate-800 text-slate-300 border-slate-700' }
     ];
 
     function formatNumeroCuenta(num) {
@@ -271,10 +286,15 @@
                                     class="w-full bg-slate-950 border border-slate-800 text-slate-100 text-xs font-bold rounded-xl px-4 py-3 outline-none focus:border-sky-500 transition cursor-pointer">
                                 ${BANCOS_VENEZUELA.map(b => `
                                     <option value="${b.nombre}" data-codigo="${b.codigo}" ${b.nombre.toLowerCase() === bancoDefault.toLowerCase() ? 'selected' : ''}>
-                                        [${b.codigo}] ${b.nombre} (${b.corto})
+                                        ${b.codigo !== '0000' ? `[${b.codigo}] ` : ''}${b.nombre} ${b.corto ? `(${b.corto})` : ''}
                                     </option>
                                 `).join('')}
                             </select>
+                            <div id="cta-banco-personalizado-box" class="space-y-1.5 hidden pt-1">
+                                <label class="text-[11px] font-bold text-sky-400 uppercase tracking-wider block">Nombre de la Entidad Bancaria Personalizada</label>
+                                <input type="text" id="cta-banco-personalizado" placeholder="Ej: Banco Agrícola / Banco Cooperativo" 
+                                       class="w-full bg-slate-950 border border-sky-500/40 text-slate-100 text-xs font-bold rounded-xl px-4 py-2.5 outline-none focus:border-sky-400 transition">
+                            </div>
                         </div>
 
                         <!-- Número de Cuenta (20 Dígitos) -->
@@ -354,15 +374,25 @@
         onBancoChange: function(bancoNombre) {
             const banco = BANCOS_VENEZUELA.find(b => b.nombre === bancoNombre);
             const inputNum = document.getElementById('cta-numero');
+            const customBox = document.getElementById('cta-banco-personalizado-box');
+            if (customBox) {
+                if (bancoNombre === 'Otro Banco / Entidad Financiera') {
+                    customBox.classList.remove('hidden');
+                } else {
+                    customBox.classList.add('hidden');
+                }
+            }
             if (!banco || !inputNum) return;
 
-            let digits = inputNum.value.replace(/\D/g, '');
-            if (digits.length <= 4) {
-                digits = banco.codigo;
-            } else {
-                digits = banco.codigo + digits.slice(4);
+            if (banco.codigo !== '0000') {
+                let digits = inputNum.value.replace(/\D/g, '');
+                if (digits.length <= 4) {
+                    digits = banco.codigo;
+                } else {
+                    digits = banco.codigo + digits.slice(4);
+                }
+                inputNum.value = formatNumeroCuenta(digits);
             }
-            inputNum.value = formatNumeroCuenta(digits);
             this.actualizarDigitosContador();
         },
 
@@ -370,6 +400,18 @@
             const digits = input.value.replace(/\D/g, '').slice(0, 20);
             input.value = formatNumeroCuenta(digits);
             this.actualizarDigitosContador();
+
+            // Detección automática inteligente del banco por los primeros 4 dígitos
+            if (digits.length >= 4) {
+                const cod = digits.slice(0, 4);
+                const bancoDetectado = BANCOS_VENEZUELA.find(b => b.codigo === cod);
+                const selectBanco = document.getElementById('cta-banco');
+                const customBox = document.getElementById('cta-banco-personalizado-box');
+                if (bancoDetectado && selectBanco && selectBanco.value !== bancoDetectado.nombre) {
+                    selectBanco.value = bancoDetectado.nombre;
+                    if (customBox) customBox.classList.add('hidden');
+                }
+            }
         },
 
         actualizarDigitosContador: function() {
@@ -392,7 +434,24 @@
             const store = global.HaciendaStore;
             if (!store) return;
 
-            const banco = document.getElementById('cta-banco').value;
+            let banco = document.getElementById('cta-banco').value;
+            if (banco === 'Otro Banco / Entidad Financiera') {
+                const customNombre = document.getElementById('cta-banco-personalizado')?.value.trim();
+                if (customNombre) {
+                    banco = customNombre;
+                } else {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Nombre de Banco Requerido',
+                            text: 'Especifique el nombre de la entidad bancaria personalizada.',
+                            confirmButtonColor: '#0284c7'
+                        });
+                    }
+                    return;
+                }
+            }
+
             const rawNumero = document.getElementById('cta-numero').value;
             const digits = rawNumero.replace(/\D/g, '');
             const tipo = document.getElementById('cta-tipo').value;
