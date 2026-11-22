@@ -140,6 +140,15 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.10.0 — 22/11/2026
+- **Módulo ERP de Gestión de Cuentas Bancarias Recaudadoras y Reactividad en Portal:**
+  - **Módulo Integral `HaciendaCuentas` (`js/modules/conciliacion/cuentas.js`):** Interfaz para administración de las cuentas bancarias oficiales de la Alcaldía con soporte para entidades bancarias nacionales según SUDEBAN (Banco de Venezuela, Banesco, BNC, Mercantil, Provincial, Banco del Tesoro, Bancamiga, etc.).
+  - **Validación Bancaria Venezolana a 20 Dígitos:** Asignación automática del código bancario de 4 dígitos según la entidad seleccionada, formateador visual por bloques (`0000-0000-00-0000000000`), contador reactivo de dígitos y validación estricta de longitud.
+  - **Operaciones Completas de Tesorería (CRUD):** Registro de nuevas cuentas, modificación de datos, alternador de estado operativo (`activa` / `inactiva`) y borrado seguro con validación de integridad referencial (impide eliminar cuentas con días de conciliación o movimientos bancarios históricos).
+  - **Integración Directa en Conciliación y Caja:** Botón destacado "Cuentas Recaudadoras" incorporado tanto en la cabecera de **Conciliación Bancaria** como en **Caja y Recaudación**. Además, el formulario de entero de pagos en caja ahora alimenta dinámicamente el selector de bancos destino desde las cuentas activas de la base de datos, eliminando opciones estáticas en código.
+  - **Desbloqueo de Sincronización en Portal del Contribuyente:** Inclusión de `hacienda_cuentas` y `hacienda_actividades_locat` en `PUBLIC_PORTAL_TABLES` tanto en `store.js` como en `realtime-sync.js`, permitiendo que el portal del comercio descargue y actualice en tiempo real (0ms) las tarjetas bancarias y selectores de consignación al momento que Tesorería realice cambios en el ERP.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.10.0` con 335 pruebas automatizadas en verde.
+
 ### Version 3.9.9 — 22/11/2026
 - **Manejo Estricto de Estado Sin Patente en Portal del Contribuyente y Bloqueo de Autoliquidación Huérfana:**
   - **Eliminación de Ramo por Defecto Arbitrario:** Se erradicó la asignación ficticia de `COM-001 Venta al por menor de víveres` y el badge "Ramo Aprobado por Alcaldía" cuando una empresa registrada en el padrón carece de una Patente de Industria y Comercio formalmente expedida por la Dirección de Administración Tributaria.

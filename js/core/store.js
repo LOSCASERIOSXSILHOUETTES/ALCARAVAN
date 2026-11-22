@@ -655,7 +655,7 @@
             if (!global.supabaseClient || !navigator.onLine) return;
             // En el portal público, bloquear descargas masivas de tablas privadas/administrativas
             if (this.isPortal()) {
-                const PUBLIC_PORTAL_TABLES = ['hacienda_popups', 'hacienda_carrusel'];
+                const PUBLIC_PORTAL_TABLES = ['hacienda_popups', 'hacienda_carrusel', 'hacienda_actividades_locat', 'hacienda_cuentas'];
                 if (!PUBLIC_PORTAL_TABLES.includes(table)) {
                     return;
                 }

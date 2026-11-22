@@ -907,7 +907,7 @@
             const vehiculos = (store.get('hacienda_vehiculos') || []).filter(v => String(v.contribuyente_id) === String(c.id));
             const publicidades = (store.get('hacienda_publicidad') || []).filter(p => String(p.contribuyente_id) === String(c.id));
             const pagos = (store.get('hacienda_pagos') || []).filter(p => String(p.contribuyente_id) === String(c.id));
-            const cuentas = store.get('hacienda_cuentas') || [];
+            const cuentas = (store.get('hacienda_cuentas') || []).filter(cta => cta.estado !== 'inactiva');
 
             container.innerHTML = `
                 <div class="max-w-5xl mx-auto space-y-8 py-6">
@@ -1366,7 +1366,17 @@
                     <div class="space-y-6">
                         <!-- Tarjetas de Cuentas Bancarias -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            ${cuentas.map(cta => `
+                            ${cuentas.length === 0 ? `
+                                <div class="col-span-full p-8 rounded-3xl bg-[#18181b] border border-amber-500/20 text-center space-y-2">
+                                    <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center mx-auto text-lg">
+                                        <i class="fas fa-university"></i>
+                                    </div>
+                                    <h4 class="text-xs font-bold text-white uppercase tracking-wider">Sin Cuentas Recaudadoras Disponibles</h4>
+                                    <p class="text-xs text-neutral-400 max-w-md mx-auto">
+                                        No hay cuentas bancarias activas registradas en la Tesorería Municipal en este momento. Comuníquese con la Dirección de Administración Tributaria.
+                                    </p>
+                                </div>
+                            ` : cuentas.map(cta => `
                                 <div class="p-6 rounded-3xl bg-gradient-to-br from-[#1c1c1e] to-[#121214] border border-white/10 shadow-xl space-y-4 relative group">
                                     <div class="flex items-center justify-between">
                                         <div class="text-xs font-bold text-white uppercase tracking-wider">${cta.banco || cta.banco_nombre}</div>
@@ -1411,7 +1421,13 @@
                                 <div class="space-y-1.5">
                                     <label class="text-[11px] font-medium text-neutral-400 uppercase tracking-wider block">Banco Receptor (Alcaldía)</label>
                                     <select id="pago-banco-destino" class="w-full bg-[#18181b] border border-white/10 text-white text-xs font-medium rounded-2xl px-4 py-3 outline-none focus:border-white/30 transition">
-                                        ${cuentas.map(cta => `<option value="${cta.banco || cta.banco_nombre}">${cta.banco || cta.banco_nombre}</option>`).join('')}
+                                        ${cuentas.length === 0 ? `
+                                            <option value="">No hay cuentas activas registradas</option>
+                                        ` : cuentas.map(cta => `
+                                            <option value="${cta.banco || cta.banco_nombre}">
+                                                ${cta.banco || cta.banco_nombre} (${(cta.numero || cta.numero_cuenta || '').slice(-4)})
+                                            </option>
+                                        `).join('')}
                                     </select>
                                 </div>
                                 <div class="space-y-1.5">
@@ -1786,7 +1802,17 @@
                             </p>
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
-                                ${cuentas.map(cta => `
+                                ${cuentas.length === 0 ? `
+                                    <div class="col-span-full p-8 rounded-3xl bg-[#18181b] border border-amber-500/20 text-center space-y-2">
+                                        <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center mx-auto text-lg">
+                                            <i class="fas fa-university"></i>
+                                        </div>
+                                        <h4 class="text-xs font-bold text-white uppercase tracking-wider">Sin Cuentas Recaudadoras Disponibles</h4>
+                                        <p class="text-xs text-neutral-400 max-w-md mx-auto">
+                                            No hay cuentas bancarias activas registradas en la Tesorería Municipal en este momento. Comuníquese con la Dirección de Administración Tributaria.
+                                        </p>
+                                    </div>
+                                ` : cuentas.map(cta => `
                                     <div class="p-6 rounded-3xl bg-gradient-to-br from-[#1c1c1e] to-[#121214] border border-white/10 shadow-xl space-y-4 relative group">
                                         <div class="flex items-center justify-between">
                                             <div class="text-xs font-bold text-white uppercase tracking-wider">${cta.banco || cta.banco_nombre}</div>

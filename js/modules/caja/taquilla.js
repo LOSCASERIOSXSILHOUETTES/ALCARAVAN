@@ -10,6 +10,8 @@
             const pagos = global.HaciendaStore ? global.HaciendaStore.get('hacienda_pagos') : [];
             const contribuyentes = global.HaciendaStore ? global.HaciendaStore.get('hacienda_contribuyentes') : [];
             const declaraciones = global.HaciendaStore ? global.HaciendaStore.get('hacienda_declaraciones') : [];
+            const cuentasBancarias = (global.HaciendaStore ? global.HaciendaStore.get('hacienda_cuentas') : [])
+                .filter(c => c.estado !== 'inactiva');
 
             const totalRecaudado = pagos
                 .filter(p => p.estado === 'conciliado')
@@ -67,10 +69,17 @@
                                 Registro de enteros bancarios, conciliación de caja y emisión de recibos oficiales.
                             </p>
                         </div>
-                        <button onclick="window.CajaModule.abrirModalPago()" class="px-5 py-2.5 bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs rounded-xl shadow-lg transition flex items-center gap-2">
-                            <i class="fas fa-plus"></i>
-                            Enterar Pago
-                        </button>
+                        <div class="flex items-center gap-2.5">
+                            <button onclick="window.HaciendaCuentas && window.HaciendaCuentas.abrirModalGestion()" 
+                                    class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-sky-400 font-bold text-xs rounded-xl border border-slate-700 hover:border-sky-500/40 shadow-lg transition flex items-center gap-2">
+                                <i class="fas fa-university text-xs"></i>
+                                <span>Cuentas Recaudadoras</span>
+                            </button>
+                            <button onclick="window.CajaModule.abrirModalPago()" class="px-5 py-2.5 bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs rounded-xl shadow-lg transition flex items-center gap-2">
+                                <i class="fas fa-plus"></i>
+                                <span>Enterar Pago</span>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
@@ -124,9 +133,13 @@
                                 <div>
                                     <label class="block text-xs font-bold text-slate-400 mb-1">Banco Destino (Alcaldía)</label>
                                     <select id="pago-banco-destino" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 text-xs outline-none">
-                                        <option value="Banco de Venezuela - Cta Recaudadora">Banco de Venezuela (Cta. Recaudadora)</option>
-                                        <option value="Banesco - Cta Administración Tributaria">Banesco (Cta. Administración Tributaria)</option>
-                                        <option value="Banco Bicentenario - Rentas">Banco Bicentenario (Rentas)</option>
+                                        ${cuentasBancarias.length === 0 ? `
+                                            <option value="Banco de Venezuela - Cta Recaudadora">Banco de Venezuela (Cta. Recaudadora)</option>
+                                        ` : cuentasBancarias.map(c => `
+                                            <option value="${c.banco} (${c.numero ? c.numero.slice(-4) : ''})">
+                                                ${c.banco} (${c.numero ? c.numero.slice(-4) : ''}) — ${c.concepto || 'Recaudación'}
+                                            </option>
+                                        `).join('')}
                                     </select>
                                 </div>
                                 <div>

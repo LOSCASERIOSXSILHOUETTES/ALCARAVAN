@@ -83,7 +83,12 @@
                                 Control de extractos bancarios, pareo automático de transferencias de contribuyentes y cierre diario de caja.
                             </p>
                         </div>
-                        <div class="flex items-center gap-3 w-full sm:w-auto">
+                        <div class="flex items-center gap-2.5 w-full sm:w-auto flex-wrap">
+                            <button onclick="window.HaciendaCuentas && window.HaciendaCuentas.abrirModalGestion()" 
+                                    class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-sky-400 font-bold text-xs rounded-xl border border-slate-700 hover:border-sky-500/40 shadow-lg transition flex items-center gap-2">
+                                <i class="fas fa-university text-xs"></i>
+                                <span>Cuentas Recaudadoras</span>
+                            </button>
                             <button onclick="window.HaciendaSmartLedger && window.HaciendaSmartLedger.abrirModal()" 
                                     class="flex-1 sm:flex-none px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-900/30 transition flex items-center justify-center gap-2">
                                 <i class="fas fa-file-invoice text-sm"></i>
