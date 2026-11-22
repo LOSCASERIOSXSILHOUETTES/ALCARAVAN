@@ -140,6 +140,20 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.8.7 — 22/11/2026
+- **Fidelidad Pixel-Perfect al Mockup Oficial del Portal del Contribuyente:**
+  - Header minimalista exacto: Emblema "A" negro, texto "Alcaravan | San Jose de Guaribe", tasa interactiva "TCMMV BCV: 1.009,07 Bs. v" y boton contorneado "Funcionarios".
+  - Pantalla de inicio de sesion exactamente como en la referencia visual:
+    - Etiqueta superior monoespaciada `PORTAL DEL CONTRIBUYENTE`.
+    - Titulo `Iniciar Sesion` en negro puro con subtitulo de dos lineas.
+    - Tarjeta blanca compacta (390px) con label `RIF o Cedula`.
+    - Campo unificado `J v | Ej: 123456789`.
+    - Boton solido negro `Ingresar ->`.
+    - Enlace centrado `¿Comercio nuevo? Solicitar censo municipal`.
+    - Leyenda inferior `Atencion presencial: Taquilla de Rentas Municipales · 8:00 AM a 4:00 PM`.
+  - Footer de dos extremos: `Alcaldia de San Jose de Guaribe · SATRIMG` y `Marco Legal LOCAT` con apertura directa de la ordenanza.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.8.7`.
+
 ### Version 3.8.6 — 22/11/2026
 - **Depuracion Radical de Ruido Visual en Portada (Clean Login Minimalista):**
   - Eliminacion de las 3 barras superiores apiladas en el portal publico: fuera topbar con clima/reloj y fuera ticker tape en movimiento continuo.
@@ -280,6 +294,20 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
   - Registro de la 14ta tabla `hacienda_popups` en `store.js` (`TABLE_SCHEMAS`), `realtime-sync.js` (`SYNCABLE_TABLES`) y `sql/schema_hacienda.sql`.
   - Consumo dinamico en `js/modules/portal-comercio.js`: lectura directa a 0ms desde LocalForage con filtrado por destino (`portal`, `ambos`) y control de visualizacion diaria (`localStorage`).
   - Bump de Service Worker a `alcaravan-v3-cache-v3.7.1`.
+
+### Version 3.8.7 — 22/11/2026
+- **Fidelidad Pixel-Perfect al Mockup Oficial del Portal del Contribuyente:**
+  - Header minimalista exacto: Emblema "A" negro, texto "Alcaravan | San Jose de Guaribe", tasa interactiva "TCMMV BCV: 1.009,07 Bs. v" y boton contorneado "Funcionarios".
+  - Pantalla de inicio de sesion exactamente como en la referencia visual:
+    - Etiqueta superior monoespaciada `PORTAL DEL CONTRIBUYENTE`.
+    - Titulo `Iniciar Sesion` en negro puro con subtitulo de dos lineas.
+    - Tarjeta blanca compacta (390px) con label `RIF o Cedula`.
+    - Campo unificado `J v | Ej: 123456789`.
+    - Boton solido negro `Ingresar ->`.
+    - Enlace centrado `¿Comercio nuevo? Solicitar censo municipal`.
+    - Leyenda inferior `Atencion presencial: Taquilla de Rentas Municipales · 8:00 AM a 4:00 PM`.
+  - Footer de dos extremos: `Alcaldia de San Jose de Guaribe · SATRIMG` y `Marco Legal LOCAT` con apertura directa de la ordenanza.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.8.7`.
 
 ### Version 3.8.6 — 22/11/2026
 - **Depuracion Radical de Ruido Visual en Portada (Clean Login Minimalista):**

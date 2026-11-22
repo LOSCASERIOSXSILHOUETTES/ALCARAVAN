@@ -732,184 +732,93 @@
             }
         },
 
+        mostrarModalTasas: function() {
+            const tasas = getTasasInfo();
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: 'Tasas Oficiales BCV',
+                    html: `
+                        <div class="text-left text-xs space-y-2 p-2">
+                            <div class="flex justify-between p-2.5 bg-amber-50 rounded-xl border border-amber-200">
+                                <span class="font-bold text-amber-900">TCMMV (LOCAT Art. 30):</span>
+                                <span class="font-mono font-bold text-amber-900">${tasas.tcmmv.toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs.</span>
+                            </div>
+                            <div class="flex justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+                                <span class="font-bold text-slate-700">Dólar (USD BCV):</span>
+                                <span class="font-mono font-bold text-slate-900">${tasas.usd.toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs.</span>
+                            </div>
+                            <div class="flex justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+                                <span class="font-bold text-slate-700">Euro (EUR BCV):</span>
+                                <span class="font-mono font-bold text-slate-900">${tasas.eur.toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs.</span>
+                            </div>
+                            <div class="flex justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+                                <span class="font-bold text-slate-700">Yuan (CNY BCV):</span>
+                                <span class="font-mono font-bold text-slate-900">${tasas.cny.toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs.</span>
+                            </div>
+                        </div>
+                    `,
+                    confirmButtonText: 'Entendido',
+                    confirmButtonColor: '#000000'
+                });
+            }
+        },
+
         renderConsultaHero: function(container) {
             const tasas = getTasasInfo();
             container.innerHTML = `
-                <div class="max-w-4xl mx-auto space-y-16 py-4 sm:py-8 text-center animate-fade-in">
-                    
-                    <!-- PANTALLA PRINCIPAL: ACCESO DIRECTO AL PORTAL -->
-                    <div class="w-full max-w-md mx-auto pt-4 pb-2">
-                        <!-- Tarjeta Central de Inicio de Sesión -->
-                        <div class="bg-white rounded-3xl p-8 sm:p-10 border border-slate-200/80 shadow-xl shadow-slate-900/5 text-center space-y-6">
-                            <!-- Icono Institucional -->
-                            <div class="w-16 h-16 rounded-2xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 text-2xl mx-auto shadow-sm">
-                                <i class="fas fa-landmark"></i>
-                            </div>
+                <div class="w-full max-w-md mx-auto text-center animate-fade-in py-2">
+                    <!-- PORTAL DEL CONTRIBUYENTE -->
+                    <div class="text-[11px] font-semibold uppercase tracking-widest text-slate-400 font-mono mb-2">
+                        PORTAL DEL CONTRIBUYENTE
+                    </div>
 
-                            <div class="space-y-1">
-                                <h1 class="text-2xl font-black text-slate-900 tracking-tight">
-                                    Portal del Contribuyente
-                                </h1>
-                                <p class="text-xs text-slate-500 leading-relaxed">
-                                    Alcaldía del Municipio San José de Guaribe
-                                </p>
-                            </div>
+                    <!-- Iniciar Sesión -->
+                    <h1 class="text-3xl sm:text-4xl font-extrabold text-black tracking-tight">
+                        Iniciar Sesión
+                    </h1>
 
-                            <!-- Formulario Directo -->
-                            <div class="space-y-4 text-left">
-                                <div class="flex items-center bg-slate-50 border-2 border-slate-200 focus-within:border-purple-600 focus-within:bg-white rounded-2xl p-1.5 transition duration-200 shadow-inner">
-                                    <select id="pc-rif-tipo" 
-                                            class="bg-white text-slate-900 font-bold text-sm px-3.5 py-3 rounded-xl border border-slate-200 outline-none cursor-pointer">
-                                        <option value="J">J</option>
-                                        <option value="V">V</option>
-                                        <option value="G">G</option>
-                                        <option value="E">E</option>
-                                        <option value="C">C</option>
-                                        <option value="P">P</option>
-                                    </select>
+                    <!-- Subtitle -->
+                    <p class="text-sm text-slate-500 max-w-sm mx-auto mt-2 leading-relaxed">
+                        Consulte su estado de cuenta, autoliquide patentes<br>y emita solvencias oficiales.
+                    </p>
 
-                                    <div class="w-px h-8 bg-slate-200 mx-1"></div>
+                    <!-- The Card -->
+                    <div class="w-full max-w-[390px] mx-auto bg-white rounded-2xl p-6 border border-slate-200 shadow-sm mt-8 text-left space-y-4">
+                        <label class="block text-xs font-medium text-slate-700">RIF o Cédula</label>
 
-                                    <input type="text" id="pc-rif-numero" 
-                                           placeholder="Número de RIF o Cédula" 
-                                           inputmode="numeric" pattern="[0-9]*" maxlength="10"
-                                           oninput="if(window.HaciendaRIF) window.HaciendaRIF.handleInput(this, 'pc-rif-tipo')"
-                                           onkeydown="if(event.key==='Enter') window.PortalComercio.ejecutarConsultaRif()"
-                                           class="w-full bg-transparent text-slate-900 text-base sm:text-lg font-mono font-bold px-3 py-2 outline-none placeholder:text-slate-400">
-                                </div>
-
-                                <button onclick="window.PortalComercio.ejecutarConsultaRif()" 
-                                        class="w-full bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 hover:from-indigo-700 hover:to-purple-700 text-white font-bold text-base rounded-2xl py-3.5 transition flex items-center justify-center gap-2 shadow-lg shadow-purple-600/25">
-                                    <span>Ingresar al Portal</span>
-                                    <i class="fas fa-arrow-right text-xs"></i>
-                                </button>
-
-                                <div class="text-center pt-2">
-                                    <button onclick="window.PortalComercio.abrirModalInscripcion()" 
-                                            class="text-purple-600 hover:text-purple-800 text-xs font-bold transition hover:underline">
-                                        ¿Comercio nuevo? Solicitar censo municipal aquí
-                                    </button>
-                                </div>
-                            </div>
+                        <div class="flex items-center border border-slate-200 rounded-xl bg-white focus-within:border-slate-400 transition overflow-hidden">
+                            <select id="pc-rif-tipo" class="bg-transparent text-slate-800 font-medium text-sm px-3 py-2.5 outline-none cursor-pointer border-r border-slate-200">
+                                <option value="J">J</option>
+                                <option value="V">V</option>
+                                <option value="G">G</option>
+                                <option value="E">E</option>
+                                <option value="C">C</option>
+                                <option value="P">P</option>
+                            </select>
+                            <input type="text" id="pc-rif-numero" placeholder="Ej: 123456789" 
+                                   inputmode="numeric" pattern="[0-9]*" maxlength="10"
+                                   oninput="if(window.HaciendaRIF) window.HaciendaRIF.handleInput(this, 'pc-rif-tipo')"
+                                   onkeydown="if(event.key==='Enter') window.PortalComercio.ejecutarConsultaRif()"
+                                   class="w-full bg-transparent text-slate-800 text-sm px-3 py-2.5 outline-none placeholder:text-slate-400 font-mono">
                         </div>
 
-                        <!-- Indicador para explorar hacia abajo -->
-                        <div class="text-center pt-8">
-                            <a href="#seccion-publica" class="inline-flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-purple-600 transition bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-full border border-slate-200">
-                                <span>Ver tasas BCV y ordenanzas municipales</span>
-                                <i class="fas fa-chevron-down text-[10px] text-purple-600 animate-bounce"></i>
-                            </a>
+                        <button onclick="window.PortalComercio.ejecutarConsultaRif()" 
+                                class="w-full bg-black hover:bg-neutral-800 text-white font-medium text-sm rounded-xl py-3 transition flex items-center justify-center gap-2 shadow-sm">
+                            <span>Ingresar</span>
+                            <span>→</span>
+                        </button>
+
+                        <div class="text-center pt-1">
+                            <button onclick="window.PortalComercio.abrirModalInscripcion()" 
+                                    class="text-xs text-slate-500 hover:text-black transition">
+                                ¿Comercio nuevo? Solicitar censo municipal
+                            </button>
                         </div>
                     </div>
 
-                    <!-- =========================================================================
-                         SECCION SECUNDARIA: ABAJO DEL FOLD
-                         Mesa de Cambio BCV, Carrusel de Avisos, Módulos y Ordenanzas
-                         ========================================================================= -->
-                    <div id="seccion-publica" class="space-y-12 border-t border-slate-200 pt-12 text-left">
-                        
-                        <!-- Mesa de Cambio Oficial BCV -->
-                        <div class="space-y-3">
-                            <div class="flex items-center justify-between text-xs text-slate-600 px-1 font-mono">
-                                <span class="flex items-center gap-2 font-bold text-slate-800">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                    <span>Mesa de Cambio Oficial BCV</span>
-                                </span>
-                                <span class="text-[11px] text-slate-400">Unidad de Cuenta · LOCAT Art. 30</span>
-                            </div>
-                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
-                                <!-- Card TCMMV -->
-                                <div class="p-4 rounded-2xl bg-amber-50/70 border border-amber-200/80 space-y-1 shadow-sm">
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-[10px] font-mono text-amber-800 font-bold uppercase tracking-wider">TCMMV (LOCAT)</span>
-                                        <i class="fas fa-crown text-[10px] text-amber-500"></i>
-                                    </div>
-                                    <div class="text-lg font-bold text-slate-900 font-mono tracking-tight"><span data-tasa="tcmmv">${tasas.tcmmv.toLocaleString('es-VE', { minimumFractionDigits: 2 })}</span> <span class="text-xs text-amber-700 font-normal">Bs.</span></div>
-                                    <div class="text-[10px] text-amber-700 font-medium">Mayor Valor Oficial</div>
-                                </div>
-                                <!-- Card USD -->
-                                <div class="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 space-y-1 shadow-sm">
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-[10px] font-mono text-emerald-800 font-bold uppercase tracking-wider">Dólar (USD)</span>
-                                        <i class="fas fa-dollar-sign text-[10px] text-emerald-600"></i>
-                                    </div>
-                                    <div class="text-lg font-bold text-slate-900 font-mono tracking-tight"><span data-tasa="usd">${tasas.usd.toLocaleString('es-VE', { minimumFractionDigits: 2 })}</span> <span class="text-xs text-emerald-700 font-normal">Bs.</span></div>
-                                    <div class="text-[10px] text-emerald-700 font-medium">▲ Oficial BCV</div>
-                                </div>
-                                <!-- Card EUR -->
-                                <div class="p-4 rounded-2xl bg-sky-50/70 border border-sky-200/80 space-y-1 shadow-sm">
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-[10px] font-mono text-sky-800 font-bold uppercase tracking-wider">Euro (EUR)</span>
-                                        <i class="fas fa-euro-sign text-[10px] text-sky-600"></i>
-                                    </div>
-                                    <div class="text-lg font-bold text-slate-900 font-mono tracking-tight"><span data-tasa="eur">${tasas.eur.toLocaleString('es-VE', { minimumFractionDigits: 2 })}</span> <span class="text-xs text-sky-700 font-normal">Bs.</span></div>
-                                    <div class="text-[10px] text-sky-700 font-medium">▲ Oficial BCV</div>
-                                </div>
-                                <!-- Card CNY / JPY -->
-                                <div class="p-4 rounded-2xl bg-rose-50/70 border border-rose-200/80 space-y-1 shadow-sm">
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-[10px] font-mono text-rose-800 font-bold uppercase tracking-wider">Yuan (CNY)</span>
-                                        <i class="fas fa-yen-sign text-[10px] text-rose-500"></i>
-                                    </div>
-                                    <div class="text-lg font-bold text-slate-900 font-mono tracking-tight"><span data-tasa="cny">${tasas.cny.toLocaleString('es-VE', { minimumFractionDigits: 2 })}</span> <span class="text-xs text-rose-700 font-normal">Bs.</span></div>
-                                    <div class="text-[10px] text-slate-500">Yen: <span data-tasa="jpy">${tasas.jpy.toLocaleString('es-VE', { minimumFractionDigits: 2 })}</span> · Rub: <span data-tasa="rub">${tasas.rub.toLocaleString('es-VE', { minimumFractionDigits: 2 })}</span></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Carrusel de Avisos y Campañas Oficiales -->
-                        <div class="space-y-3">
-                            <div class="flex items-center justify-between text-xs text-slate-600 px-1 font-mono">
-                                <span class="flex items-center gap-2 font-bold text-slate-800">
-                                    <i class="fas fa-bullhorn text-purple-600"></i>
-                                    <span>Comunicados y Avisos Oficiales</span>
-                                </span>
-                                <span class="text-[11px] text-slate-400">Información al Contribuyente</span>
-                            </div>
-                            ${this.renderCarruselAvisos()}
-                        </div>
-
-                        <!-- Bento Grid de Módulos Tributarios -->
-                        <div class="space-y-3">
-                            <div class="text-xs text-slate-600 px-1 font-mono font-bold text-slate-800 flex items-center gap-2">
-                                <i class="fas fa-th-large text-purple-600"></i>
-                                <span>Servicios y Módulos de Autogestión</span>
-                            </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
-                                <div class="p-6 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-3 hover:border-purple-300 transition duration-200">
-                                    <div class="w-11 h-11 rounded-2xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 text-sm shadow-sm">
-                                        <i class="fas fa-suitcase"></i>
-                                    </div>
-                                    <h3 class="text-sm font-bold text-slate-900">Mis Empresas (LOCAT)</h3>
-                                    <p class="text-xs text-slate-600 leading-relaxed">
-                                        Autoliquidación mensual, tabulador de alícuotas armonizadas, conciliación de pagos y Solvencia QR.
-                                    </p>
-                                </div>
-
-                                <div class="p-6 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-3 hover:border-purple-300 transition duration-200">
-                                    <div class="w-11 h-11 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 text-sm shadow-sm">
-                                        <i class="fas fa-building"></i>
-                                    </div>
-                                    <h3 class="text-sm font-bold text-slate-900">Inmuebles y Vehículos</h3>
-                                    <p class="text-xs text-slate-600 leading-relaxed">
-                                        Control catastral de terrenos y locales urbanos, derecho de frente y patentes automotrices comerciales.
-                                    </p>
-                                </div>
-
-                                <div class="p-6 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-3 hover:border-purple-300 transition duration-200">
-                                    <div class="w-11 h-11 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 text-sm shadow-sm">
-                                        <i class="fas fa-university"></i>
-                                    </div>
-                                    <h3 class="text-sm font-bold text-slate-900">Cuentas y Pagos</h3>
-                                    <p class="text-xs text-slate-600 leading-relaxed">
-                                        Cuentas bancarias recaudadoras oficiales de la Alcaldía para transferencias y pagos móviles directos.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Centro Oficial de Gacetas y Ordenanzas Municipales -->
-                        ${this.renderCentroOrdenanzas()}
+                    <!-- Footnote below the card -->
+                    <div class="text-xs text-slate-400 text-center mt-6">
+                        Atención presencial: Taquilla de Rentas Municipales · 8:00 AM a 4:00 PM
                     </div>
                 </div>
 
@@ -918,8 +827,6 @@
                 ${this.renderPopupOficial()}
             `;
 
-            // Inicializar autoplay de carrusel y verificación de popup
-            this.iniciarCarrusel();
             this.verificarPopup();
         },
 
