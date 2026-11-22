@@ -1192,33 +1192,77 @@
                             </p>
                         </div>
 
-                        <!-- Selector de Actividad Económica LOCAT -->
-                        <div class="space-y-1.5">
-                            <label class="text-[11px] font-medium text-neutral-400 uppercase tracking-wider block">Actividad Económica / Ramo LOCAT</label>
-                            <select id="dec-actividad-locat" onchange="window.PortalComercio.cambiarActividadLocat()" 
-                                    class="w-full bg-[#18181b] border border-white/10 text-white text-xs font-medium rounded-2xl px-4 py-3.5 outline-none focus:border-white/30 transition cursor-pointer">
-                                ${(global.CatalogoLocat && typeof global.CatalogoLocat.getCategorias === 'function' ? global.CatalogoLocat.getCategorias() : []).map(cat => `
-                                    <optgroup label="${cat}" class="bg-[#18181b] text-neutral-400 font-bold">
-                                        ${global.CatalogoLocat.getByCategoria(cat).map(item => `
-                                            <option value="${item.codigo}" 
-                                                    data-alicuota="${item.alicuota}" 
-                                                    data-minimo="${item.minimo_tcmmv}"
-                                                    class="text-white"
-                                                    ${item.codigo === (codPatente || actividadSeleccionada.codigo) ? 'selected' : ''}>
-                                                [${item.codigo}] ${item.nombre} — ${(item.alicuota * 100).toFixed(2)}% (Mín. ${item.minimo_tcmmv.toFixed(2)} MMAV)
-                                            </option>
-                                        `).join('')}
-                                    </optgroup>
-                                `).join('') || catalogo.map(item => `
-                                    <option value="${item.codigo}" 
-                                            data-alicuota="${item.alicuota}" 
-                                            data-minimo="${item.minimo_tcmmv}"
-                                            ${item.codigo === (codPatente || actividadSeleccionada.codigo) ? 'selected' : ''}>
-                                        [${item.codigo}] ${item.nombre} — ${(item.alicuota * 100).toFixed(2)}% (Mín. ${item.minimo_tcmmv.toFixed(2)} MMAV)
-                                    </option>
-                                `).join('')}
-                            </select>
-                        </div>
+                        <!-- Actividad Económica Oficial Bloqueada por Licencia -->
+                        ${(function() {
+                            const misPatentes = (global.HaciendaStore ? global.HaciendaStore.get('hacienda_patentes') : [])
+                                .filter(p => String(p.contribuyente_id) === String(c.id) && p.estado !== 'anulada' && p.estado !== 'suspendida');
+                            const pOficial = misPatentes[0] || patenteActiva;
+                            const descOficial = pOficial?.descripcion_actividad || actividadSeleccionada.nombre;
+                            const codOficial = pOficial?.codigo_locat || actividadSeleccionada.codigo;
+                            const numPatenteOficial = pOficial?.numero_patente || 'EN TRÁMITE';
+
+                            if (misPatentes.length > 1) {
+                                return `
+                                    <div class="space-y-1.5">
+                                        <div class="flex items-center justify-between">
+                                            <label class="text-[11px] font-medium text-neutral-400 uppercase tracking-wider block">Seleccione la Patente a Autoliquidar</label>
+                                            <span class="text-[11px] font-medium text-sky-400 bg-sky-500/10 border border-sky-500/20 px-2.5 py-0.5 rounded-full">
+                                                ${misPatentes.length} Licencias Aprobadas
+                                            </span>
+                                        </div>
+                                        <select id="dec-actividad-locat" onchange="window.PortalComercio.cambiarActividadLocat()" 
+                                                class="w-full bg-[#18181b] border border-white/10 text-white text-xs font-medium rounded-2xl px-4 py-3.5 outline-none focus:border-white/30 transition cursor-pointer">
+                                            ${misPatentes.map((p, idx) => `
+                                                <option value="${p.codigo_locat || 'COM-001'}" 
+                                                        data-patente-id="${p.id}"
+                                                        data-alicuota="${p.alicuota}" 
+                                                        data-minimo="${p.minimo_tributable_tcmmv || p.minimo_tcmmv || 0.30}"
+                                                        class="text-white"
+                                                        ${idx === 0 ? 'selected' : ''}>
+                                                    [${p.numero_patente || 'LICENCIA'}] [${p.codigo_locat || 'LOCAT'}] ${p.descripcion_actividad || 'Actividad Comercial'} — ${(Number(p.alicuota) * 100).toFixed(2)}% (Mín. ${Number(p.minimo_tributable_tcmmv || 0.30).toFixed(2)} MMAV)
+                                                </option>
+                                            `).join('')}
+                                        </select>
+                                    </div>
+                                `;
+                            }
+
+                            return `
+                                <div class="space-y-1.5">
+                                    <div class="flex items-center justify-between">
+                                        <label class="text-[11px] font-medium text-neutral-400 uppercase tracking-wider block">Actividad Económica Oficial (Licencia Municipal)</label>
+                                        <span class="inline-flex items-center gap-1.5 text-[11px] font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full">
+                                            <i class="fas fa-lock text-[9px]"></i> Ramo Aprobado por Alcaldía
+                                        </span>
+                                    </div>
+                                    <div class="p-4 rounded-2xl bg-[#18181b] border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                        <div class="space-y-0.5">
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-xs font-mono font-bold text-sky-400">[${codOficial}]</span>
+                                                <span class="text-xs font-semibold text-white">${descOficial}</span>
+                                            </div>
+                                            <p class="text-[11px] text-neutral-400 font-mono">
+                                                Licencia N°: <span class="text-neutral-200 font-bold">${numPatenteOficial}</span> · Alícuota: <span class="text-neutral-200 font-bold">${(aliActual * 100).toFixed(2)}%</span> · Mínimo: <span class="text-neutral-200 font-bold">${minTcmmvActual.toFixed(2)} MMAV</span>
+                                            </p>
+                                        </div>
+                                        <div class="shrink-0">
+                                            <span class="text-xs font-mono text-neutral-300 bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl">
+                                                Alícuota: <strong class="text-emerald-400 font-bold">${(aliActual * 100).toFixed(2)}%</strong>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <select id="dec-actividad-locat" class="hidden" style="display: none;">
+                                        <option value="${codOficial}" 
+                                                data-patente-id="${pOficial ? pOficial.id : ''}"
+                                                data-alicuota="${aliActual}" 
+                                                data-minimo="${minTcmmvActual}"
+                                                selected>
+                                            [${codOficial}] ${descOficial}
+                                        </option>
+                                    </select>
+                                </div>
+                            `;
+                        })()}
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div class="space-y-1.5">
@@ -2163,12 +2207,14 @@
             let minTcmmv = 0.30;
             let codigoLocat = 'COM-001';
             let descActividad = 'Venta al por menor de víveres, alimentos y abarrotes';
+            let patenteIdFromSelect = null;
             if (selectLocat && selectLocat.selectedIndex >= 0) {
                 const opt = selectLocat.options[selectLocat.selectedIndex];
                 codigoLocat = opt.value;
                 descActividad = opt.text.split('] ')[1]?.split(' —')[0] || opt.text;
                 alicuota = parseFloat(opt.dataset.alicuota || 0.01);
                 minTcmmv = parseFloat(opt.dataset.minimo || 0.30);
+                patenteIdFromSelect = opt.dataset.patenteId || null;
             }
             const tasaActual = getTasaMMAV();
             const minimoBs = minTcmmv * tasaActual;
@@ -2185,7 +2231,7 @@
             }
 
             const patentes = (store.get('hacienda_patentes') || []).filter(p => String(p.contribuyente_id) === String(activeContribuyente.id));
-            let p = patentes[0] || null;
+            let p = (patenteIdFromSelect ? patentes.find(pat => String(pat.id) === String(patenteIdFromSelect)) : null) || patentes[0] || null;
             if (!p) {
                 p = {
                     id: Date.now(),

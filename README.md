@@ -140,6 +140,14 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.9.7 — 22/11/2026
+- **Blindaje Fiscal en Autoliquidación: Bloqueo de Ramo y Vinculación Estricta a Licencia Municipal:**
+  - **Bloqueo de Actividad Económica por Licencia:** Sustitución del selector libre de 80 actividades por una tarjeta oficial de solo lectura que bloquea el ramo económico y la alícuota a la Patente de Industria y Comercio formalmente aprobada por los fiscales de la Alcaldía en `hacienda_patentes`.
+  - **Prevención de Evasión Fiscal:** Neutralización de la posibilidad de que comercios con alícuotas más altas (licorerías, discotecas, mayoristas) seleccionen actividades de alícuotas reducidas (hortalizas, abarrotes) para defraudar al fisco municipal.
+  - **Soporte de Múltiples Patentes Autorizadas:** Si un contribuyente posee más de una licencia legalmente emitida en el mismo RIF (ej. abasto y expendio de licores), el sistema despliega un selector restringido exclusivamente a sus licencias aprobadas, sin acceso al resto del catálogo nacional.
+  - **Cálculo y Presentación Inmutables:** Los datos de cálculo (alícuota, mínimo MMAV y código LOCAT) se transmiten de forma inmutable a la liquidación y se asocian de forma atómica a la patente oficial del contribuyente.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.9.7`.
+
 ### Version 3.9.6 — 22/11/2026
 - **Migración del Catálogo LOCAT a Base de Datos SGB y Desacoplamiento de Código Duro:**
   - **Tabla `hacienda_actividades_locat` (17ma Tabla del Sistema Tributario):** Creación del modelo relacional en `sql/schema_hacienda.sql` con campos `id`, `codigo`, `categoria`, `nombre`, `alicuota`, `minimo_tcmmv`, `activo`, `created_at` y `updated_at`, con RLS, política permisiva y publicación en `supabase_realtime`.
