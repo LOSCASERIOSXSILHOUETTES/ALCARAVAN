@@ -186,11 +186,19 @@ CREATE TABLE IF NOT EXISTS "public"."hacienda_vehiculos" (
     "id" TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
     "contribuyente_id" TEXT NOT NULL REFERENCES "public"."hacienda_contribuyentes"("id") ON DELETE CASCADE,
     "placa" TEXT NOT NULL,
+    "tipo" TEXT DEFAULT 'automovil', -- 'automovil', 'camioneta', 'moto', 'minibus', 'autobus', 'camion_350', 'camion_750', 'gandola', 'volteo', 'remolque', 'maquinaria'
     "marca" TEXT,
     "modelo" TEXT,
     "anio" INT,
-    "uso" TEXT DEFAULT 'carga', -- 'carga', 'particular', 'transporte_publico'
-    "estado" TEXT DEFAULT 'activo',
+    "color" TEXT,
+    "uso" TEXT DEFAULT 'particular', -- 'particular', 'carga', 'transporte_publico', 'transporte_escolar', 'mototaxi', 'oficial'
+    "serial_carroceria" TEXT,
+    "serial_motor" TEXT,
+    "capacidad_puestos" INT DEFAULT 5,
+    "capacidad_carga" NUMERIC(10,2) DEFAULT 0,
+    "numero_ejes" INT DEFAULT 2,
+    "numero_titulo" TEXT,
+    "estado" TEXT DEFAULT 'activo', -- 'activo', 'desincorporado', 'en_tramite'
     "created_at" TIMESTAMPTZ DEFAULT NOW(),
     "updated_at" TIMESTAMPTZ DEFAULT NOW()
 );

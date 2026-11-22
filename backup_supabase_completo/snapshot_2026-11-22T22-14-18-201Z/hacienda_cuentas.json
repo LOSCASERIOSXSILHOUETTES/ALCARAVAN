@@ -1,0 +1,14 @@
+[
+  {
+    "id": "a359a876-fab4-4204-8341-c949ad365035",
+    "banco": "Banco de Venezuela",
+    "numero": "0102-0363-58-0000031133",
+    "tipo": "Corriente",
+    "concepto": "Recaudación Tributaria SATRIMG",
+    "saldo_inicial": 0,
+    "saldo_actual": 0,
+    "estado": "activa",
+    "created_at": "2026-11-22T21:51:45.777+00:00",
+    "updated_at": "2026-11-22T21:51:45.778+00:00"
+  }
+]

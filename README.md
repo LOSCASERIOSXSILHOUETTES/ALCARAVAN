@@ -140,6 +140,36 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.10.6 — 22/11/2026
+- **Módulo Integral de Registro Vehicular (Patente sobre Vehículos y Transporte Terrestre) — Estándar Los Teques / SATGUAICA:**
+  - **Inputs y Ficha Técnica Completa (Normativa INTT y Ordenanza Municipal):**
+    - Incorporación de los mismos campos oficiales de la plataforma SATGUAICA (Los Teques / Guaicaipuro):
+      1. **Placa / Matrícula:** Con validación alfanumérica sin espacios y auto-mayúsculas.
+      2. **Tipo / Clase de Vehículo:** Automóvil, Camioneta/Pick-Up/SUV, Motocicleta, Minibús/Van, Autobús Colectivo, Camión 350, Camión 750, Gandola/Chuto, Volteo, Remolque/Batea, Maquinaria Especial.
+      3. **Marca:** Selector con catálogo de marcas venezolanas (Chevrolet, Ford, Toyota, Fiat, Renault, Hyundai, Chery, Mitsubishi, Nissan, Jeep, Kia, Volkswagen, Honda, Mazda, Mack, Iveco, Bera, Empire Keeway, Motos Toro) e input dinámico para otras marcas.
+      4. **Modelo:** Texto descriptivo (Silverado, Hilux, Aveo, Sbr, etc.).
+      5. **Año de Fabricación:** Rango 1970 a 2026.
+      6. **Color Oficial:** Blanco, Negro, Gris/Plata, Azul, Rojo, Verde, Beige/Arena, Dorado, Marrón, Amarillo, Naranja, Vinotinto, Multicolor.
+      7. **Uso Oficial:** Particular/Privado, Carga Comercial/Reparto, Transporte Público, Transporte Escolar, Mototaxi, Institucional/Oficial.
+      8. **Serial de Carrocería (NIV / VIN / Chasis):** Validación `serial-vehicle` alfanumérica en mayúsculas.
+      9. **Serial de Motor:** Registro alfanumérico.
+      10. **Capacidad de Puestos:** Número de pasajeros autorizados.
+      11. **Capacidad de Carga (Ton):** Carga en toneladas con decimales.
+      12. **Número de Ejes:** 2, 3, 4, 5+ ejes.
+      13. **N° de Certificado de Registro / Título INTT:** Identificador del carnet de circulación.
+  - **Portal del Contribuyente (`portal-comercio.js`):**
+    - HUD con métricas de flota automotriz (Total Flota, Carga/Comercial, Particulares, Pasajeros).
+    - Tarjetas vehiculares de diseño moderno con chapa automotriz venezolana, insignias por tipo y uso, ficha técnica con seriales y botones de acción (Editar y Desincorporar).
+    - Modal espacioso `modal-nuevo-vehiculo` con soporte para creación y edición reactiva a 0ms.
+  - **ERP Administrativo de Rentas (`comercial.js`):**
+    - Conmutador de vistas en el módulo de Patentes (`PatentesModule`): Pestaña de **Actividades Económicas (LOCAT)** y Pestaña de **Patente sobre Vehículos**.
+    - Buscador en vivo multi-criterio (por placa, RIF, razón social, marca o serial).
+    - Modal de registro en ERP con asignación a cualquier contribuyente mediante `SelectorContribuyenteModal`.
+  - **Esquema y Sincronización SGB:**
+    - Actualizado `TABLE_SCHEMAS['hacienda_vehiculos']` en `js/core/store.js` y DDL en `sql/schema_hacienda.sql`.
+    - Script SQL de `ALTER TABLE` generado para migración en consola Supabase.
+    - Bump de Service Worker a `alcaravan-v3-cache-v3.10.6` con 355 pruebas automatizadas al 100% en verde.
+
 ### Version 3.10.5 — 22/11/2026
 - **Normalización de Campos y Renderizado Completo de Tarjetas de Métodos de Pago en Portal del Contribuyente:**
   - **Mapeo de Propiedades SGB en Tarjetas de Pago:** Se corrigió la discrepancia de nombres de atributos entre el almacén relacional (`hacienda_metodos_pago`: `tipo`, `telefono`, `identificacion`, `titular`, `banco`) y el módulo de visualización del portal (`portal-comercio.js`), donde se consultaban propiedades desalineadas (`m.canal`, `m.telefono_pago_movil`, `m.documento_pago_movil`).

@@ -1797,6 +1797,51 @@
         },
 
         renderModuloVehiculos: function(vehiculos) {
+            const totalVehiculos = vehiculos.length;
+            const vehiculosCarga = vehiculos.filter(v => v.uso === 'carga' || v.uso === 'Comercial' || v.uso === 'Carga').length;
+            const vehiculosParticulares = vehiculos.filter(v => v.uso === 'particular' || v.uso === 'Particular').length;
+            const vehiculosTransporte = vehiculos.filter(v => v.uso === 'transporte_publico' || v.uso === 'transporte_escolar' || v.uso === 'mototaxi').length;
+
+            const mapTipoIcon = {
+                'automovil': 'fa-car-side',
+                'camioneta': 'fa-truck-pickup',
+                'moto': 'fa-motorcycle',
+                'minibus': 'fa-van-shuttle',
+                'autobus': 'fa-bus',
+                'camion_350': 'fa-truck',
+                'camion_750': 'fa-truck-moving',
+                'gandola': 'fa-trailer',
+                'volteo': 'fa-dumpster',
+                'remolque': 'fa-trailer',
+                'maquinaria': 'fa-tractor'
+            };
+
+            const mapTipoLabel = {
+                'automovil': 'Automóvil',
+                'camioneta': 'Camioneta / SUV',
+                'moto': 'Motocicleta',
+                'minibus': 'Minibús / Van',
+                'autobus': 'Autobús Colectivo',
+                'camion_350': 'Camión 350',
+                'camion_750': 'Camión 750 / Pesado',
+                'gandola': 'Gandola / Chuto',
+                'volteo': 'Camión de Volteo',
+                'remolque': 'Remolque / Batea',
+                'maquinaria': 'Maquinaria Especial'
+            };
+
+            const mapUsoLabel = {
+                'particular': 'Particular / Privado',
+                'carga': 'Carga Comercial',
+                'transporte_publico': 'Transporte Público',
+                'transporte_escolar': 'Transporte Escolar',
+                'mototaxi': 'Mototaxi / Reparto',
+                'oficial': 'Oficial / Alcaldía',
+                'Comercial': 'Carga Comercial',
+                'Carga': 'Carga Comercial',
+                'Particular': 'Particular / Privado'
+            };
+
             return `
                 <div class="space-y-6 animate-fade-in">
                     <div class="flex items-center justify-between">
@@ -1804,38 +1849,144 @@
                                 class="text-xs text-neutral-400 hover:text-white font-medium transition flex items-center gap-2">
                             <span>← Volver a la Suite</span>
                         </button>
-                        <span class="text-xs font-mono text-neutral-500">Módulo: Mis Vehículos / Patente Automotriz</span>
+                        <span class="text-xs font-mono text-neutral-500">Módulo: Mis Vehículos / Patente Automotriz Municipal</span>
+                    </div>
+
+                    <!-- HUD Resumen Vehicular -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <div class="p-4 rounded-2xl bg-[#121214] border border-white/5 space-y-1">
+                            <span class="text-[10px] font-mono uppercase tracking-wider text-neutral-400">Total Flota</span>
+                            <div class="text-xl font-bold font-mono text-white">${totalVehiculos}</div>
+                        </div>
+                        <div class="p-4 rounded-2xl bg-[#121214] border border-white/5 space-y-1">
+                            <span class="text-[10px] font-mono uppercase tracking-wider text-sky-400">Carga / Comercial</span>
+                            <div class="text-xl font-bold font-mono text-sky-400">${vehiculosCarga}</div>
+                        </div>
+                        <div class="p-4 rounded-2xl bg-[#121214] border border-white/5 space-y-1">
+                            <span class="text-[10px] font-mono uppercase tracking-wider text-emerald-400">Particulares</span>
+                            <div class="text-xl font-bold font-mono text-emerald-400">${vehiculosParticulares}</div>
+                        </div>
+                        <div class="p-4 rounded-2xl bg-[#121214] border border-white/5 space-y-1">
+                            <span class="text-[10px] font-mono uppercase tracking-wider text-purple-400">Pasajeros / Otros</span>
+                            <div class="text-xl font-bold font-mono text-purple-400">${vehiculosTransporte}</div>
+                        </div>
                     </div>
 
                     <div class="p-8 sm:p-10 rounded-3xl bg-[#121214] border border-white/[0.08] shadow-2xl space-y-6">
-                        <div class="flex items-center justify-between border-b border-white/5 pb-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/5 pb-4">
                             <div>
-                                <h3 class="text-lg font-semibold text-white">Vehículos Registrados</h3>
-                                <p class="text-xs text-neutral-400">Patente automotriz para transporte de carga, comerciales o particulares.</p>
+                                <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                                    <i class="fas fa-car text-emerald-400 text-base"></i>
+                                    <span>Vehículos Registrados en el Padrón</span>
+                                </h3>
+                                <p class="text-xs text-neutral-400">Registro oficial de vehículos para la liquidación de la Patente sobre Vehículos y Transporte Terrestre.</p>
                             </div>
                             <button onclick="window.PortalComercio.abrirModalVehiculo()" 
-                                    class="bg-white hover:bg-neutral-200 text-black text-xs font-semibold rounded-full px-5 py-2 transition shadow">
-                                + Registrar Vehículo
+                                    class="bg-white hover:bg-neutral-200 text-black text-xs font-semibold rounded-full px-6 py-2.5 transition shadow-lg flex items-center gap-2 self-start sm:self-auto">
+                                <i class="fas fa-plus text-xs"></i>
+                                <span>Registrar Vehículo</span>
                             </button>
                         </div>
 
                         ${vehiculos.length === 0 ? `
-                            <div class="py-12 text-center text-neutral-500 space-y-2">
-                                <i class="fas fa-car text-3xl opacity-30"></i>
-                                <div class="text-xs">No tienes vehículos registrados en tu cuenta.</div>
+                            <div class="py-16 text-center text-neutral-500 space-y-3">
+                                <div class="w-16 h-16 rounded-2xl bg-white/[0.02] border border-white/5 flex items-center justify-center mx-auto text-neutral-600 text-2xl">
+                                    <i class="fas fa-car"></i>
+                                </div>
+                                <div class="text-sm font-semibold text-neutral-300">No tienes vehículos registrados en tu cuenta</div>
+                                <p class="text-xs text-neutral-500 max-w-md mx-auto">
+                                    Registra las placas de tus vehículos particulares o flota comercial de transporte para mantener al día tu solvencia vehicular y carnet de circulación.
+                                </p>
+                                <button onclick="window.PortalComercio.abrirModalVehiculo()" 
+                                        class="mt-2 px-5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition">
+                                    Comenzar Registro Vehicular
+                                </button>
                             </div>
                         ` : `
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                ${vehiculos.map(v => `
-                                    <div class="p-6 rounded-2xl bg-[#18181b] border border-white/5 space-y-2">
-                                        <div class="flex items-center justify-between">
-                                            <span class="text-sm font-mono font-bold text-white tracking-wider">${v.placa}</span>
-                                            <span class="text-[10px] uppercase font-mono px-2 py-0.5 rounded-full bg-white/5 text-neutral-400">${v.uso || 'Carga'}</span>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                ${vehiculos.map(v => {
+                                    const tipoKey = v.tipo || 'automovil';
+                                    const iconClass = mapTipoIcon[tipoKey] || 'fa-car';
+                                    const tipoNombre = mapTipoLabel[tipoKey] || 'Automóvil';
+                                    const usoNombre = mapUsoLabel[v.uso] || v.uso || 'Particular';
+                                    const isCarga = v.uso === 'carga' || v.uso === 'Comercial' || v.uso === 'Carga';
+
+                                    return `
+                                        <div class="p-6 rounded-3xl bg-gradient-to-br from-[#1a1a1d] to-[#121214] border border-white/10 shadow-xl space-y-4 hover:border-white/20 transition flex flex-col justify-between group">
+                                            <div class="space-y-3">
+                                                <!-- Cabecera de la Tarjeta con Chapa Vehicular -->
+                                                <div class="flex items-start justify-between gap-3">
+                                                    <div class="flex items-center gap-3">
+                                                        <!-- Chapa Estilo Placa Nacional -->
+                                                        <div class="px-3.5 py-1.5 rounded-xl bg-slate-900 border-2 border-white/30 shadow-inner flex flex-col items-center justify-center font-mono font-black text-sm tracking-widest text-white">
+                                                            <span class="text-[7px] text-sky-400 uppercase tracking-widest font-sans font-bold leading-none">VENEZUELA</span>
+                                                            <span class="leading-none pt-0.5 select-all">${v.placa}</span>
+                                                        </div>
+                                                        <div>
+                                                            <div class="text-xs font-bold text-white tracking-wide">${v.marca} ${v.modelo}</div>
+                                                            <span class="text-[11px] text-neutral-400 font-mono">Año: ${v.anio || 'S/A'} ${v.color ? `· Color: ${v.color}` : ''}</span>
+                                                        </div>
+                                                    </div>
+                                                    <span class="text-[10px] font-mono uppercase px-2.5 py-1 rounded-full border ${isCarga ? 'bg-sky-500/10 text-sky-400 border-sky-500/20' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'}">
+                                                        ${usoNombre}
+                                                    </span>
+                                                </div>
+
+                                                <!-- Ficha Técnica -->
+                                                <div class="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5 space-y-2 text-xs font-mono">
+                                                    <div class="flex items-center justify-between text-neutral-400">
+                                                        <span class="flex items-center gap-1.5">
+                                                            <i class="fas ${iconClass} text-neutral-500 text-[11px]"></i>
+                                                            <span>Tipo / Clase:</span>
+                                                        </span>
+                                                        <span class="text-neutral-200 font-semibold">${tipoNombre}</span>
+                                                    </div>
+                                                    ${v.serial_carroceria ? `
+                                                        <div class="flex items-center justify-between text-neutral-400">
+                                                            <span>Serial Carrocería (NIV):</span>
+                                                            <span class="text-neutral-200 font-bold select-all">${v.serial_carroceria}</span>
+                                                        </div>
+                                                    ` : ''}
+                                                    ${v.serial_motor ? `
+                                                        <div class="flex items-center justify-between text-neutral-400">
+                                                            <span>Serial Motor:</span>
+                                                            <span class="text-neutral-300 select-all">${v.serial_motor}</span>
+                                                        </div>
+                                                    ` : ''}
+                                                    <div class="grid grid-cols-2 gap-2 pt-1 border-t border-white/5 text-[11px] text-neutral-400">
+                                                        <div>Puestos: <span class="text-neutral-200 font-bold">${v.capacidad_puestos || 5}</span></div>
+                                                        <div>Carga: <span class="text-neutral-200 font-bold">${Number(v.capacidad_carga || 0).toFixed(2)} Ton.</span></div>
+                                                    </div>
+                                                    ${v.numero_titulo ? `
+                                                        <div class="flex items-center justify-between text-[11px] text-neutral-500 pt-1 border-t border-white/5">
+                                                            <span>Título INTT:</span>
+                                                            <span class="text-neutral-300 select-all">${v.numero_titulo}</span>
+                                                        </div>
+                                                    ` : ''}
+                                                </div>
+                                            </div>
+
+                                            <!-- Acciones de Tarjeta -->
+                                            <div class="flex items-center justify-between pt-2 border-t border-white/5 text-xs">
+                                                <span class="text-[10px] font-mono text-emerald-400 flex items-center gap-1">
+                                                    <i class="fas fa-check-circle text-[9px]"></i>
+                                                    <span>Estatus: ${(v.estado || 'activo').toUpperCase()}</span>
+                                                </span>
+                                                <div class="flex items-center gap-2">
+                                                    <button onclick="window.PortalComercio.abrirModalVehiculo('${v.id}')" 
+                                                            class="px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-300 hover:text-white transition text-[11px] font-medium flex items-center gap-1">
+                                                        <i class="fas fa-edit text-[10px]"></i>
+                                                        <span>Editar</span>
+                                                    </button>
+                                                    <button onclick="window.PortalComercio.eliminarVehiculo('${v.id}')" 
+                                                            class="px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 transition text-[11px] font-medium">
+                                                        <i class="fas fa-trash text-[10px]"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="text-xs font-semibold text-neutral-300">${v.marca} ${v.modelo} (${v.anio})</div>
-                                        <div class="text-[11px] text-emerald-400 font-mono">Estatus: ${v.estado || 'Al día'}</div>
-                                    </div>
-                                `).join('')}
+                                    `;
+                                }).join('')}
                             </div>
                         `}
                     </div>
@@ -3052,57 +3203,337 @@
             this.navegarModulo('inmuebles');
         },
 
-        // Modal para registrar Vehículo
+        // Modal para registrar / editar Vehículo con todos los inputs de Los Teques / SATGUAICA
         renderModalNuevoVehiculo: function() {
+            const anioActual = new Date().getFullYear();
+            const listaAnios = [];
+            for (let a = anioActual; a >= 1970; a--) {
+                listaAnios.push(a);
+            }
+
             return `
                 <div id="modal-nuevo-vehiculo" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
-                    <div class="bg-[#121214] border border-white/10 rounded-3xl w-full max-w-md shadow-2xl p-6 sm:p-8 space-y-4">
+                    <div class="bg-[#121214] border border-white/10 rounded-3xl w-full max-w-2xl shadow-2xl p-6 sm:p-8 space-y-5 max-h-[90vh] overflow-y-auto">
+                        <!-- Cabecera del Modal -->
                         <div class="flex items-center justify-between border-b border-white/5 pb-3">
-                            <h3 class="text-sm font-semibold text-white">Registrar Vehículo</h3>
-                            <button onclick="window.PortalComercio.cerrarModalVehiculo()" class="text-neutral-500 hover:text-white"><i class="fas fa-times"></i></button>
-                        </div>
-                        <div class="space-y-3 text-xs">
                             <div>
-                                <label class="text-[11px] text-neutral-400 block mb-1">Placa</label>
-                                <input type="text" id="veh-placa" placeholder="Ej: A12BC3D" class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none uppercase font-mono">
+                                <span id="veh-modal-subtitulo" class="text-[10px] font-mono text-emerald-400 uppercase tracking-widest block">Patente Automotriz Municipal</span>
+                                <h3 id="veh-modal-titulo" class="text-base font-bold text-white flex items-center gap-2">
+                                    <i class="fas fa-car text-emerald-400"></i>
+                                    <span>Registrar Vehículo</span>
+                                </h3>
                             </div>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label class="text-[11px] text-neutral-400 block mb-1">Marca</label>
-                                    <input type="text" id="veh-marca" placeholder="Ej: Chevrolet" class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none">
+                            <button onclick="window.PortalComercio.cerrarModalVehiculo()" class="text-neutral-500 hover:text-white p-2 rounded-xl hover:bg-white/5 transition">
+                                <i class="fas fa-times text-sm"></i>
+                            </button>
+                        </div>
+
+                        <!-- ID Oculto para Edición -->
+                        <input type="hidden" id="veh-id" value="">
+
+                        <!-- Formulario Organizado en Bloques -->
+                        <div class="space-y-4 text-xs">
+                            <!-- BLOQUE 1: Identificación y Marca -->
+                            <div class="p-4 rounded-2xl bg-white/[0.02] border border-white/5 space-y-3">
+                                <span class="text-[11px] font-bold text-neutral-300 uppercase tracking-wider block flex items-center gap-1.5">
+                                    <i class="fas fa-id-badge text-sky-400"></i>
+                                    1. Datos de Identificación y Marca
+                                </span>
+                                
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                    <div class="space-y-1">
+                                        <label class="text-[11px] text-neutral-400 block font-medium">Placa / Matrícula <span class="text-rose-400">*</span></label>
+                                        <input type="text" id="veh-placa" placeholder="Ej: AB123CD" maxlength="10"
+                                               oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9-]/g, '')"
+                                               class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3.5 py-2.5 outline-none font-mono font-bold uppercase focus:border-emerald-500 transition">
+                                        <span class="text-[10px] text-neutral-500 block">Formato nacional sin espacios</span>
+                                    </div>
+
+                                    <div class="space-y-1">
+                                        <label class="text-[11px] text-neutral-400 block font-medium">Tipo / Clase <span class="text-rose-400">*</span></label>
+                                        <select id="veh-tipo" class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none focus:border-emerald-500 transition cursor-pointer">
+                                            <option value="automovil">Automóvil (Sedán / Coupé / Hatchback)</option>
+                                            <option value="camioneta">Camioneta (Pick-Up / SUV / Rústico 4x4)</option>
+                                            <option value="moto">Motocicleta / Moto</option>
+                                            <option value="minibus">Minibús / Van / Pasajeros</option>
+                                            <option value="autobus">Autobús Colectivo Urbano</option>
+                                            <option value="camion_350">Camión 350 (Carga Liviana)</option>
+                                            <option value="camion_750">Camión 750 (Carga Pesada)</option>
+                                            <option value="gandola">Gandola / Chuto / Tractocamión</option>
+                                            <option value="volteo">Camión de Volteo</option>
+                                            <option value="remolque">Remolque / Batea / Plataforma</option>
+                                            <option value="maquinaria">Maquinaria Especial / Agrícola</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="space-y-1">
+                                        <label class="text-[11px] text-neutral-400 block font-medium">Marca <span class="text-rose-400">*</span></label>
+                                        <select id="veh-marca-select" onchange="window.PortalComercio.alCambiarMarcaVehiculo(this.value)" class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none focus:border-emerald-500 transition cursor-pointer">
+                                            <option value="Chevrolet">Chevrolet</option>
+                                            <option value="Ford">Ford</option>
+                                            <option value="Toyota">Toyota</option>
+                                            <option value="Fiat">Fiat</option>
+                                            <option value="Renault">Renault</option>
+                                            <option value="Hyundai">Hyundai</option>
+                                            <option value="Chery">Chery</option>
+                                            <option value="Mitsubishi">Mitsubishi</option>
+                                            <option value="Nissan">Nissan</option>
+                                            <option value="Jeep">Jeep</option>
+                                            <option value="Kia">Kia</option>
+                                            <option value="Volkswagen">Volkswagen</option>
+                                            <option value="Honda">Honda</option>
+                                            <option value="Mazda">Mazda</option>
+                                            <option value="Mack">Mack</option>
+                                            <option value="Iveco">Iveco</option>
+                                            <option value="Bera">Bera</option>
+                                            <option value="Empire Keeway">Empire Keeway</option>
+                                            <option value="Motos Toro">Motos Toro</option>
+                                            <option value="OTRA">Otra Marca...</option>
+                                        </select>
+                                        <input type="text" id="veh-marca-otra" placeholder="Especifique marca" class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2 outline-none mt-1 hidden focus:border-emerald-500">
+                                    </div>
                                 </div>
-                                <div>
-                                    <label class="text-[11px] text-neutral-400 block mb-1">Modelo</label>
-                                    <input type="text" id="veh-modelo" placeholder="Ej: Silverado" class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none">
+
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                                    <div class="space-y-1">
+                                        <label class="text-[11px] text-neutral-400 block font-medium">Modelo <span class="text-rose-400">*</span></label>
+                                        <input type="text" id="veh-modelo" placeholder="Ej: Silverado / Hilux / Aveo" 
+                                               class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none focus:border-emerald-500 transition">
+                                    </div>
+
+                                    <div class="space-y-1">
+                                        <label class="text-[11px] text-neutral-400 block font-medium">Año de Fabricación</label>
+                                        <select id="veh-anio" class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none font-mono focus:border-emerald-500 transition cursor-pointer">
+                                            ${listaAnios.map(a => `<option value="${a}">${a}</option>`).join('')}
+                                        </select>
+                                    </div>
+
+                                    <div class="space-y-1">
+                                        <label class="text-[11px] text-neutral-400 block font-medium">Color</label>
+                                        <select id="veh-color" class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none focus:border-emerald-500 transition cursor-pointer">
+                                            <option value="Blanco">Blanco</option>
+                                            <option value="Negro">Negro</option>
+                                            <option value="Gris">Gris / Plata</option>
+                                            <option value="Azul">Azul</option>
+                                            <option value="Rojo">Rojo</option>
+                                            <option value="Verde">Verde</option>
+                                            <option value="Beige">Beige / Arena</option>
+                                            <option value="Dorado">Dorado</option>
+                                            <option value="Marrón">Marrón</option>
+                                            <option value="Amarillo">Amarillo</option>
+                                            <option value="Naranja">Naranja</option>
+                                            <option value="Vinotinto">Vinotinto</option>
+                                            <option value="Multicolor">Multicolor / Otro</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label class="text-[11px] text-neutral-400 block mb-1">Año</label>
-                                    <input type="number" id="veh-anio" value="2022" class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none font-mono">
+
+                            <!-- BLOQUE 2: Uso y Destino Fiscal -->
+                            <div class="p-4 rounded-2xl bg-white/[0.02] border border-white/5 space-y-3">
+                                <span class="text-[11px] font-bold text-neutral-300 uppercase tracking-wider block flex items-center gap-1.5">
+                                    <i class="fas fa-route text-emerald-400"></i>
+                                    2. Uso y Destino Operativo (Ordenanza Municipal)
+                                </span>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div class="space-y-1">
+                                        <label class="text-[11px] text-neutral-400 block font-medium">Uso / Servicio Autorizado</label>
+                                        <select id="veh-uso" class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none focus:border-emerald-500 transition cursor-pointer">
+                                            <option value="particular">Particular / Privado</option>
+                                            <option value="carga">Carga Comercial / Reparto y Distribución</option>
+                                            <option value="transporte_publico">Transporte Público de Pasajeros</option>
+                                            <option value="transporte_escolar">Transporte Escolar / Turístico</option>
+                                            <option value="mototaxi">Mototaxi / Reparto Domiciliario</option>
+                                            <option value="oficial">Institucional / Oficial</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="space-y-1">
+                                        <label class="text-[11px] text-neutral-400 block font-medium">Estado del Vehículo</label>
+                                        <select id="veh-estado" class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none focus:border-emerald-500 transition cursor-pointer">
+                                            <option value="activo">Activo / En Circulación</option>
+                                            <option value="en_tramite">En Trámite de Registro</option>
+                                            <option value="desincorporado">Desincorporado / Fuera de Servicio</option>
+                                        </select>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label class="text-[11px] text-neutral-400 block mb-1">Uso</label>
-                                    <select id="veh-uso" class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none">
-                                        <option value="Carga">Carga / Reparto</option>
-                                        <option value="Comercial">Comercial</option>
-                                        <option value="Particular">Particular</option>
-                                    </select>
+                            </div>
+
+                            <!-- BLOQUE 3: Datos Técnicos y Seriales INTT -->
+                            <div class="p-4 rounded-2xl bg-white/[0.02] border border-white/5 space-y-3">
+                                <span class="text-[11px] font-bold text-neutral-300 uppercase tracking-wider block flex items-center gap-1.5">
+                                    <i class="fas fa-cogs text-purple-400"></i>
+                                    3. Seriales y Ficha Técnica Oficial (INTT)
+                                </span>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div class="space-y-1">
+                                        <label class="text-[11px] text-neutral-400 block font-medium">Serial de Carrocería / NIV / VIN</label>
+                                        <input type="text" id="veh-serial-carroceria" placeholder="Ej: 8A1BC123456789012"
+                                               oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9-]/g, '')"
+                                               class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none font-mono font-medium focus:border-purple-500 transition">
+                                    </div>
+
+                                    <div class="space-y-1">
+                                        <label class="text-[11px] text-neutral-400 block font-medium">Serial de Motor</label>
+                                        <input type="text" id="veh-serial-motor" placeholder="Ej: 4G63-123456"
+                                               oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9-]/g, '')"
+                                               class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none font-mono font-medium focus:border-purple-500 transition">
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
+                                    <div class="space-y-1">
+                                        <label class="text-[11px] text-neutral-400 block font-medium">Puestos</label>
+                                        <input type="number" id="veh-puestos" min="1" max="90" value="5"
+                                               class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none font-mono focus:border-purple-500">
+                                    </div>
+
+                                    <div class="space-y-1">
+                                        <label class="text-[11px] text-neutral-400 block font-medium">Capacidad Carga (Ton)</label>
+                                        <input type="number" id="veh-carga" min="0" step="0.01" value="0.00"
+                                               class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none font-mono focus:border-purple-500">
+                                    </div>
+
+                                    <div class="space-y-1">
+                                        <label class="text-[11px] text-neutral-400 block font-medium">N° de Ejes</label>
+                                        <select id="veh-ejes" class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none font-mono focus:border-purple-500">
+                                            <option value="2">2 Ejes</option>
+                                            <option value="3">3 Ejes</option>
+                                            <option value="4">4 Ejes</option>
+                                            <option value="5">5 o más Ejes</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="space-y-1">
+                                        <label class="text-[11px] text-neutral-400 block font-medium">N° Título INTT</label>
+                                        <input type="text" id="veh-titulo" placeholder="Ej: 12345678"
+                                               class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none font-mono focus:border-purple-500">
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="flex justify-end gap-2 pt-2 border-t border-white/5">
-                            <button onclick="window.PortalComercio.cerrarModalVehiculo()" class="px-4 py-2 text-xs text-neutral-400">Cancelar</button>
-                            <button onclick="window.PortalComercio.guardarVehiculo()" class="bg-white text-black text-xs font-semibold rounded-full px-5 py-2">Guardar</button>
+
+                        <!-- Pie y Botones -->
+                        <div class="flex items-center justify-end gap-3 pt-3 border-t border-white/5">
+                            <button onclick="window.PortalComercio.cerrarModalVehiculo()" 
+                                    class="px-5 py-2.5 text-xs text-neutral-400 hover:text-white rounded-xl hover:bg-white/5 transition font-medium">
+                                Cancelar
+                            </button>
+                            <button onclick="window.PortalComercio.guardarVehiculo()" 
+                                    class="bg-white hover:bg-neutral-200 text-black text-xs font-semibold rounded-full px-7 py-2.5 transition shadow-lg flex items-center gap-2">
+                                <i class="fas fa-save text-xs"></i>
+                                <span id="veh-btn-guardar-label">Guardar Vehículo</span>
+                            </button>
                         </div>
                     </div>
                 </div>
             `;
         },
 
-        abrirModalVehiculo: function() {
+        alCambiarMarcaVehiculo: function(val) {
+            const inputOtra = document.getElementById('veh-marca-otra');
+            if (inputOtra) {
+                if (val === 'OTRA') {
+                    inputOtra.classList.remove('hidden');
+                    inputOtra.focus();
+                } else {
+                    inputOtra.classList.add('hidden');
+                    inputOtra.value = '';
+                }
+            }
+        },
+
+        abrirModalVehiculo: function(vehiculoId = null) {
             const m = document.getElementById('modal-nuevo-vehiculo');
-            if (m) m.classList.remove('hidden');
+            if (!m) return;
+
+            const inputId = document.getElementById('veh-id');
+            const inputPlaca = document.getElementById('veh-placa');
+            const selectTipo = document.getElementById('veh-tipo');
+            const selectMarca = document.getElementById('veh-marca-select');
+            const inputMarcaOtra = document.getElementById('veh-marca-otra');
+            const inputModelo = document.getElementById('veh-modelo');
+            const selectAnio = document.getElementById('veh-anio');
+            const selectColor = document.getElementById('veh-color');
+            const selectUso = document.getElementById('veh-uso');
+            const selectEstado = document.getElementById('veh-estado');
+            const inputCarroceria = document.getElementById('veh-serial-carroceria');
+            const inputMotor = document.getElementById('veh-serial-motor');
+            const inputPuestos = document.getElementById('veh-puestos');
+            const inputCarga = document.getElementById('veh-carga');
+            const selectEjes = document.getElementById('veh-ejes');
+            const inputTitulo = document.getElementById('veh-titulo');
+            const tituloEl = document.getElementById('veh-modal-titulo');
+            const btnLabel = document.getElementById('veh-btn-guardar-label');
+
+            if (vehiculoId) {
+                const store = global.HaciendaStore;
+                const vehiculos = store ? (store.get('hacienda_vehiculos') || []) : [];
+                const v = vehiculos.find(item => String(item.id) === String(vehiculoId));
+
+                if (v) {
+                    if (inputId) inputId.value = v.id;
+                    if (inputPlaca) inputPlaca.value = v.placa || '';
+                    if (selectTipo) selectTipo.value = v.tipo || 'automovil';
+
+                    const marcasComunes = new Set(['Chevrolet', 'Ford', 'Toyota', 'Fiat', 'Renault', 'Hyundai', 'Chery', 'Mitsubishi', 'Nissan', 'Jeep', 'Kia', 'Volkswagen', 'Honda', 'Mazda', 'Mack', 'Iveco', 'Bera', 'Empire Keeway', 'Motos Toro']);
+                    if (marcasComunes.has(v.marca)) {
+                        if (selectMarca) selectMarca.value = v.marca;
+                        if (inputMarcaOtra) {
+                            inputMarcaOtra.classList.add('hidden');
+                            inputMarcaOtra.value = '';
+                        }
+                    } else if (v.marca) {
+                        if (selectMarca) selectMarca.value = 'OTRA';
+                        if (inputMarcaOtra) {
+                            inputMarcaOtra.classList.remove('hidden');
+                            inputMarcaOtra.value = v.marca;
+                        }
+                    }
+
+                    if (inputModelo) inputModelo.value = v.modelo || '';
+                    if (selectAnio) selectAnio.value = String(v.anio || new Date().getFullYear());
+                    if (selectColor) selectColor.value = v.color || 'Blanco';
+                    if (selectUso) selectUso.value = v.uso || 'particular';
+                    if (selectEstado) selectEstado.value = v.estado || 'activo';
+                    if (inputCarroceria) inputCarroceria.value = v.serial_carroceria || '';
+                    if (inputMotor) inputMotor.value = v.serial_motor || '';
+                    if (inputPuestos) inputPuestos.value = v.capacidad_puestos || 5;
+                    if (inputCarga) inputCarga.value = Number(v.capacidad_carga || 0).toFixed(2);
+                    if (selectEjes) selectEjes.value = String(v.numero_ejes || 2);
+                    if (inputTitulo) inputTitulo.value = v.numero_titulo || '';
+
+                    if (tituloEl) tituloEl.innerHTML = `<i class="fas fa-edit text-emerald-400"></i><span>Editar Vehículo (${v.placa})</span>`;
+                    if (btnLabel) btnLabel.innerText = 'Actualizar Vehículo';
+                }
+            } else {
+                if (inputId) inputId.value = '';
+                if (inputPlaca) inputPlaca.value = '';
+                if (selectTipo) selectTipo.value = 'automovil';
+                if (selectMarca) selectMarca.value = 'Chevrolet';
+                if (inputMarcaOtra) {
+                    inputMarcaOtra.classList.add('hidden');
+                    inputMarcaOtra.value = '';
+                }
+                if (inputModelo) inputModelo.value = '';
+                if (selectAnio) selectAnio.value = String(new Date().getFullYear());
+                if (selectColor) selectColor.value = 'Blanco';
+                if (selectUso) selectUso.value = 'particular';
+                if (selectEstado) selectEstado.value = 'activo';
+                if (inputCarroceria) inputCarroceria.value = '';
+                if (inputMotor) inputMotor.value = '';
+                if (inputPuestos) inputPuestos.value = '5';
+                if (inputCarga) inputCarga.value = '0.00';
+                if (selectEjes) selectEjes.value = '2';
+                if (inputTitulo) inputTitulo.value = '';
+
+                if (tituloEl) tituloEl.innerHTML = `<i class="fas fa-car text-emerald-400"></i><span>Registrar Vehículo</span>`;
+                if (btnLabel) btnLabel.innerText = 'Guardar Vehículo';
+            }
+
+            m.classList.remove('hidden');
         },
 
         cerrarModalVehiculo: function() {
@@ -3114,31 +3545,136 @@
             const store = global.HaciendaStore;
             if (!store || !activeContribuyente) return;
 
-            const placa = document.getElementById('veh-placa').value.trim().toUpperCase();
-            const marca = document.getElementById('veh-marca').value.trim();
-            const modelo = document.getElementById('veh-modelo').value.trim();
-            const anio = parseInt(document.getElementById('veh-anio').value, 10);
-            const uso = document.getElementById('veh-uso').value;
+            const idExistente = document.getElementById('veh-id')?.value;
+            const placa = document.getElementById('veh-placa')?.value.trim().toUpperCase() || '';
+            const selectMarca = document.getElementById('veh-marca-select')?.value || 'Chevrolet';
+            const marcaOtra = document.getElementById('veh-marca-otra')?.value.trim() || '';
+            const marcaFinal = selectMarca === 'OTRA' ? (marcaOtra || 'Otra Marca') : selectMarca;
+            const modelo = document.getElementById('veh-modelo')?.value.trim() || '';
+            const tipo = document.getElementById('veh-tipo')?.value || 'automovil';
+            const anio = parseInt(document.getElementById('veh-anio')?.value || new Date().getFullYear(), 10);
+            const color = document.getElementById('veh-color')?.value || 'Blanco';
+            const uso = document.getElementById('veh-uso')?.value || 'particular';
+            const estado = document.getElementById('veh-estado')?.value || 'activo';
+            const serialCarroceria = document.getElementById('veh-serial-carroceria')?.value.trim().toUpperCase() || '';
+            const serialMotor = document.getElementById('veh-serial-motor')?.value.trim().toUpperCase() || '';
+            const puestos = parseInt(document.getElementById('veh-puestos')?.value || 5, 10);
+            const carga = parseFloat(document.getElementById('veh-carga')?.value || 0);
+            const ejes = parseInt(document.getElementById('veh-ejes')?.value || 2, 10);
+            const titulo = document.getElementById('veh-titulo')?.value.trim().toUpperCase() || '';
 
-            if (!placa || !marca) {
-                if (typeof Swal !== 'undefined') Swal.fire({ icon: 'warning', title: 'Datos requeridos', text: 'Indica placa y marca.', confirmButtonColor: '#000000' });
+            if (!placa || placa.length < 4) {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Placa requerida',
+                        text: 'Ingrese una placa o matrícula válida (ej: AB123CD o 7A1B2C3).',
+                        confirmButtonColor: '#000000'
+                    });
+                }
                 return;
             }
 
-            const nuevoVehiculo = {
-                id: Date.now(),
+            if (!modelo) {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Modelo requerido',
+                        text: 'Ingrese el modelo del vehículo (ej: Silverado, Hilux, Aveo).',
+                        confirmButtonColor: '#000000'
+                    });
+                }
+                return;
+            }
+
+            const vehiculos = store.get('hacienda_vehiculos') || [];
+            const anterior = idExistente ? vehiculos.find(v => String(v.id) === String(idExistente)) : null;
+
+            // Validar que la placa no esté repetida en otro vehículo distinto
+            const placaDuplicada = vehiculos.find(v => String(v.placa).toUpperCase() === placa && String(v.id) !== String(idExistente));
+            if (placaDuplicada) {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Placa ya registrada',
+                        text: `La placa ${placa} ya se encuentra registrada en el padrón municipal.`,
+                        confirmButtonColor: '#000000'
+                    });
+                }
+                return;
+            }
+
+            const idFinal = idExistente || ('veh_' + Date.now());
+
+            const vehiculoObj = {
+                id: idFinal,
                 contribuyente_id: activeContribuyente.id,
                 placa: placa,
-                marca: marca,
+                tipo: tipo,
+                marca: marcaFinal,
                 modelo: modelo,
                 anio: anio,
+                color: color,
                 uso: uso,
-                estado: 'activo'
+                serial_carroceria: serialCarroceria,
+                serial_motor: serialMotor,
+                capacidad_puestos: puestos,
+                capacidad_carga: carga,
+                numero_ejes: ejes,
+                numero_titulo: titulo,
+                estado: estado,
+                created_at: anterior ? (anterior.created_at || new Date().toISOString()) : new Date().toISOString(),
+                updated_at: new Date().toISOString()
             };
 
-            await store.set('hacienda_vehiculos', nuevoVehiculo);
+            await store.set('hacienda_vehiculos', vehiculoObj);
             this.cerrarModalVehiculo();
             this.navegarModulo('vehiculos');
+
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'success',
+                    title: idExistente ? 'Vehículo Actualizado' : 'Vehículo Registrado',
+                    text: `El vehículo con placa ${placa} (${marcaFinal} ${modelo}) ha sido guardado exitosamente.`,
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }
+        },
+
+        eliminarVehiculo: async function(vehiculoId) {
+            const store = global.HaciendaStore;
+            if (!store || !vehiculoId) return;
+
+            const vehiculos = store.get('hacienda_vehiculos') || [];
+            const v = vehiculos.find(item => String(item.id) === String(vehiculoId));
+            if (!v) return;
+
+            const confirmar = typeof Swal !== 'undefined' ? await Swal.fire({
+                title: '¿Desincorporar Vehículo?',
+                text: `¿Desea desincorporar la placa ${v.placa} (${v.marca} ${v.modelo}) de su cuenta tributaria?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#e11d48',
+                cancelButtonColor: '#27272a',
+                confirmButtonText: 'Sí, desincorporar',
+                cancelButtonText: 'Cancelar'
+            }) : { isConfirmed: confirm(`¿Eliminar vehículo ${v.placa}?`) };
+
+            if (confirmar.isConfirmed) {
+                await store.remove('hacienda_vehiculos', vehiculoId);
+                this.navegarModulo('vehiculos');
+
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Vehículo Desincorporado',
+                        text: `La placa ${v.placa} ha sido retirada de su padrón vehicular.`,
+                        timer: 1800,
+                        showConfirmButton: false
+                    });
+                }
+            }
         },
 
         // Modal para registrar Publicidad

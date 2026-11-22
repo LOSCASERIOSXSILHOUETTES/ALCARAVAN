@@ -84,7 +84,7 @@
             'id', 'contribuyente_id', 'numero_catastro', 'direccion', 'uso', 'valor_fiscal_bs', 'estado', 'created_at', 'updated_at'
         ],
         'hacienda_vehiculos': [
-            'id', 'contribuyente_id', 'placa', 'marca', 'modelo', 'anio', 'uso', 'estado', 'created_at', 'updated_at'
+            'id', 'contribuyente_id', 'placa', 'tipo', 'marca', 'modelo', 'anio', 'color', 'uso', 'serial_carroceria', 'serial_motor', 'capacidad_puestos', 'capacidad_carga', 'numero_ejes', 'numero_titulo', 'estado', 'created_at', 'updated_at'
         ],
         'hacienda_publicidad': [
             'id', 'contribuyente_id', 'tipo', 'ubicacion', 'metros_cuadrados', 'texto_aviso', 'estado', 'created_at', 'updated_at'
