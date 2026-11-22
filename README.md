@@ -140,6 +140,13 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.9.9 — 22/11/2026
+- **Manejo Estricto de Estado Sin Patente en Portal del Contribuyente y Bloqueo de Autoliquidación Huérfana:**
+  - **Eliminación de Ramo por Defecto Arbitrario:** Se erradicó la asignación ficticia de `COM-001 Venta al por menor de víveres` y el badge "Ramo Aprobado por Alcaldía" cuando una empresa registrada en el padrón carece de una Patente de Industria y Comercio formalmente expedida por la Dirección de Administración Tributaria.
+  - **Tarjeta Informativa Institucional para Empresas sin Licencia:** Cuando un contribuyente registrado en el padrón no posee patentes activas, el módulo de autoliquidación despliega un banner informativo elegante en tonos ámbar explicando claramente que su registro en el padrón está activo pero pendiente por la asignación de su ramo oficial LOCAT tras la evaluación del Acta Constitutiva por parte de Rentas Municipales.
+  - **Candado Fiscal Anti-Creación Huérfana (`presentarDeclaracion`):** Se neutralizó la auto-generación de patentes temporales en cliente (`PAT-2026-XXXX`). Si el contribuyente no tiene licencia aprobada por la taquilla municipal, la presentación de la declaración se bloquea con advertencia formal, salvaguardando la exactitud y legalidad de la recaudación tributaria.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.9.9` con 330 pruebas automatizadas en verde.
+
 ### Version 3.9.8 — 22/11/2026
 - **Selector Inteligente de Contribuyentes con Cards, Live Search y Paginación:**
   - **Componente Reutilizable `SelectorContribuyenteModal`:** Sustitución de los `<select>` estáticos con sobrecarga de DOM en el ERP por un modal interactivo con grid de tarjetas (cards) y paginación en bloques de 8 registros a 0ms, eliminando la congelación del navegador ante padrones de 15.000+ registros.

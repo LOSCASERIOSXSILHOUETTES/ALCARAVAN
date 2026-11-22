@@ -1175,14 +1175,63 @@
 
         renderContenidoEmpresa: function(tab, c, patenteActiva, alicuota, minimoTcmmv, minimoBs, declaraciones, declaracionesPendientes, totalDeudaBs, esSolvente, pagos, cuentas) {
             const catalogo = global.CatalogoLocat ? global.CatalogoLocat.getAll() : [];
-            const codPatente = patenteActiva ? (patenteActiva.codigo_locat || '') : '';
-            const actividadSeleccionada = catalogo.find(item => item.codigo === codPatente) || catalogo[0] || { codigo: 'COM-001', alicuota: 0.01, minimo_tcmmv: 0.30 };
-            const aliActual = patenteActiva ? Number(patenteActiva.alicuota || actividadSeleccionada.alicuota) : actividadSeleccionada.alicuota;
-            const minTcmmvActual = patenteActiva ? Number(patenteActiva.minimo_tributable_tcmmv || patenteActiva.minimo_tcmmv || actividadSeleccionada.minimo_tcmmv) : actividadSeleccionada.minimo_tcmmv;
+            const misPatentes = (global.HaciendaStore ? global.HaciendaStore.get('hacienda_patentes') : [])
+                .filter(p => String(p.contribuyente_id) === String(c.id) && p.estado !== 'anulada' && p.estado !== 'suspendida');
+            const pOficial = misPatentes[0] || patenteActiva;
+            const tienePatente = misPatentes.length > 0 || (!!pOficial && !!pOficial.codigo_locat);
+
+            const codPatente = pOficial ? (pOficial.codigo_locat || '') : '';
+            const actividadSeleccionada = catalogo.find(item => item.codigo === codPatente) || (pOficial ? { codigo: pOficial.codigo_locat, alicuota: pOficial.alicuota, minimo_tcmmv: pOficial.minimo_tributable_tcmmv || 0.30, nombre: pOficial.descripcion_actividad } : null);
+            const aliActual = pOficial ? Number(pOficial.alicuota || (actividadSeleccionada?.alicuota ?? 0.01)) : 0.01;
+            const minTcmmvActual = pOficial ? Number(pOficial.minimo_tributable_tcmmv || pOficial.minimo_tcmmv || (actividadSeleccionada?.minimo_tcmmv ?? 0.30)) : 0.30;
             const tasaActual = getTasaMMAV();
             const minBsActual = minTcmmvActual * tasaActual;
 
             if (tab === 'declarar') {
+                if (!tienePatente) {
+                    return `
+                        <div class="p-8 sm:p-10 rounded-3xl bg-[#121214] border border-amber-500/20 shadow-2xl space-y-6">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0 text-amber-400">
+                                    <i class="fas fa-file-signature text-xl"></i>
+                                </div>
+                                <div class="space-y-1.5 flex-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs font-semibold uppercase tracking-wider text-amber-400 font-mono">Padrón Municipal</span>
+                                        <span class="text-[11px] font-medium text-neutral-400 bg-white/5 border border-white/10 px-2.5 py-0.5 rounded-full">Sin Licencia Comercial</span>
+                                    </div>
+                                    <h3 class="text-lg font-bold text-white">Comercio Registrado — Pendiente Asignación de Patente</h3>
+                                    <p class="text-xs text-neutral-300 leading-relaxed">
+                                        El contribuyente <strong class="text-white">${c.razon_social || c.nombre}</strong> (RIF: <strong class="text-white font-mono">${c.rif}</strong>) se encuentra válidamente registrado en el Padrón Municipal de Contribuyentes, pero aún no tiene emitida una <strong>Licencia de Actividades Económicas (Patente LOCAT)</strong> por parte de la Dirección de Administración Tributaria.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="p-5 rounded-2xl bg-white/[0.03] border border-white/5 space-y-3">
+                                <h4 class="text-xs font-semibold text-neutral-200 uppercase tracking-wider flex items-center gap-2">
+                                    <i class="fas fa-info-circle text-sky-400 text-xs"></i>
+                                    ¿Por qué no puede autoliquidar todavía?
+                                </h4>
+                                <ul class="text-xs text-neutral-400 space-y-2 list-disc list-inside leading-relaxed">
+                                    <li>La Administración Tributaria Municipal debe evaluar su Acta Constitutiva u objeto social para formalizar la asignación del código o ramo oficial del clasificador LOCAT (Gaceta Oficial).</li>
+                                    <li>Una vez emitida su Licencia Comercial en taquilla o sistema administrativo, este módulo se habilitará automáticamente con la alícuota y mínimo tributable oficial para sus autoliquidaciones mensuales a 0ms.</li>
+                                </ul>
+                            </div>
+
+                            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2 border-t border-white/5">
+                                <div class="text-[11px] text-neutral-500 font-mono">
+                                    Estado de Licencia: <span class="text-amber-400 font-bold">NO ASIGNADA / EN PROCESO</span>
+                                </div>
+                                <button onclick="window.PortalComercio.navegarModulo('grid')" 
+                                        class="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white text-xs font-semibold rounded-full px-6 py-2.5 transition flex items-center justify-center gap-2">
+                                    <i class="fas fa-arrow-left text-xs"></i>
+                                    <span>Volver a la Suite</span>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+
                 return `
                     <div class="p-8 sm:p-10 rounded-3xl bg-[#121214] border border-white/[0.08] shadow-2xl space-y-8">
                         <div class="space-y-1">
@@ -1194,12 +1243,9 @@
 
                         <!-- Actividad Económica Oficial Bloqueada por Licencia -->
                         ${(function() {
-                            const misPatentes = (global.HaciendaStore ? global.HaciendaStore.get('hacienda_patentes') : [])
-                                .filter(p => String(p.contribuyente_id) === String(c.id) && p.estado !== 'anulada' && p.estado !== 'suspendida');
-                            const pOficial = misPatentes[0] || patenteActiva;
-                            const descOficial = pOficial?.descripcion_actividad || actividadSeleccionada.nombre;
-                            const codOficial = pOficial?.codigo_locat || actividadSeleccionada.codigo;
-                            const numPatenteOficial = pOficial?.numero_patente || 'EN TRÁMITE';
+                            const descOficial = pOficial?.descripcion_actividad || actividadSeleccionada?.nombre || 'Actividad Comercial';
+                            const codOficial = pOficial?.codigo_locat || actividadSeleccionada?.codigo || 'COM-001';
+                            const numPatenteOficial = pOficial?.numero_patente || 'VIGENTE';
 
                             if (misPatentes.length > 1) {
                                 return `
@@ -2230,22 +2276,18 @@
                 return;
             }
 
-            const patentes = (store.get('hacienda_patentes') || []).filter(p => String(p.contribuyente_id) === String(activeContribuyente.id));
+            const patentes = (store.get('hacienda_patentes') || []).filter(p => String(p.contribuyente_id) === String(activeContribuyente.id) && p.estado !== 'anulada' && p.estado !== 'suspendida');
             let p = (patenteIdFromSelect ? patentes.find(pat => String(pat.id) === String(patenteIdFromSelect)) : null) || patentes[0] || null;
             if (!p) {
-                p = {
-                    id: Date.now(),
-                    contribuyente_id: activeContribuyente.id,
-                    numero_patente: 'PAT-' + anio + '-' + String(Date.now()).slice(-4),
-                    tipo: 'comercial',
-                    codigo_locat: codigoLocat,
-                    descripcion_actividad: descActividad,
-                    alicuota: alicuota,
-                    minimo_tributable_tcmmv: minTcmmv,
-                    estado: 'activa',
-                    fecha_emision: new Date().toISOString().split('T')[0]
-                };
-                await store.set('hacienda_patentes', p);
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Sin Licencia Comercial',
+                        text: 'Su comercio no tiene una Patente de Actividades Económicas emitida por la Alcaldía. Comuníquese con la Dirección de Administración Tributaria para formalizar la asignación de su ramo LOCAT.',
+                        confirmButtonColor: '#000000'
+                    });
+                }
+                return;
             }
 
             const nuevaDeclaracion = {
