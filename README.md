@@ -140,6 +140,13 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.9.1 — 22/11/2026
+- **Blanqueo de Contraseña a Estado "Primer Ingreso" para Autogestión del Contribuyente:**
+  - **Función de Blanqueo (`blanquearClaveContribuyente`):** Permite a los administradores borrar la contraseña asignada de un comercio para regresarlo al estado de Primer Ingreso.
+  - **Disparador en Modal de Clave y Modal de Edición:** Disponible tanto desde el diálogo de "Clave" como dentro de la ventana de modificación de datos del contribuyente.
+  - **Experiencia de Usuario en Portal:** Cuando el comerciante ingresa al portal público (`index.html`) tras el blanqueo, el sistema detecta la ausencia de clave y activa automáticamente el flujo de **Primer Ingreso**, solicitándole validar la Cédula del Representante Legal registrada y establecer su propia contraseña personalmente.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.9.1` con 312 pruebas automatizadas en verde.
+
 ### Version 3.9.0 — 22/11/2026
 - **Edicion Integral de Contribuyentes Protegida por Matriz ACL (`contribuyentes_editar`):**
   - **Boton de Accion "Editar" en Padrón RUC:** Integrado en la columna de acciones de cada comercio para funcionarios con permisos correspondientes.

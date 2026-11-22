@@ -262,6 +262,17 @@
                                     <input type="file" id="edit-c-foto" accept="image/*" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-slate-300 text-xs file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-sky-600 file:text-white hover:file:bg-sky-500">
                                 </div>
                             </div>
+                            <!-- Estado y Reset de Clave de Acceso -->
+                            <div class="p-3 bg-slate-950 border border-slate-800 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-300">Acceso al Portal del Contribuyente</label>
+                                    <div id="edit-c-clave-status" class="text-[11px] text-slate-400 mt-0.5">Verificando estado de clave...</div>
+                                </div>
+                                <button type="button" onclick="window.ContribuyentesModule.blanquearClaveContribuyente(document.getElementById('edit-c-id').value); window.ContribuyentesModule.cerrarModalEditar();" 
+                                        class="px-3 py-1.5 bg-rose-500/15 hover:bg-rose-500/30 text-rose-400 border border-rose-500/30 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 self-start sm:self-auto">
+                                    <i class="fas fa-undo"></i> Blanquear a Primer Ingreso
+                                </button>
+                            </div>
                             <div class="pt-4 flex justify-end gap-3 border-t border-slate-800">
                                 <button type="button" onclick="window.ContribuyentesModule.cerrarModalEditar()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl">Cancelar</button>
                                 <button type="submit" id="btn-actualizar-contribuyente" class="px-5 py-2 bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs rounded-xl shadow-lg">Guardar Cambios</button>
@@ -500,6 +511,20 @@
                         <div class="text-[11px] text-slate-400 italic">
                             Nota: Esta clave le permitirá al comercio iniciar sesión en el portal municipal para autoliquidar patentes y emitir solvencias.
                         </div>
+
+                        ${c.clave ? `
+                            <div class="pt-2.5 border-t border-slate-800 flex items-center justify-between gap-2">
+                                <span class="text-slate-400 text-[11px]">¿Prefiere que el comerciante la cree él mismo?</span>
+                                <button type="button" onclick="Swal.close(); window.ContribuyentesModule.blanquearClaveContribuyente('${c.id}')" 
+                                        class="px-2.5 py-1 bg-rose-500/15 hover:bg-rose-500/30 text-rose-400 border border-rose-500/30 rounded-lg text-[11px] font-semibold transition flex items-center gap-1">
+                                    <i class="fas fa-undo"></i> Blanquear a Primer Ingreso
+                                </button>
+                            </div>
+                        ` : `
+                            <div class="p-2.5 bg-amber-500/10 border border-amber-500/20 rounded-xl text-[11px] text-amber-300">
+                                <i class="fas fa-info-circle mr-1"></i> Este comercio no tiene clave. Si no le asigna una aquí, el propio contribuyente la creará al ingresar al portal validando su cédula.
+                            </div>
+                        `}
                     </div>
                 `,
                 focusConfirm: false,
@@ -551,6 +576,54 @@
             }
         },
 
+        blanquearClaveContribuyente: async function(id) {
+            const store = global.HaciendaStore;
+            if (!store) return;
+            const contribuyentes = store.get('hacienda_contribuyentes') || [];
+            const c = contribuyentes.find(item => String(item.id) === String(id));
+            if (!c) return;
+
+            if (typeof Swal !== 'undefined') {
+                const result = await Swal.fire({
+                    title: '¿Blanquear Contraseña?',
+                    html: `
+                        <div class="text-left text-xs space-y-2 text-slate-300">
+                            <p>Se borrará la clave de acceso de <strong>${c.razon_social}</strong> (${c.rif}).</p>
+                            <div class="p-3 bg-amber-500/10 border border-amber-500/25 rounded-xl text-amber-300 leading-relaxed">
+                                El comercio quedará en estado de <strong>Primer Ingreso</strong>. Cuando el contribuyente intente ingresar al portal público, el sistema le solicitará validar la Cédula del Representante Legal y establecer su propia contraseña personalmente.
+                            </div>
+                        </div>
+                    `,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, Blanquear Clave',
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonColor: '#e11d48',
+                    cancelButtonColor: '#475569'
+                });
+
+                if (!result.isConfirmed) return;
+            } else {
+                if (!confirm(`¿Desea blanquear la clave de ${c.razon_social} para que el comerciante la cree en su primer ingreso?`)) return;
+            }
+
+            c.clave = null;
+            c.updated_at = new Date().toISOString();
+            await store.set('hacienda_contribuyentes', c);
+
+            this.filtrarTabla();
+
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Clave Blanqueada',
+                    text: `La contraseña ha sido eliminada con éxito. El comercio creará su clave al acceder al portal.`,
+                    confirmButtonColor: '#0284c7',
+                    timer: 2200
+                });
+            }
+        },
+
         abrirModalEditar: function(id) {
             if (global.HaciendaAuth && !global.HaciendaAuth.hasPermission('contribuyentes_editar')) {
                 if (typeof Swal !== 'undefined') {
@@ -593,6 +666,13 @@
             document.getElementById('edit-c-rep-cedula-numero').value = parsedCed.numero || '';
 
             document.getElementById('edit-c-estado').value = c.estado || 'activo';
+
+            const elStatus = document.getElementById('edit-c-clave-status');
+            if (elStatus) {
+                elStatus.innerHTML = c.clave 
+                    ? '<span class="text-emerald-400 font-semibold"><i class="fas fa-check-circle"></i> Clave configurada activa</span>' 
+                    : '<span class="text-amber-400 font-semibold"><i class="fas fa-exclamation-circle"></i> Sin clave (Pendiente de primer ingreso)</span>';
+            }
 
             document.getElementById('modal-editar-contribuyente')?.classList.remove('hidden');
         },
