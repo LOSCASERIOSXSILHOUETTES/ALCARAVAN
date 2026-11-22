@@ -330,6 +330,20 @@ html.sgb-light input[type="date"] {
     color-scheme: light !important;
 }
 
+html.sgb-light select {
+    color-scheme: light !important;
+}
+
+html.sgb-light select option,
+html.sgb-light select optgroup,
+select option,
+select optgroup {
+    background-color: #FFFFFF !important;
+    color: #0F172A !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+}
+
 /* Selector Reactivo de Ente en Header de Ingresos */
 html.sgb-light #ingresos-ente-selector {
     color: #0F172A !important;

@@ -812,20 +812,27 @@
                         <!-- Campo RIF -->
                         <div id="pc-box-rif" class="space-y-1 ${loginModo === 'rif' ? '' : 'hidden'}">
                             <label class="block text-xs font-medium text-slate-700">RIF o Cédula</label>
-                            <div class="flex items-center border border-slate-200 rounded-xl bg-white focus-within:border-slate-400 transition overflow-hidden">
-                                <select id="pc-rif-tipo" class="bg-transparent text-slate-800 font-medium text-sm px-3 py-2.5 outline-none cursor-pointer border-r border-slate-200">
-                                    <option value="J">J</option>
-                                    <option value="V">V</option>
-                                    <option value="G">G</option>
-                                    <option value="E">E</option>
-                                    <option value="C">C</option>
-                                    <option value="P">P</option>
-                                </select>
+                            <div class="flex items-center border border-slate-200 rounded-xl bg-white focus-within:border-slate-400 transition">
+                                <div class="relative shrink-0">
+                                    <select id="pc-rif-tipo" 
+                                            class="appearance-none bg-white text-slate-900 font-bold text-sm pl-3.5 pr-7 py-2.5 outline-none cursor-pointer border-r border-slate-200 rounded-l-xl"
+                                            style="color-scheme: light; min-width: 62px; background-color: #ffffff !important; color: #0f172a !important;">
+                                        <option value="J" style="background-color: #ffffff; color: #0f172a; font-weight: bold;">J</option>
+                                        <option value="V" style="background-color: #ffffff; color: #0f172a; font-weight: bold;">V</option>
+                                        <option value="G" style="background-color: #ffffff; color: #0f172a; font-weight: bold;">G</option>
+                                        <option value="E" style="background-color: #ffffff; color: #0f172a; font-weight: bold;">E</option>
+                                        <option value="C" style="background-color: #ffffff; color: #0f172a; font-weight: bold;">C</option>
+                                        <option value="P" style="background-color: #ffffff; color: #0f172a; font-weight: bold;">P</option>
+                                    </select>
+                                    <div class="pointer-events-none absolute inset-y-0 right-2 flex items-center text-slate-400 text-[10px]">
+                                        <i class="fas fa-chevron-down"></i>
+                                    </div>
+                                </div>
                                 <input type="text" id="pc-rif-numero" placeholder="Ej: 123456789" 
                                        inputmode="numeric" pattern="[0-9]*" maxlength="10"
                                        oninput="if(window.HaciendaRIF) window.HaciendaRIF.handleInput(this, 'pc-rif-tipo')"
                                        onkeydown="if(event.key==='Enter') window.PortalComercio.ejecutarConsultaRif()"
-                                       class="w-full bg-transparent text-slate-800 text-sm px-3 py-2.5 outline-none placeholder:text-slate-400 font-mono">
+                                       class="w-full bg-transparent text-slate-800 text-sm px-3 py-2.5 outline-none placeholder:text-slate-400 font-mono rounded-r-xl">
                             </div>
                         </div>
 
@@ -2808,10 +2815,10 @@
                             <div>
                                 <label class="text-[11px] font-medium text-slate-600 uppercase block mb-1">Cédula del Representante Legal (Solo Números)</label>
                                 <div class="grid grid-cols-3 gap-2">
-                                    <select id="pi-cedula-tipo" class="bg-white border border-slate-200 text-slate-800 rounded-xl px-2 py-2.5 text-xs outline-none focus:border-slate-400">
-                                        <option value="V">V</option>
-                                        <option value="E">E</option>
-                                        <option value="P">P</option>
+                                    <select id="pi-cedula-tipo" class="bg-white border border-slate-200 text-slate-800 font-bold rounded-xl px-2 py-2.5 text-xs outline-none focus:border-slate-400" style="color-scheme: light; background-color: #ffffff !important; color: #0f172a !important;">
+                                        <option value="V" style="background-color: #ffffff; color: #0f172a; font-weight: bold;">V</option>
+                                        <option value="E" style="background-color: #ffffff; color: #0f172a; font-weight: bold;">E</option>
+                                        <option value="P" style="background-color: #ffffff; color: #0f172a; font-weight: bold;">P</option>
                                     </select>
                                     <input type="text" id="pi-cedula-numero" placeholder="Solo números (ej: 12345678)"
                                            inputmode="numeric" pattern="[0-9]*" maxlength="9"
@@ -2881,10 +2888,10 @@
                             <div>
                                 <label class="text-[11px] font-medium text-slate-600 uppercase block mb-1">Cédula del Representante Legal (Solo Números)</label>
                                 <div class="grid grid-cols-3 gap-2">
-                                    <select id="rec-cedula-tipo" class="bg-white border border-slate-200 text-slate-800 rounded-xl px-2 py-2.5 text-xs outline-none focus:border-slate-400">
-                                        <option value="V">V</option>
-                                        <option value="E">E</option>
-                                        <option value="P">P</option>
+                                    <select id="rec-cedula-tipo" class="bg-white border border-slate-200 text-slate-800 font-bold rounded-xl px-2 py-2.5 text-xs outline-none focus:border-slate-400" style="color-scheme: light; background-color: #ffffff !important; color: #0f172a !important;">
+                                        <option value="V" style="background-color: #ffffff; color: #0f172a; font-weight: bold;">V</option>
+                                        <option value="E" style="background-color: #ffffff; color: #0f172a; font-weight: bold;">E</option>
+                                        <option value="P" style="background-color: #ffffff; color: #0f172a; font-weight: bold;">P</option>
                                     </select>
                                     <input type="text" id="rec-cedula-numero" placeholder="Solo números"
                                            inputmode="numeric" pattern="[0-9]*" maxlength="9"

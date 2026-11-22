@@ -140,6 +140,13 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.10.4 — 22/11/2026
+- **Corrección de Visibilidad Universal y Despliegue de Opciones en Select de RIF (`index.html`):**
+  - **Resolución de Conflicto de Modo Oscuro del Sistema:** Se identificó que en navegadores basados en Chromium con tema oscuro del sistema operativo, los menús desplegables nativos de `<select>` renderizaban las opciones con texto oscuro sobre fondo oscuro o fondos transparentes al carecer de `color-scheme: light` explícito.
+  - **Reset Universal de `select` y `option`:** Incorporada regla forzada en `styles.css` e `index.html` garantizando que todo `<select>` y sus `<option>` y `<optgroup>` mantengan fondo blanco puro (`#FFFFFF`), texto de alto contraste (`#0F172A`) y tipografía negrita legible en cualquier sistema operativo.
+  - **Estructuración del Selector de RIF (`pc-rif-tipo`):** Eliminado el `overflow-hidden` del contenedor padre que provocaba recortes en el popup, añadido contenedor relativo con chevron personalizado y estilos inline blindados en cada opción (`J`, `V`, `G`, `E`, `C`, `P`).
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.10.4` con 355 pruebas automatizadas al 100% en verde.
+
 ### Version 3.10.3 — 22/11/2026
 - **Erradicación Total de Semillas y Cuentas Bancarias Mockeadas (Limpieza Definitiva para Producción):**
   - **Eliminación de Siembra Automática en `store.js`:** Suprimido de raíz el bloque que inyectaba por defecto las cuentas de prueba `cta_01` (0102-0544-21-0000012345) y `cta_02` (0134-0371-82-0000098765), así como los métodos de pago mockeados asociados (`met_pm_bdv`, `met_tr_bdv`, etc.).
