@@ -1760,6 +1760,9 @@
                 }
                 displayIdentificador = correo;
                 match = contribuyentes.find(c => String(c.correo || '').trim().toLowerCase() === correo);
+                if (!match && typeof store.fetchSingleContribuyente === 'function') {
+                    match = await store.fetchSingleContribuyente({ correo });
+                }
             } else {
                 const tipo = document.getElementById('pc-rif-tipo') ? document.getElementById('pc-rif-tipo').value : 'J';
                 const rawNum = document.getElementById('pc-rif-numero') ? document.getElementById('pc-rif-numero').value : '';
@@ -1779,6 +1782,9 @@
                 }
                 displayIdentificador = parsed.full;
                 match = rifHelper ? rifHelper.findMatch(contribuyentes, parsed.tipo, parsed.numero) : contribuyentes.find(c => c.rif === parsed.full);
+                if (!match && typeof store.fetchSingleContribuyente === 'function') {
+                    match = await store.fetchSingleContribuyente({ rif: parsed.full });
+                }
             }
 
             if (!match) {
@@ -1835,6 +1841,11 @@
 
             activeContribuyente = match;
             activeModule = 'grid'; // Abre la Suite Principal
+
+            // Sincronización quirúrgica exclusiva de este contribuyente
+            if (store && typeof store.syncContribuyenteSurgical === 'function') {
+                await store.syncContribuyenteSurgical(match.id);
+            }
 
             const container = document.getElementById('portal-main-content');
             if (container) this.render(container);
@@ -1925,6 +1936,11 @@
 
             activeContribuyente = c;
             activeModule = 'grid';
+
+            if (store && typeof store.syncContribuyenteSurgical === 'function') {
+                await store.syncContribuyenteSurgical(c.id);
+            }
+
             const container = document.getElementById('portal-main-content');
             if (container) this.render(container);
         },
@@ -1957,7 +1973,7 @@
             const rifHelper = global.HaciendaRIF;
             const parsed = rifHelper ? rifHelper.parse(ident) : null;
 
-            const match = contribuyentes.find(c => {
+            let match = contribuyentes.find(c => {
                 if (String(c.correo || '').trim().toLowerCase() === ident.toLowerCase()) return true;
                 if (parsed && parsed.numero) {
                     const matchDigits = String(c.rif || '').replace(/\D/g, '');
@@ -1965,6 +1981,14 @@
                 }
                 return c.rif === ident;
             });
+
+            if (!match && typeof store.fetchSingleContribuyente === 'function') {
+                if (ident.includes('@')) {
+                    match = await store.fetchSingleContribuyente({ correo: ident });
+                } else {
+                    match = await store.fetchSingleContribuyente({ rif: ident });
+                }
+            }
 
             if (!match) {
                 if (typeof Swal !== 'undefined') Swal.fire({ icon: 'error', title: 'Comercio no encontrado', text: 'No existe ningún contribuyente registrado con ese RIF o Correo.', confirmButtonColor: '#000000' });
@@ -2008,6 +2032,28 @@
         cerrarConsulta: function() {
             activeContribuyente = null;
             activeModule = 'grid';
+
+            // Si estamos en el portal público, limpiar los datos del contribuyente anterior de la memoria y cache
+            const store = global.HaciendaStore;
+            if (store && typeof store.isPortal === 'function' && store.isPortal()) {
+                const privateTables = [
+                    'hacienda_contribuyentes',
+                    'hacienda_declaraciones',
+                    'hacienda_pagos',
+                    'hacienda_solvencias',
+                    'hacienda_patentes',
+                    'hacienda_inmuebles',
+                    'hacienda_vehiculos',
+                    'hacienda_publicidad'
+                ];
+                privateTables.forEach(t => {
+                    store._cache[t] = [];
+                    if (store._localStore) {
+                        store._localStore.removeItem(`tbl_${t}`).catch(() => {});
+                    }
+                });
+            }
+
             const container = document.getElementById('portal-main-content');
             if (container) this.render(container);
         },

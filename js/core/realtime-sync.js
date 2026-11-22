@@ -28,8 +28,34 @@
         'user_profiles'
     ]);
 
+    function isPortal() {
+        return typeof window !== 'undefined' && (
+            window.HACIENDA_CONTEXT === 'portal' ||
+            document.getElementById('portal-main-content') !== null ||
+            (window.location && typeof window.location.pathname === 'string' && (window.location.pathname.endsWith('index.html') || (!window.location.pathname.includes('admin') && !window.location.pathname.includes('admin.html'))))
+        );
+    }
+
     function queueTableRefresh(table) {
         if (!table || !SYNCABLE_TABLES.has(table)) return;
+
+        // En el portal público, bloquear recargas masivas de tablas privadas/administrativas
+        if (isPortal()) {
+            const PUBLIC_PORTAL_TABLES = new Set(['hacienda_popups', 'hacienda_carrusel']);
+            if (!PUBLIC_PORTAL_TABLES.has(table)) {
+                // Si el contribuyente tiene su sesión abierta, sincronizar solo sus registros de forma quirúrgica
+                const activeC = global.PortalComercio && typeof global.PortalComercio.getActiveContribuyente === 'function'
+                    ? global.PortalComercio.getActiveContribuyente()
+                    : null;
+                if (activeC && activeC.id) {
+                    if (global.HaciendaStore && typeof global.HaciendaStore.syncContribuyenteSurgical === 'function') {
+                        global.HaciendaStore.syncContribuyenteSurgical(activeC.id).catch(() => {});
+                    }
+                }
+                return;
+            }
+        }
+
         pendingTables.add(table);
 
         // Tablas interconectadas que deben refrescar juntas
@@ -155,7 +181,9 @@
                     try { global.supabaseClient.removeChannel(channel); } catch(_) {} 
                     channel = null; 
                 }
-                ['hacienda_contribuyentes', 'hacienda_declaraciones', 'hacienda_pagos', 'hacienda_solvencias'].forEach(t => queueTableRefresh(t));
+                if (!isPortal()) {
+                    ['hacienda_contribuyentes', 'hacienda_declaraciones', 'hacienda_pagos', 'hacienda_solvencias'].forEach(t => queueTableRefresh(t));
+                }
                 initRealtime();
             }
         });

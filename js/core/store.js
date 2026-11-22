@@ -601,9 +601,25 @@
             }
         },
 
+        // Detectar si el contexto actual es el Portal Público del Contribuyente
+        isPortal: function() {
+            return typeof window !== 'undefined' && (
+                window.HACIENDA_CONTEXT === 'portal' ||
+                document.getElementById('portal-main-content') !== null ||
+                (window.location && typeof window.location.pathname === 'string' && (window.location.pathname.endsWith('index.html') || (!window.location.pathname.includes('admin') && !window.location.pathname.includes('admin.html'))))
+            );
+        },
+
         // Descarga fresca paginada (1000 en 1000) con fusión de pendientes
         downloadFreshFromSupabase: async function(table) {
             if (!global.supabaseClient || !navigator.onLine) return;
+            // En el portal público, bloquear descargas masivas de tablas privadas/administrativas
+            if (this.isPortal()) {
+                const PUBLIC_PORTAL_TABLES = ['hacienda_popups', 'hacienda_carrusel'];
+                if (!PUBLIC_PORTAL_TABLES.includes(table)) {
+                    return;
+                }
+            }
             try {
                 const PAGE_SIZE = 1000;
                 let allRemote = [];
@@ -662,6 +678,77 @@
             } catch (err) {
                 console.warn(`[HaciendaStore] Error descargando ${table}:`, err);
             }
+        },
+
+        // Sincronización quirúrgica: descarga ÚNICAMENTE los registros de un contribuyente específico
+        syncContribuyenteSurgical: async function(contribuyenteId) {
+            if (!global.supabaseClient || !navigator.onLine || !contribuyenteId) return;
+            const tablesToSync = [
+                'hacienda_declaraciones',
+                'hacienda_pagos',
+                'hacienda_solvencias',
+                'hacienda_patentes',
+                'hacienda_inmuebles',
+                'hacienda_vehiculos',
+                'hacienda_publicidad'
+            ];
+            for (const tbl of tablesToSync) {
+                try {
+                    const { data, error } = await global.supabaseClient
+                        .from(tbl)
+                        .select('*')
+                        .eq('contribuyente_id', contribuyenteId);
+                    if (!error && Array.isArray(data)) {
+                        const current = this._cache[tbl] || [];
+                        const otherRecords = current.filter(r => String(r.contribuyente_id) !== String(contribuyenteId));
+                        const merged = otherRecords.concat(data);
+                        this._cache[tbl] = merged;
+                        if (this._localStore) {
+                            await this._localStore.setItem(`tbl_${tbl}`, merged);
+                        }
+                        this.notify(tbl, 'refresh', { count: data.length });
+                    }
+                } catch (e) {
+                    console.warn(`[HaciendaStore] Error en sincronización quirúrgica de ${tbl}:`, e);
+                }
+            }
+        },
+
+        // Búsqueda remota puntual quirúrgica de un contribuyente por RIF o Correo
+        fetchSingleContribuyente: async function(params) {
+            if (!global.supabaseClient || !navigator.onLine || !params) return null;
+            try {
+                let query = global.supabaseClient.from('hacienda_contribuyentes').select('*');
+                if (params.correo) {
+                    query = query.ilike('correo', String(params.correo).trim());
+                } else if (params.rif) {
+                    const cleanRif = String(params.rif).trim();
+                    const numOnly = cleanRif.replace(/\D/g, '');
+                    if (numOnly) {
+                        query = query.or(`rif.eq.${cleanRif},rif.ilike.%${numOnly}%`);
+                    } else {
+                        query = query.eq('rif', cleanRif);
+                    }
+                } else {
+                    return null;
+                }
+
+                const { data, error } = await query.limit(1);
+                if (!error && Array.isArray(data) && data.length > 0) {
+                    const c = data[0];
+                    const list = this._cache['hacienda_contribuyentes'] || [];
+                    const filtered = list.filter(item => String(item.id) !== String(c.id));
+                    filtered.push(c);
+                    this._cache['hacienda_contribuyentes'] = filtered;
+                    if (this._localStore) {
+                        await this._localStore.setItem('tbl_hacienda_contribuyentes', filtered);
+                    }
+                    return c;
+                }
+            } catch (err) {
+                console.warn('[HaciendaStore] Error en fetchSingleContribuyente:', err);
+            }
+            return null;
         },
 
         // Descargar todas las tablas en paralelo

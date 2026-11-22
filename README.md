@@ -140,6 +140,14 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.9.3 — 22/11/2026
+- **Blindaje del Portal Público y Consultas Quirúrgicas Anti-Fuga de Datos:**
+  - **Bloqueo de Descarga Masiva en Portal (`index.html`):** Restricción arquitectónica en `store.js` y `realtime-sync.js` que impide que el portal público descargue o sincronice el padrón municipal completo o tablas administrativas privadas (`user_profiles`, `hacienda_conciliacion`, `hacienda_cuentas`, desgloses bancarios).
+  - **Búsqueda Quirúrgica Bajo Demanda (`fetchSingleContribuyente`):** Cuando un contribuyente consulta su RIF o correo en el portal, el sistema ejecuta una petición remota exacta y aislada a Supabase exclusivamente para su propio registro, sin exponer comercios de terceros.
+  - **Sincronización Quirúrgica Post-Autenticación (`syncContribuyenteSurgical`):** Tras validar la contraseña, se descargan únicamente las declaraciones, pagos, solvencias y bienes del contribuyente activo (`contribuyente_id = active.id`).
+  - **Purga de Memoria al Cerrar Sesión (`cerrarConsulta`):** Al salir del portal, se limpian inmediatamente de la memoria RAM y de LocalForage todos los registros del comercio consultado, garantizando cero rastros en equipos compartidos o cibercafés.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.9.3` con 312 pruebas automatizadas superadas al 100%.
+
 ### Version 3.9.2 — 22/11/2026
 - **Visibilidad de Contraseñas (Ojito) y Corrección de Contraste en Botones de Acción:**
   - **Alternador Universal de Contraseñas (`toggleInputClave`):** Integración de botones interactivos con icono de ojo (`fa-eye` / `fa-eye-slash`) en todos los campos de contraseña: modal de Primer Ingreso (`pi-clave`, `pi-clave-confirm`), modal de Recuperación de Clave (`rec-nueva-clave`, `rec-confirm-clave`) e Inscripción de Comercio (`ins-clave`, `ins-clave-confirm`).
