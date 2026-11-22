@@ -735,113 +735,78 @@
         renderConsultaHero: function(container) {
             const tasas = getTasasInfo();
             container.innerHTML = `
-                <div class="max-w-4xl mx-auto space-y-12 py-4 sm:py-8 text-center animate-fade-in">
-                    <!-- =========================================================================
-                         BLOQUE 1: PANTALLA PRINCIPAL DE INICIO DE SESIÓN (ACCESO DIRECTO)
-                         Diseñado especialmente para comerciantes y adultos mayores:
-                         Cero sobrecarga visual, alta legibilidad, letras grandes y acceso directo.
-                         ========================================================================= -->
-                    <div id="buscador-rif" class="max-w-xl mx-auto pt-2 pb-2">
-                        <!-- Insignia Institucional Oficial -->
-                        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-50 border border-purple-200 text-purple-700 text-xs font-bold tracking-wide shadow-sm mb-4">
-                            <i class="fas fa-landmark text-purple-600"></i>
-                            <span>Alcaldía de San José de Guaribe</span>
-                            <span class="text-purple-300">·</span>
-                            <span class="font-mono text-purple-600">SATRIMG</span>
-                        </div>
-
+                <div class="max-w-4xl mx-auto space-y-16 py-4 sm:py-8 text-center animate-fade-in">
+                    
+                    <!-- PANTALLA PRINCIPAL: ACCESO DIRECTO AL PORTAL -->
+                    <div class="w-full max-w-md mx-auto pt-4 pb-2">
                         <!-- Tarjeta Central de Inicio de Sesión -->
-                        <div class="portal-login-card bg-white rounded-3xl p-6 sm:p-9 border border-slate-200 shadow-xl shadow-slate-900/5 text-left space-y-6 relative overflow-hidden">
-                            <div class="border-b border-slate-100 pb-5">
-                                <div class="flex items-center justify-between gap-4">
-                                    <div>
-                                        <span class="text-xs font-bold uppercase tracking-wider text-purple-600 font-mono">Portal del Contribuyente</span>
-                                        <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mt-1">
-                                            Iniciar Sesión
-                                        </h1>
-                                    </div>
-                                    <div class="w-12 h-12 rounded-2xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 text-xl shrink-0 shadow-sm">
-                                        <i class="fas fa-user-check"></i>
-                                    </div>
-                                </div>
-                                <p class="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
-                                    Ingrese su RIF para consultar su estado de cuenta, autoliquidar patentes LOCAT y emitir solvencias municipales oficiales.
+                        <div class="bg-white rounded-3xl p-8 sm:p-10 border border-slate-200/80 shadow-xl shadow-slate-900/5 text-center space-y-6">
+                            <!-- Icono Institucional -->
+                            <div class="w-16 h-16 rounded-2xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 text-2xl mx-auto shadow-sm">
+                                <i class="fas fa-landmark"></i>
+                            </div>
+
+                            <div class="space-y-1">
+                                <h1 class="text-2xl font-black text-slate-900 tracking-tight">
+                                    Portal del Contribuyente
+                                </h1>
+                                <p class="text-xs text-slate-500 leading-relaxed">
+                                    Alcaldía del Municipio San José de Guaribe
                                 </p>
                             </div>
 
-                            <!-- Formulario de Consulta / Login -->
-                            <div class="space-y-4">
-                                <div>
-                                    <label for="pc-rif-numero" class="block text-xs font-bold uppercase tracking-wider text-slate-700 font-mono mb-2">
-                                        Tipo y Número de RIF o Cédula
-                                    </label>
+                            <!-- Formulario Directo -->
+                            <div class="space-y-4 text-left">
+                                <div class="flex items-center bg-slate-50 border-2 border-slate-200 focus-within:border-purple-600 focus-within:bg-white rounded-2xl p-1.5 transition duration-200 shadow-inner">
+                                    <select id="pc-rif-tipo" 
+                                            class="bg-white text-slate-900 font-bold text-sm px-3.5 py-3 rounded-xl border border-slate-200 outline-none cursor-pointer">
+                                        <option value="J">J</option>
+                                        <option value="V">V</option>
+                                        <option value="G">G</option>
+                                        <option value="E">E</option>
+                                        <option value="C">C</option>
+                                        <option value="P">P</option>
+                                    </select>
 
-                                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center bg-slate-50 border-2 border-slate-200 focus-within:border-purple-600 focus-within:bg-white rounded-2xl p-1.5 transition duration-200 gap-2 shadow-inner">
-                                        <select id="pc-rif-tipo" 
-                                                class="bg-white text-slate-900 font-bold text-xs sm:text-sm px-3.5 py-3 rounded-xl border border-slate-200 sm:border-0 outline-none cursor-pointer">
-                                            <option value="J">J - Jurídico</option>
-                                            <option value="V">V - Natural</option>
-                                            <option value="G">G - Gobierno</option>
-                                            <option value="E">E - Extranjero</option>
-                                            <option value="C">C - Comuna</option>
-                                            <option value="P">P - Pasaporte</option>
-                                        </select>
-                                        
-                                        <div class="hidden sm:block w-px h-8 bg-slate-200"></div>
+                                    <div class="w-px h-8 bg-slate-200 mx-1"></div>
 
-                                        <input type="text" id="pc-rif-numero" 
-                                               placeholder="Solo números (ej: 123456789)" 
-                                               inputmode="numeric" pattern="[0-9]*" maxlength="10"
-                                               oninput="if(window.HaciendaRIF) window.HaciendaRIF.handleInput(this, 'pc-rif-tipo')"
-                                               onkeydown="if(event.key==='Enter') window.PortalComercio.ejecutarConsultaRif()"
-                                               class="w-full bg-transparent text-slate-900 text-base sm:text-lg font-mono font-bold px-3 py-2 outline-none placeholder:text-slate-400">
-
-                                        <button onclick="window.PortalComercio.ejecutarConsultaRif()" 
-                                                class="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 hover:from-indigo-700 hover:to-purple-700 text-white font-bold text-sm rounded-xl px-7 py-3.5 transition shrink-0 flex items-center justify-center gap-2 shadow-lg shadow-purple-600/25">
-                                            <span>Ingresar</span>
-                                            <i class="fas fa-arrow-right text-xs"></i>
-                                        </button>
-                                    </div>
+                                    <input type="text" id="pc-rif-numero" 
+                                           placeholder="Número de RIF o Cédula" 
+                                           inputmode="numeric" pattern="[0-9]*" maxlength="10"
+                                           oninput="if(window.HaciendaRIF) window.HaciendaRIF.handleInput(this, 'pc-rif-tipo')"
+                                           onkeydown="if(event.key==='Enter') window.PortalComercio.ejecutarConsultaRif()"
+                                           class="w-full bg-transparent text-slate-900 text-base sm:text-lg font-mono font-bold px-3 py-2 outline-none placeholder:text-slate-400">
                                 </div>
 
-                                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-1 text-xs text-slate-500">
+                                <button onclick="window.PortalComercio.ejecutarConsultaRif()" 
+                                        class="w-full bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 hover:from-indigo-700 hover:to-purple-700 text-white font-bold text-base rounded-2xl py-3.5 transition flex items-center justify-center gap-2 shadow-lg shadow-purple-600/25">
+                                    <span>Ingresar al Portal</span>
+                                    <i class="fas fa-arrow-right text-xs"></i>
+                                </button>
+
+                                <div class="text-center pt-2">
                                     <button onclick="window.PortalComercio.abrirModalInscripcion()" 
-                                            class="text-purple-600 hover:text-purple-800 font-bold transition inline-flex items-center gap-1.5 hover:underline">
-                                        <i class="fas fa-store"></i>
-                                        <span>¿Comercio nuevo o no censado? Solicitar censo municipal aquí</span>
+                                            class="text-purple-600 hover:text-purple-800 text-xs font-bold transition hover:underline">
+                                        ¿Comercio nuevo? Solicitar censo municipal aquí
                                     </button>
-                                    <span class="font-mono text-[11px] text-slate-400">Acceso seguro 0ms</span>
-                                </div>
-                            </div>
-
-                            <!-- Caja de Asistencia para Adultos Mayores -->
-                            <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 flex items-start gap-3 text-xs text-slate-600">
-                                <div class="w-8 h-8 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center shrink-0 mt-0.5">
-                                    <i class="fas fa-info-circle text-sm"></i>
-                                </div>
-                                <div class="space-y-0.5">
-                                    <strong class="text-slate-900 font-semibold block">¿Necesita ayuda con su trámite?</strong>
-                                    <p class="leading-relaxed">
-                                        Atención personalizada en la Taquilla de Rentas Municipales (Planta Baja de la Alcaldía, frente a Plaza Bolívar) de 8:00 AM a 4:00 PM.
-                                    </p>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Indicador para explorar hacia abajo -->
-                        <div class="pt-6">
-                            <a href="#seccion-publica" class="inline-flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-purple-700 transition bg-white hover:bg-slate-50 px-5 py-2.5 rounded-full border border-slate-200 shadow-sm">
-                                <span>Ver tasas oficiales BCV, avisos y ordenanzas municipales</span>
+                        <div class="text-center pt-8">
+                            <a href="#seccion-publica" class="inline-flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-purple-600 transition bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-full border border-slate-200">
+                                <span>Ver tasas BCV y ordenanzas municipales</span>
                                 <i class="fas fa-chevron-down text-[10px] text-purple-600 animate-bounce"></i>
                             </a>
                         </div>
                     </div>
 
                     <!-- =========================================================================
-                         BLOQUE 2: CONTENIDO SECUNDARIO (ABAJO DEL FOLD)
-                         Mesa de Cambio BCV, Carrusel de Avisos, Módulos Informativos y Ordenanzas
+                         SECCION SECUNDARIA: ABAJO DEL FOLD
+                         Mesa de Cambio BCV, Carrusel de Avisos, Módulos y Ordenanzas
                          ========================================================================= -->
-                    <div id="seccion-publica" class="space-y-12 border-t border-slate-200 pt-10 text-left">
+                    <div id="seccion-publica" class="space-y-12 border-t border-slate-200 pt-12 text-left">
                         
                         <!-- Mesa de Cambio Oficial BCV -->
                         <div class="space-y-3">

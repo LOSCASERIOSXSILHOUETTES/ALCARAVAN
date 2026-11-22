@@ -140,6 +140,15 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.8.6 — 22/11/2026
+- **Depuracion Radical de Ruido Visual en Portada (Clean Login Minimalista):**
+  - Eliminacion de las 3 barras superiores apiladas en el portal publico: fuera topbar con clima/reloj y fuera ticker tape en movimiento continuo.
+  - Navbar minimalista sobrio: Unicamente logo institucional Alcaravan + Alcaldia de San Jose de Guaribe a la izquierda y boton discreto de "Acceso Funcionarios" a la derecha.
+  - Tarjeta de inicio de sesion ultra limpia, centrada y sin sobrecarga:
+    - Retiro de todas las pildoras redundantes, badges de latencia, textos de ayuda y labels duplicadas dentro y fuera de la tarjeta.
+    - Diseño centrado verticalmente: Emblema institucional, titulo "Portal del Contribuyente", selector `J/V/G/E/C/P`, campo de RIF con foco directo, boton "Ingresar al Portal" y enlace simple a censo municipal.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.8.6`.
+
 ### Version 3.8.5 — 22/11/2026
 - **Simplificacion del Landing del Portal (`index.html`) y Pantalla de Inicio de Sesion Directa:**
   - Rediseño enfocado en usabilidad para comerciantes y adultos mayores: eliminacion de la sobrecarga visual inicial en el primer viewport.
@@ -271,6 +280,15 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
   - Registro de la 14ta tabla `hacienda_popups` en `store.js` (`TABLE_SCHEMAS`), `realtime-sync.js` (`SYNCABLE_TABLES`) y `sql/schema_hacienda.sql`.
   - Consumo dinamico en `js/modules/portal-comercio.js`: lectura directa a 0ms desde LocalForage con filtrado por destino (`portal`, `ambos`) y control de visualizacion diaria (`localStorage`).
   - Bump de Service Worker a `alcaravan-v3-cache-v3.7.1`.
+
+### Version 3.8.6 — 22/11/2026
+- **Depuracion Radical de Ruido Visual en Portada (Clean Login Minimalista):**
+  - Eliminacion de las 3 barras superiores apiladas en el portal publico: fuera topbar con clima/reloj y fuera ticker tape en movimiento continuo.
+  - Navbar minimalista sobrio: Unicamente logo institucional Alcaravan + Alcaldia de San Jose de Guaribe a la izquierda y boton discreto de "Acceso Funcionarios" a la derecha.
+  - Tarjeta de inicio de sesion ultra limpia, centrada y sin sobrecarga:
+    - Retiro de todas las pildoras redundantes, badges de latencia, textos de ayuda y labels duplicadas dentro y fuera de la tarjeta.
+    - Diseño centrado verticalmente: Emblema institucional, titulo "Portal del Contribuyente", selector `J/V/G/E/C/P`, campo de RIF con foco directo, boton "Ingresar al Portal" y enlace simple a censo municipal.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.8.6`.
 
 ### Version 3.8.5 — 22/11/2026
 - **Simplificacion del Landing del Portal (`index.html`) y Pantalla de Inicio de Sesion Directa:**
