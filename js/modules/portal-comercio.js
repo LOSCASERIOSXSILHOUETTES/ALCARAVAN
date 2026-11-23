@@ -1431,28 +1431,29 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             ${metodosPago.length > 0 ? metodosPago.map(m => {
                                 const cta = m.cuenta_id ? cuentasMap.get(String(m.cuenta_id)) : null;
-                                const tipoCanal = m.tipo || m.canal || 'transferencia';
-                                const isPagoMovil = tipoCanal === 'pago_movil';
-                                const isTransferencia = tipoCanal === 'transferencia';
-                                const isPuntoVenta = tipoCanal === 'punto_venta';
-                                const isEfectivo = tipoCanal === 'efectivo';
+                                const rawTipo = String(m.tipo || m.canal || '').toLowerCase().trim();
+                                const rawNombre = String(m.nombre || '').toLowerCase();
+                                const isPagoMovil = rawTipo === 'pago_movil' || rawTipo.includes('movil') || rawTipo.includes('móvil') || rawNombre.includes('pago móvil') || rawNombre.includes('pago movil');
+                                const isTransferencia = !isPagoMovil && (rawTipo === 'transferencia' || rawNombre.includes('transferencia') || (!rawTipo && !rawNombre.includes('punto') && !rawNombre.includes('efectivo')));
+                                const isPuntoVenta = rawTipo === 'punto_venta' || rawTipo.includes('punto') || rawTipo.includes('pos') || rawNombre.includes('punto');
+                                const isEfectivo = rawTipo === 'efectivo' || rawNombre.includes('efectivo');
 
                                 const badgeColor = isPagoMovil ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
                                     : isTransferencia ? 'bg-sky-500/10 text-sky-400 border-sky-500/20'
                                     : isPuntoVenta ? 'bg-purple-500/10 text-purple-400 border-purple-500/20'
                                     : isEfectivo ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-                                    : 'bg-neutral-500/10 text-neutral-400 border-neutral-500/20';
+                                    : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
 
                                 const canalLabel = isPagoMovil ? 'Pago Móvil C2P / P2P'
                                     : isTransferencia ? 'Transferencia Bancaria'
                                     : isPuntoVenta ? 'Punto de Venta Taquilla'
                                     : isEfectivo ? 'Efectivo en Taquilla'
-                                    : (tipoCanal || 'Canal de Pago').toUpperCase();
+                                    : 'Canal Oficial de Recaudación';
 
-                                const numCuenta = cta ? (cta.numero || cta.numero_cuenta || '') : (m.numero || '');
-                                const bancoNombre = m.banco || (cta ? (cta.banco || cta.banco_nombre || '') : 'Bancario');
-                                const tlf = m.telefono || m.telefono_pago_movil || '';
-                                const doc = m.identificacion || m.documento_pago_movil || (cta ? cta.rif_titular : 'G-20000163-9') || '';
+                                const numCuenta = cta ? (cta.numero || cta.numero_cuenta || '') : (m.numero || m.numero_cuenta || '');
+                                const bancoNombre = m.banco || (cta ? (cta.banco || cta.banco_nombre || '') : 'Banco de Venezuela');
+                                const tlf = m.telefono || m.telefono_pago_movil || (cta ? (cta.telefono || cta.telefono_pago_movil) : '') || '';
+                                const doc = m.identificacion || m.documento_pago_movil || (cta ? (cta.rif_titular || cta.rif) : 'G-20000163-9') || 'G-20000163-9';
                                 const titular = m.titular || (cta ? (cta.titular || cta.beneficiario) : '') || '';
 
                                 return `
@@ -1557,8 +1558,32 @@
                                                     </div>
                                                 `}
                                             ` : `
-                                                <div class="p-3 rounded-2xl bg-white/[0.03] border border-white/5 text-neutral-300">
-                                                    <p>${m.instrucciones || 'Canal habilitado para recaudación tributaria municipal.'}</p>
+                                                <div class="p-3 rounded-2xl bg-white/[0.03] border border-white/5 space-y-1.5 font-mono">
+                                                    ${bancoNombre ? `<div class="flex justify-between items-center text-neutral-400"><span>Banco:</span><span class="text-white font-bold">${bancoNombre}</span></div>` : ''}
+                                                    ${tlf ? `<div class="flex justify-between items-center text-neutral-400"><span>Teléfono:</span><span class="text-white font-bold select-all">${tlf}</span></div>` : ''}
+                                                    ${doc ? `<div class="flex justify-between items-center text-neutral-400"><span>RIF / C.I.:</span><span class="text-white font-bold select-all">${doc}${titular ? ` (${titular})` : ''}</span></div>` : ''}
+                                                    ${numCuenta ? `<div class="flex justify-between items-center text-neutral-400"><span>N° Cuenta:</span><span class="text-white font-bold text-xs select-all">${numCuenta}</span></div>` : ''}
+                                                </div>
+                                                ${m.instrucciones ? `
+                                                    <div class="p-2.5 rounded-xl bg-white/[0.02] border border-white/5 text-[11px] text-neutral-300">
+                                                        <i class="fas fa-info-circle text-neutral-500 mr-1"></i> ${m.instrucciones}
+                                                    </div>
+                                                ` : ''}
+                                                <div class="grid grid-cols-2 gap-2">
+                                                    ${tlf ? `
+                                                        <button onclick="window.PortalComercio.copiarAlPortapapeles('${tlf}', 'Teléfono copiado.')" 
+                                                                class="py-2 bg-white/[0.06] hover:bg-white/[0.12] text-neutral-300 hover:text-white text-[11px] font-medium rounded-xl transition flex items-center justify-center gap-1.5 border border-white/5">
+                                                            <i class="fas fa-copy text-[10px]"></i>
+                                                            <span>Copiar Teléfono</span>
+                                                        </button>
+                                                    ` : ''}
+                                                    ${doc ? `
+                                                        <button onclick="window.PortalComercio.copiarAlPortapapeles('${doc}', 'RIF copiado.')" 
+                                                                class="py-2 bg-white/[0.06] hover:bg-white/[0.12] text-neutral-300 hover:text-white text-[11px] font-medium rounded-xl transition flex items-center justify-center gap-1.5 border border-white/5">
+                                                            <i class="fas fa-copy text-[10px]"></i>
+                                                            <span>Copiar RIF</span>
+                                                        </button>
+                                                    ` : ''}
                                                 </div>
                                             `}
                                         </div>

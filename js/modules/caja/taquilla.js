@@ -128,8 +128,13 @@
                                     <option value="">Seleccione la declaración pendiente...</option>
                                     ${declaraciones.filter(d => d.estado !== 'pagada').map(d => {
                                         const c = contribuyentes.find(item => String(item.id) === String(d.contribuyente_id));
-                                        return `<option value="${d.id}" data-monto="${d.impuesto_determinado_bs}" data-contribuyente="${d.contribuyente_id}">
-                                            Mes ${d.mes}/${d.anio} - ${c ? c.razon_social : ''} (${Number(d.impuesto_determinado_bs).toLocaleString('es-VE')} Bs.)
+                                        const saldo = d.saldo_pendiente_bs != null ? Number(d.saldo_pendiente_bs) : Number(d.impuesto_determinado_bs || 0);
+                                        const esParcial = d.estado === 'parcial' || (d.monto_pagado_bs && Number(d.monto_pagado_bs) > 0);
+                                        const txtInfo = esParcial 
+                                            ? ` [Saldo Restante: ${saldo.toLocaleString('es-VE')} Bs · Abonado: ${Number(d.monto_pagado_bs).toLocaleString('es-VE')} Bs]`
+                                            : ` (${saldo.toLocaleString('es-VE')} Bs.)`;
+                                        return `<option value="${d.id}" data-monto="${saldo}" data-contribuyente="${d.contribuyente_id}">
+                                            Mes ${d.mes}/${d.anio} - ${c ? c.razon_social : ''}${txtInfo}
                                         </option>`;
                                     }).join('')}
                                 </select>
@@ -182,6 +187,7 @@
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 mb-1">Monto a Enterar (Bs.)</label>
                                 <input type="number" step="0.01" id="pago-monto" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-100 text-base font-mono font-bold outline-none focus:border-amber-500">
+                                <p class="text-[11px] text-slate-400 mt-1">Si ingresas un monto menor a la deuda, el sistema lo registrará automáticamente como Abono Parcial manteniendo la mora por la diferencia.</p>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 mb-1">Comprobante de Pago (ImgBB / Offline)</label>
@@ -381,6 +387,15 @@
                 const cuentaIdDestino = optDestino?.dataset?.cuentaId ? parseInt(optDestino.dataset.cuentaId, 10) : null;
                 const cuentaIdFinal = (metodoObj && metodoObj.cuenta_id) ? metodoObj.cuenta_id : (cuentaIdDestino || null);
 
+                const montoIngresado = parseFloat(document.getElementById('pago-monto').value);
+                const declaraciones = global.HaciendaStore ? (global.HaciendaStore.get('hacienda_declaraciones') || []) : [];
+                const dec = declaraciones.find(d => String(d.id) === String(declaracionId));
+
+                const totalDec = dec ? Number(dec.impuesto_determinado_bs || 0) : montoIngresado;
+                const saldoActual = dec ? Number(dec.saldo_pendiente_bs != null ? dec.saldo_pendiente_bs : totalDec) : totalDec;
+                const esAbono = montoIngresado < saldoActual;
+                const nuevoSaldo = Math.max(0, saldoActual - montoIngresado);
+
                 const nuevoPago = {
                     numero_recibo: numRecibo,
                     contribuyente_id: contribuyenteId,
@@ -391,9 +406,10 @@
                     banco_destino: document.getElementById('pago-banco-destino').value,
                     referencia_bancaria: document.getElementById('pago-referencia').value.trim(),
                     fecha_pago: document.getElementById('pago-fecha').value,
-                    monto_bs: parseFloat(document.getElementById('pago-monto').value),
+                    monto_bs: montoIngresado,
                     comprobante_url: compUrl,
                     metodo: document.getElementById('pago-metodo').value,
+                    tipo_pago: esAbono ? 'abono' : 'total',
                     estado: 'conciliado', // Auto-conciliado en taquilla
                     verificado_por: 'Taquilla Hacienda',
                     fecha_verificacion: new Date().toISOString()
@@ -401,23 +417,27 @@
 
                 await global.HaciendaStore.set('hacienda_pagos', nuevoPago);
 
-                // Actualizar estatus de la declaración a 'pagada'
-                const declaraciones = global.HaciendaStore.get('hacienda_declaraciones');
-                const dec = declaraciones.find(d => String(d.id) === String(declaracionId));
+                // Actualizar estatus de la declaración
                 if (dec) {
-                    dec.estado = 'pagada';
+                    dec.monto_pagado_bs = Number((Number(dec.monto_pagado_bs || 0) + montoIngresado).toFixed(2));
+                    dec.saldo_pendiente_bs = Number(nuevoSaldo.toFixed(2));
+                    dec.estado = nuevoSaldo <= 0 ? 'pagada' : 'parcial';
                     await global.HaciendaStore.set('hacienda_declaraciones', dec);
                 }
 
                 this.cerrarModalPago();
+                const container = document.getElementById('app-main-content');
+                if (container) this.render(container);
 
                 if (typeof Swal !== 'undefined') {
                     Swal.fire({
                         icon: 'success',
-                        title: 'Pago Conciliado',
-                        text: 'Recibo oficial emitido con éxito: ' + numRecibo,
+                        title: esAbono ? 'Abono Parcial Registrado' : 'Pago Total Conciliado',
+                        text: esAbono 
+                            ? `Se enteró un abono de ${montoIngresado.toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs. Saldo pendiente: ${nuevoSaldo.toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs.` 
+                            : `Recibo oficial emitido con éxito: ${numRecibo}`,
                         confirmButtonColor: '#d97706',
-                        timer: 2000,
+                        timer: 2400,
                         showConfirmButton: false
                     });
                 }

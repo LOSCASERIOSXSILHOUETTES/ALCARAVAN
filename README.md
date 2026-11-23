@@ -140,6 +140,12 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.10.10 — 22/11/2026
+- **Blindaje Total de Datos y Autodetección en Tarjetas de Métodos de Pago (`portal-comercio.js`):**
+  - **Autodetección Inteligente por Nombre y Canal:** Se implementó detección semántica de tipo de canal evaluando tanto `m.tipo` / `m.canal` como palabras clave en `m.nombre` ("pago móvil", "transferencia", "punto", "efectivo"), garantizando que canales creados o importados sin el campo estricto se clasifiquen y estilicen correctamente.
+  - **Renderizado Completo en Bloques de Respaldo:** El bloque de contingencia de las tarjetas de recaudación ahora proyecta siempre los datos bancarios y de contacto (Banco, Teléfono, RIF/Cédula, Titular, Número de Cuenta y botones de copiado rápido al portapapeles) aún en casos de configuración personalizada, impidiendo que una tarjeta oculte sus datos de contacto y muestre únicamente la descripción.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.10.10`.
+
 ### Version 3.10.9 — 22/11/2026
 - **Gestión Avanzada de Pagos Incompletos (Abonos Parciales) y Rechazo de Pagos Falsos en Taquilla ERP:**
   - **Detección Automática de Pagos Incompletos:** En la tabla de Taquilla / Recaudación del ERP (`taquilla.js`), el sistema compara automáticamente el monto transferido (`p.monto_bs`) contra el saldo de la declaración (`d.impuesto_determinado_bs`). Si el monto es inferior, despliega una alerta visual: `Incompleto (-X Bs.)` y desactiva la validación como pago total.
