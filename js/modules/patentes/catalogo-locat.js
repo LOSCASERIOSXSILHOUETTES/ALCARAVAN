@@ -139,6 +139,245 @@
         getByCategoria: (cat) => getItems().filter(i => i.categoria === cat)
     };
 
+    // =========================================================================
+    // MODAL INTERACTIVO DE SELECCIÓN CON BUSCADOR Y TARJETAS (LOCAT)
+    // =========================================================================
+    let _locatModalCallback = null;
+    let _locatModalPagina = 1;
+    const _locatModalPorPagina = 8;
+    let _locatModalQuery = '';
+    let _locatModalCategoria = 'todas';
+
+    const SelectorActividadLocatModal = {
+        abrir: function(options) {
+            _locatModalCallback = (options && typeof options.onSelect === 'function') ? options.onSelect : null;
+            _locatModalPagina = 1;
+            _locatModalQuery = (options && options.initialQuery) ? String(options.initialQuery).trim() : '';
+            _locatModalCategoria = (options && options.categoria) ? options.categoria : 'todas';
+
+            let modalEl = document.getElementById('modal-selector-actividad-locat');
+            if (!modalEl) {
+                this.crearEstructura();
+                modalEl = document.getElementById('modal-selector-actividad-locat');
+            }
+
+            const inputBuscar = document.getElementById('sel-locat-buscar');
+            if (inputBuscar) {
+                inputBuscar.value = _locatModalQuery;
+            }
+
+            modalEl.classList.remove('hidden');
+            this.renderizarCategorias();
+            this.renderizar();
+            setTimeout(() => {
+                if (inputBuscar) inputBuscar.focus();
+            }, 100);
+        },
+
+        cerrar: function() {
+            const modalEl = document.getElementById('modal-selector-actividad-locat');
+            if (modalEl) modalEl.classList.add('hidden');
+            _locatModalCallback = null;
+        },
+
+        seleccionar: function(codigo) {
+            const item = global.CatalogoLocat.getByCodigo(codigo);
+            if (item && typeof _locatModalCallback === 'function') {
+                _locatModalCallback(item);
+            }
+            this.cerrar();
+        },
+
+        filtrar: function(texto) {
+            _locatModalQuery = String(texto || '').trim().toLowerCase();
+            _locatModalPagina = 1;
+            this.renderizar();
+        },
+
+        filtrarCategoria: function(cat) {
+            _locatModalCategoria = cat;
+            _locatModalPagina = 1;
+            this.renderizarCategorias();
+            this.renderizar();
+        },
+
+        cambiarPagina: function(p) {
+            _locatModalPagina = p;
+            this.renderizar();
+        },
+
+        crearEstructura: function() {
+            if (typeof document === 'undefined') return;
+            const div = document.createElement('div');
+            div.id = 'modal-selector-actividad-locat';
+            div.className = 'fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden';
+            div.innerHTML = `
+                <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-fade-in">
+                    <!-- Cabecera -->
+                    <div class="px-6 py-5 border-b border-slate-800 flex justify-between items-center bg-slate-950/60 shrink-0">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center">
+                                <i class="fas fa-briefcase text-base"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-bold text-slate-100 flex items-center gap-2">
+                                    Clasificador Armonizado LOCAT
+                                </h3>
+                                <p class="text-xs text-slate-400">Gaceta Oficial N° 6.755 · Seleccione la actividad económica y alícuota aplicable</p>
+                            </div>
+                        </div>
+                        <button type="button" onclick="window.SelectorActividadLocatModal.cerrar()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition">
+                            <i class="fas fa-times text-xs"></i>
+                        </button>
+                    </div>
+
+                    <!-- Buscador y Categorias -->
+                    <div class="p-5 border-b border-slate-800/80 bg-slate-900/50 space-y-3 shrink-0">
+                        <div class="flex flex-col sm:flex-row gap-3 items-center justify-between">
+                            <div class="relative w-full">
+                                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                                <input type="text" id="sel-locat-buscar" oninput="window.SelectorActividadLocatModal.filtrar(this.value)" 
+                                       placeholder="Buscar por código (ej: COM-001, IND-002), actividad o palabra clave..." 
+                                       class="w-full bg-slate-950 border border-slate-800 rounded-2xl pl-10 pr-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 outline-none focus:border-indigo-500 transition">
+                            </div>
+                            <span id="sel-locat-contador" class="shrink-0 text-xs font-mono text-slate-400 bg-slate-950 px-3 py-2 rounded-xl border border-slate-800">
+                                Cargando...
+                            </span>
+                        </div>
+
+                        <!-- Filtros de Categorias (Pills horizontales) -->
+                        <div id="sel-locat-categorias" class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
+                            <!-- Inyectado dinámicamente -->
+                        </div>
+                    </div>
+
+                    <!-- Contenedor Grid de Cards -->
+                    <div id="sel-locat-grid" class="p-6 overflow-y-auto flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Inyectado dinámicamente -->
+                    </div>
+
+                    <!-- Paginación -->
+                    <div class="px-6 py-4 border-t border-slate-800 bg-slate-950/60 flex items-center justify-between shrink-0">
+                        <button type="button" id="sel-locat-prev" onclick="window.SelectorActividadLocatModal.cambiarPagina(_locatModalPagina - 1)" 
+                                class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 font-bold transition disabled:opacity-40 disabled:cursor-not-allowed">
+                            <i class="fas fa-chevron-left mr-1"></i> Anterior
+                        </button>
+                        <span id="sel-locat-pag-info" class="text-xs font-mono text-slate-400">
+                            Página 1 de 1
+                        </span>
+                        <button type="button" id="sel-locat-next" onclick="window.SelectorActividadLocatModal.cambiarPagina(_locatModalPagina + 1)" 
+                                class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 font-bold transition disabled:opacity-40 disabled:cursor-not-allowed">
+                            Siguiente <i class="fas fa-chevron-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(div);
+        },
+
+        renderizarCategorias: function() {
+            const cont = document.getElementById('sel-locat-categorias');
+            if (!cont) return;
+            const cats = ['todas', ...global.CatalogoLocat.getCategorias()];
+            cont.innerHTML = cats.map(cat => {
+                const esActiva = _locatModalCategoria === cat;
+                const label = cat === 'todas' ? 'Todas las Categorías' : cat;
+                return `
+                    <button type="button" onclick="window.SelectorActividadLocatModal.filtrarCategoria('${cat}')" 
+                            class="px-3 py-1 rounded-xl text-[11px] whitespace-nowrap transition border ${esActiva ? 'bg-indigo-600 border-indigo-500 text-white font-bold shadow' : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700 font-medium'}">
+                        ${label}
+                    </button>
+                `;
+            }).join('');
+        },
+
+        renderizar: function() {
+            if (typeof document === 'undefined') return;
+            const grid = document.getElementById('sel-locat-grid');
+            const contador = document.getElementById('sel-locat-contador');
+            const pagInfo = document.getElementById('sel-locat-pag-info');
+            const btnPrev = document.getElementById('sel-locat-prev');
+            const btnNext = document.getElementById('sel-locat-next');
+            if (!grid) return;
+
+            let list = global.CatalogoLocat.getAll();
+
+            // Filtrar por categoria
+            if (_locatModalCategoria && _locatModalCategoria !== 'todas') {
+                list = list.filter(i => i.categoria === _locatModalCategoria);
+            }
+
+            // Filtrar por texto
+            if (_locatModalQuery) {
+                list = list.filter(a => {
+                    const cod = String(a.codigo || '').toLowerCase();
+                    const nom = String(a.nombre || '').toLowerCase();
+                    const cat = String(a.categoria || '').toLowerCase();
+                    return cod.includes(_locatModalQuery) || nom.includes(_locatModalQuery) || cat.includes(_locatModalQuery);
+                });
+            }
+
+            const total = list.length;
+            const totalPaginas = Math.ceil(total / _locatModalPorPagina) || 1;
+            if (_locatModalPagina > totalPaginas) _locatModalPagina = totalPaginas;
+            if (_locatModalPagina < 1) _locatModalPagina = 1;
+
+            const inicio = (_locatModalPagina - 1) * _locatModalPorPagina;
+            const fin = inicio + _locatModalPorPagina;
+            const paginaItems = list.slice(inicio, fin);
+
+            if (contador) contador.innerText = `${total} actividad(es)`;
+            if (pagInfo) pagInfo.innerText = `Página ${_locatModalPagina} de ${totalPaginas}`;
+            if (btnPrev) btnPrev.disabled = (_locatModalPagina <= 1);
+            if (btnNext) btnNext.disabled = (_locatModalPagina >= totalPaginas);
+
+            if (paginaItems.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full py-12 text-center text-slate-500">
+                        <i class="fas fa-tags text-3xl mb-2 block"></i>
+                        <p class="text-xs">No se encontraron actividades económicas con ese criterio.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = paginaItems.map(a => `
+                <div onclick="window.SelectorActividadLocatModal.seleccionar('${a.codigo}')" 
+                     class="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 hover:border-indigo-500/60 hover:bg-slate-800/40 transition cursor-pointer flex flex-col justify-between gap-3 group shadow-sm">
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 font-mono text-xs font-bold">
+                                ${a.codigo}
+                            </span>
+                            <span class="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 truncate max-w-[200px]" title="${a.categoria}">
+                                ${a.categoria}
+                            </span>
+                        </div>
+                        <h4 class="text-xs font-bold text-slate-100 group-hover:text-indigo-300 transition line-clamp-2 leading-snug">
+                            ${a.nombre}
+                        </h4>
+                        <div class="flex items-center gap-2 pt-1">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-mono text-[11px] font-bold">
+                                <i class="fas fa-percentage text-[9px]"></i> ${(a.alicuota * 100).toFixed(2)}%
+                            </span>
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-400 font-mono text-[11px] font-bold">
+                                <i class="fas fa-coins text-[9px]"></i> ${a.minimo_tcmmv.toFixed(2)} TCMMV
+                            </span>
+                        </div>
+                    </div>
+                    <div class="pt-2 border-t border-slate-800/60 flex items-center justify-between">
+                        <span class="text-[10px] text-slate-500">Mínimo tributable mensual</span>
+                        <span class="text-xs font-bold text-indigo-400 group-hover:translate-x-1 transition flex items-center gap-1">
+                            Seleccionar <i class="fas fa-arrow-right text-[10px]"></i>
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+    };
+
+    global.SelectorActividadLocatModal = SelectorActividadLocatModal;
+
     // Auto-sembrado en HaciendaStore si ya esta inicializado y la tabla esta vacia
     const store = (typeof window !== 'undefined' && window.HaciendaStore) || global.HaciendaStore;
     if (store && typeof store.sembrarActividadesLocat === 'function') {

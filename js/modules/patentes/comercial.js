@@ -175,15 +175,24 @@
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-400 mb-1">Actividad Económica (Clasificador LOCAT)</label>
-                                <select id="pat-locat-select" onchange="window.PatentesModule.alCambiarActividad()" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 text-xs outline-none focus:border-indigo-500">
-                                    <option value="">Seleccione una actividad del clasificador...</option>
-                                    ${(global.CatalogoLocat ? global.CatalogoLocat.getAll() : []).map(a => `
-                                        <option value="${a.codigo}" data-alicuota="${a.alicuota}" data-minimo="${a.minimo_tcmmv}">
-                                            [${a.codigo}] ${a.nombre} (${(a.alicuota * 100).toFixed(2)}%)
-                                        </option>
-                                    `).join('')}
-                                </select>
+                                <label class="block text-xs font-bold text-slate-400 mb-1">Actividad Económica (Clasificador Armonizado LOCAT)</label>
+                                <input type="hidden" id="pat-locat-codigo" required>
+                                <input type="hidden" id="pat-locat-descripcion">
+                                <div id="pat-actividad-box" onclick="window.PatentesModule.abrirSelectorActividad()" 
+                                     class="p-3 bg-slate-950 border border-dashed border-slate-800 hover:border-indigo-500/60 rounded-xl cursor-pointer transition flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs shrink-0">
+                                            <i class="fas fa-tags"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs font-bold text-slate-200">Seleccionar Actividad Económica</p>
+                                            <p class="text-[10px] text-slate-500">Haga clic para abrir el catálogo con tarjetas, categorías y buscador</p>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-indigo-400 text-xs font-bold rounded-lg transition shrink-0">
+                                        Buscar
+                                    </button>
+                                </div>
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
@@ -561,6 +570,7 @@
 
         alCambiarActividad: function() {
             const select = document.getElementById('pat-locat-select');
+            if (!select) return;
             const opt = select.options[select.selectedIndex];
             if (!opt || !opt.dataset) return;
 
@@ -569,6 +579,81 @@
 
             document.getElementById('pat-alicuota').value = (alicuota * 100).toFixed(2);
             document.getElementById('pat-minimo').value = minimo.toFixed(2);
+        },
+
+        abrirSelectorActividad: function() {
+            if (global.SelectorActividadLocatModal) {
+                global.SelectorActividadLocatModal.abrir({
+                    onSelect: (act) => this.setActividad(act)
+                });
+            }
+        },
+
+        setActividad: function(act) {
+            if (!act) return;
+            const inputCodigo = document.getElementById('pat-locat-codigo');
+            const inputDesc = document.getElementById('pat-locat-descripcion');
+            const inputAlicuota = document.getElementById('pat-alicuota');
+            const inputMinimo = document.getElementById('pat-minimo');
+
+            if (inputCodigo) inputCodigo.value = act.codigo;
+            if (inputDesc) inputDesc.value = act.nombre;
+            if (inputAlicuota) inputAlicuota.value = (parseFloat(act.alicuota || 0) * 100).toFixed(2);
+            if (inputMinimo) inputMinimo.value = parseFloat(act.minimo_tcmmv || 0).toFixed(2);
+
+            const box = document.getElementById('pat-actividad-box');
+            if (box) {
+                box.className = "p-3 bg-slate-950 border border-indigo-500/40 rounded-xl flex items-center justify-between";
+                box.innerHTML = `
+                    <div class="flex items-center gap-3 pr-2">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs shrink-0">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="text-xs font-mono font-bold text-indigo-400">[${act.codigo}]</span>
+                                <span class="text-xs font-bold text-slate-100 truncate">${act.nombre}</span>
+                            </div>
+                            <p class="text-[10px] text-slate-400">
+                                ${act.categoria ? act.categoria + ' · ' : ''}Alícuota: <span class="text-emerald-400 font-mono font-bold">${(parseFloat(act.alicuota || 0) * 100).toFixed(2)}%</span> · Mín: <span class="text-amber-400 font-mono font-bold">${parseFloat(act.minimo_tcmmv || 0).toFixed(2)} TCMMV</span>
+                            </p>
+                        </div>
+                    </div>
+                    <button type="button" onclick="window.PatentesModule.abrirSelectorActividad()" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded-lg transition shrink-0">
+                        Cambiar
+                    </button>
+                `;
+            }
+        },
+
+        resetActividadBox: function() {
+            const inputCodigo = document.getElementById('pat-locat-codigo');
+            const inputDesc = document.getElementById('pat-locat-descripcion');
+            const inputAlicuota = document.getElementById('pat-alicuota');
+            const inputMinimo = document.getElementById('pat-minimo');
+            if (inputCodigo) inputCodigo.value = '';
+            if (inputDesc) inputDesc.value = '';
+            if (inputAlicuota) inputAlicuota.value = '';
+            if (inputMinimo) inputMinimo.value = '';
+
+            const box = document.getElementById('pat-actividad-box');
+            if (box) {
+                box.className = "p-3 bg-slate-950 border border-dashed border-slate-800 hover:border-indigo-500/60 rounded-xl cursor-pointer transition flex items-center justify-between";
+                box.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs shrink-0">
+                            <i class="fas fa-tags"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-200">Seleccionar Actividad Económica</p>
+                            <p class="text-[10px] text-slate-500">Haga clic para abrir el catálogo con tarjetas, categorías y buscador</p>
+                        </div>
+                    </div>
+                    <button type="button" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-indigo-400 text-xs font-bold rounded-lg transition shrink-0">
+                        Buscar
+                    </button>
+                `;
+            }
         },
 
         abrirSelector: function() {
@@ -698,6 +783,8 @@
             const numInput = document.getElementById('pat-numero');
             if (numInput) numInput.value = nextCorrelativo;
 
+            this.resetActividadBox();
+
             if (contribuyenteId) {
                 const store = global.HaciendaStore;
                 const contribuyentes = store ? store.get('hacienda_contribuyentes') : [];
@@ -718,6 +805,7 @@
             document.getElementById('modal-nueva-patente')?.classList.add('hidden');
             document.getElementById('form-patente')?.reset();
             this.resetContribuyenteBox();
+            this.resetActividadBox();
         },
 
         abrirModalVehiculo: function(vehiculoId = null) {
@@ -936,15 +1024,29 @@
                 return;
             }
 
-            const locatSelect = document.getElementById('pat-locat-select');
-            const opt = locatSelect.options[locatSelect.selectedIndex];
+            const codigoLocat = document.getElementById('pat-locat-codigo')?.value || document.getElementById('pat-locat-select')?.value;
+            let descripcionActividad = document.getElementById('pat-locat-descripcion')?.value;
+            if (!descripcionActividad) {
+                const locatSelect = document.getElementById('pat-locat-select');
+                if (locatSelect && locatSelect.selectedIndex >= 0) {
+                    const opt = locatSelect.options[locatSelect.selectedIndex];
+                    descripcionActividad = opt ? (opt.text.split('] ')[1]?.split(' (')[0] || opt.text) : '';
+                }
+            }
+
+            if (!codigoLocat) {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({ icon: 'warning', title: 'Atención', text: 'Debe seleccionar una actividad económica del clasificador LOCAT.', confirmButtonColor: '#4f46e5' });
+                }
+                return;
+            }
 
             const nuevaPatente = {
                 numero_patente: document.getElementById('pat-numero').value.trim(),
                 contribuyente_id: contribId,
                 tipo: 'comercial',
-                codigo_locat: locatSelect.value,
-                descripcion_actividad: opt.text.split('] ')[1]?.split(' (')[0] || opt.text,
+                codigo_locat: codigoLocat,
+                descripcion_actividad: descripcionActividad || codigoLocat,
                 alicuota: parseFloat(document.getElementById('pat-alicuota').value) / 100,
                 minimo_tributable_tcmmv: parseFloat(document.getElementById('pat-minimo').value),
                 estado: 'activa',

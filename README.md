@@ -140,6 +140,14 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.10.7 — 22/11/2026
+- **Selector Interactivo de Actividades Económicas LOCAT (Modal con Buscador en Vivo y Tarjetas):**
+  - **Sustitución del Dropdown Nativo:** Se reemplazó el tradicional selector desplegable `<select id="pat-locat-select">` (con más de 80 rubros económicos de la LOCAT) por un selector interactivo tipo modal (`SelectorActividadLocatModal`), homólogo al buscador de contribuyentes del padrón.
+  - **Buscador en Tiempo Real:** Filtro instantáneo por código de actividad (ej. `COM-001`, `IND-002`, `RES-001`), nombre del ramo o palabras clave descriptivas.
+  - **Filtro de Categorías por Pills:** Navegación segmentada por categorías armonizadas: Todas las Categorías, Comercio de Alimentos y Víveres, Ferretería y Bienes del Hogar, Restaurantes y Hospedaje, Licores y Diversión Nocturna, Servicios Técnicos y Personales, Salud, Educación y Asesoría, Industria, Agro y Construcción, Telecomunicaciones y Finanzas.
+  - **Cuadrícula de Tarjetas y Paginación Dinámica:** Cards estructuradas con código oficial, categoría, denominación de la actividad, alícuota porcentual aplicable (%) y mínimo tributable en TCMMV, con paginación fluida a 0ms de latencia.
+  - **Previsualización en Formulario:** Caja visual interactiva en el modal de otorgamiento de licencia que muestra la actividad seleccionada con opción de cambiar con un solo clic.
+
 ### Version 3.10.6 — 22/11/2026
 - **Módulo Integral de Registro Vehicular (Patente sobre Vehículos y Transporte Terrestre) — Estándar Los Teques / SATGUAICA:**
   - **Inputs y Ficha Técnica Completa (Normativa INTT y Ordenanza Municipal):**
