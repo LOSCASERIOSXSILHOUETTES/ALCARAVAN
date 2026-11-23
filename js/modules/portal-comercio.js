@@ -52,6 +52,46 @@
         'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
     ];
 
+    // Catálogo oficial de entidades bancarias nacionales (SUDEBAN / Venezuela)
+    const BANCOS_VENEZUELA = [
+        { codigo: '0102', nombre: 'Banco de Venezuela', corto: 'BDV' },
+        { codigo: '0134', nombre: 'Banesco Banco Universal', corto: 'Banesco' },
+        { codigo: '0191', nombre: 'Banco Nacional de Crédito BNC', corto: 'BNC' },
+        { codigo: '0105', nombre: 'Mercantil Banco', corto: 'Mercantil' },
+        { codigo: '0108', nombre: 'BBVA Banco Provincial', corto: 'Provincial' },
+        { codigo: '0163', nombre: 'Banco del Tesoro', corto: 'Tesoro' },
+        { codigo: '0172', nombre: 'Bancamiga Banco Universal', corto: 'Bancamiga' },
+        { codigo: '0175', nombre: 'Banco Bicentenario del Pueblo', corto: 'Bicentenario' },
+        { codigo: '0177', nombre: 'Banco de la Fuerza Armada Nacional Bolivariana (BANFANB)', corto: 'BANFANB' },
+        { codigo: '0166', nombre: 'Banco Agrícola de Venezuela', corto: 'BAV' },
+        { codigo: '0104', nombre: 'Banco Venezolano de Crédito (BVC) / BDT', corto: 'BVC / BDT' },
+        { codigo: '0174', nombre: 'Banplus Banco Universal', corto: 'Banplus' },
+        { codigo: '0138', nombre: 'Banco Plaza', corto: 'Plaza' },
+        { codigo: '0151', nombre: 'BFC Banco Fondo Común', corto: 'BFC' },
+        { codigo: '0114', nombre: 'Bancaribe', corto: 'Bancaribe' },
+        { codigo: '0115', nombre: 'Banco Exterior', corto: 'Exterior' },
+        { codigo: '0128', nombre: 'Banco Caroní', corto: 'Caroní' },
+        { codigo: '0156', nombre: '100% Banco', corto: '100% Banco' },
+        { codigo: '0171', nombre: 'Banco Activo', corto: 'Activo' },
+        { codigo: '0157', nombre: 'DelSur Banco Universal', corto: 'DelSur' },
+        { codigo: '0137', nombre: 'Banco Sofitasa', corto: 'Sofitasa' },
+        { codigo: '0168', nombre: 'Bancrecer Banco Microfinanciero', corto: 'Bancrecer' },
+        { codigo: '0169', nombre: 'Mi Banco Banco Microfinanciero', corto: 'Mi Banco' },
+        { codigo: '0146', nombre: 'Bangente', corto: 'Bangente' },
+        { codigo: '0178', nombre: 'N58 Banco Digital', corto: 'N58' },
+        { codigo: '0601', nombre: 'Instituto Municipal de Crédito Popular (IMCP)', corto: 'IMCP' },
+        { codigo: '0173', nombre: 'Banco Internacional de Desarrollo', corto: 'BID' },
+        { codigo: '0116', nombre: 'Banco Occidental de Descuento (BOD)', corto: 'BOD' },
+        { codigo: '0000', nombre: 'Otro Banco / Entidad Financiera', corto: 'Otro' }
+    ];
+
+    function getBancosVenezuela() {
+        if (global.HaciendaCuentas && Array.isArray(global.HaciendaCuentas.BANCOS) && global.HaciendaCuentas.BANCOS.length > 0) {
+            return global.HaciendaCuentas.BANCOS;
+        }
+        return BANCOS_VENEZUELA;
+    }
+
     const AVISOS_CARRUSEL = [
         {
             id: 'slide_1',
@@ -1584,8 +1624,13 @@
                                 </div>
                                 <div class="space-y-1.5">
                                     <label class="text-[11px] font-medium text-neutral-400 uppercase tracking-wider block">Banco de Origen (Tu Banco)</label>
-                                    <input type="text" id="pago-banco-origen" placeholder="Ej: Banesco, Mercantil, BDV, Provincial" 
-                                           class="w-full bg-[#18181b] border border-white/10 text-white text-xs font-medium rounded-2xl px-4 py-3 outline-none focus:border-white/30 transition">
+                                    <select id="pago-banco-origen" class="w-full bg-[#18181b] border border-white/10 text-white text-xs font-medium rounded-2xl px-4 py-3 outline-none focus:border-white/30 transition">
+                                        <option value="">Selecciona tu banco emisor...</option>
+                                        ${getBancosVenezuela().map(b => {
+                                            const label = (b.corto && b.corto !== b.nombre) ? `${b.nombre} (${b.corto})` : b.nombre;
+                                            return `<option value="${b.nombre}">${label}</option>`;
+                                        }).join('')}
+                                    </select>
                                 </div>
                                 <div class="space-y-1.5">
                                     <label class="text-[11px] font-medium text-neutral-400 uppercase tracking-wider block">Cuenta / Banco Receptor (Alcaldía)</label>
@@ -2695,17 +2740,17 @@
             const cuentaIdDesdeDestino = bancoDestinoSelect && bancoDestinoSelect.value ? parseInt(bancoDestinoSelect.value, 10) : null;
             const bancoDestinoNombre = optDestino?.dataset?.bancoNombre || (optDestino ? optDestino.text.trim() : 'Tesorería Municipal');
 
-            const bancoOrigen = document.getElementById('pago-banco-origen')?.value.trim() || 'No especificado';
+            const bancoOrigen = document.getElementById('pago-banco-origen')?.value.trim();
             const referencia = document.getElementById('pago-referencia')?.value.trim();
             const monto = parseFloat(document.getElementById('pago-monto')?.value || 0);
             const fecha = document.getElementById('pago-fecha')?.value;
 
-            if (!decId || !referencia || monto <= 0) {
+            if (!decId || !referencia || monto <= 0 || !bancoOrigen) {
                 if (typeof Swal !== 'undefined') {
                     Swal.fire({
                         icon: 'warning',
                         title: 'Campos requeridos',
-                        text: 'Selecciona la declaración, ingresa referencia y monto válido.',
+                        text: 'Selecciona la declaración, tu banco emisor de origen, ingresa referencia y monto válido.',
                         confirmButtonColor: '#000000'
                     });
                 }

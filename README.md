@@ -140,6 +140,12 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.10.8 — 22/11/2026
+- **Selector Oficial de Banco Emisor (Origen) en Reporte de Pagos de Impuestos:**
+  - **Reemplazo de Input de Texto Libre:** Se sustituyó el campo de texto libre `#pago-banco-origen` por un menú desplegable `<select>` pre-cargado con el catálogo oficial completo de la banca venezolana (SUDEBAN).
+  - **Catálogo Nacional SUDEBAN Completo:** Incorporación de todos los bancos nacionales (Banco de Venezuela, Banesco, BNC, Mercantil, Provincial, Bancamiga, Banco del Tesoro, Bicentenario, BDT / BVC, BANFANB, Banplus, Banco Plaza, BFC, Bancaribe, Exterior, Caroní, 100% Banco, Activo, DelSur, Sofitasa, Bancrecer, Mi Banco, Bangente, N58 Banco Digital, etc.) con sus acrónimos y opción genérica.
+  - **Validación Automatizada:** El contribuyente ya no tiene que tipear su banco manualmente, evitando discrepancias tipográficas en la conciliación bancaria y asegurando la selección del banco emisor al reportar la transferencia o pago móvil.
+
 ### Version 3.10.7 — 22/11/2026
 - **Selector Interactivo de Actividades Económicas LOCAT (Modal con Buscador en Vivo y Tarjetas):**
   - **Sustitución del Dropdown Nativo:** Se reemplazó el tradicional selector desplegable `<select id="pat-locat-select">` (con más de 80 rubros económicos de la LOCAT) por un selector interactivo tipo modal (`SelectorActividadLocatModal`), homólogo al buscador de contribuyentes del padrón.
