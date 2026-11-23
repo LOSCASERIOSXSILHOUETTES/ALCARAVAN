@@ -102,7 +102,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-800/60 font-medium">
-                                    ${this.generarFilasTabla(pagos, contribuyentes)}
+                                    ${this.generarFilasTabla(pagos, contribuyentes, declaraciones)}
                                 </tbody>
                             </table>
                         </div>
@@ -197,18 +197,29 @@
             `;
         },
 
-        generarFilasTabla: function(pagos, contribuyentes) {
+        generarFilasTabla: function(pagos, contribuyentes, declaraciones) {
             if (!pagos || pagos.length === 0) {
                 return `<tr><td colspan="7" class="py-8 text-center text-slate-500 italic">No hay pagos registrados en taquilla aún.</td></tr>`;
             }
 
             return pagos.map(p => {
                 const c = contribuyentes.find(item => String(item.id) === String(p.contribuyente_id));
+                const d = declaraciones ? declaraciones.find(item => String(item.id) === String(p.declaracion_id)) : null;
                 const isConciliado = p.estado === 'conciliado';
+                const isRechazado = p.estado === 'rechazado';
+                const isAbono = p.tipo_pago === 'abono';
+
+                const montoDeclarado = d ? Number((d.saldo_pendiente_bs != null ? d.saldo_pendiente_bs : d.impuesto_determinado_bs) || 0) : 0;
+                const montoReportado = Number(p.monto_bs || 0);
+                const isIncompleto = d && montoReportado < montoDeclarado && p.estado === 'pendiente';
+                const faltante = Math.max(0, montoDeclarado - montoReportado);
 
                 return `
                     <tr class="hover:bg-slate-800/40 transition">
-                        <td class="py-3 px-4 font-mono font-bold text-amber-400">${p.numero_recibo || 'REC-PEND'}</td>
+                        <td class="py-3 px-4 font-mono font-bold text-amber-400">
+                            ${p.numero_recibo || 'REC-PEND'}
+                            ${isAbono ? `<span class="block text-[9px] font-sans text-amber-300 font-semibold">[ABONO]</span>` : ''}
+                        </td>
                         <td class="py-3 px-4">
                             <div class="font-bold text-slate-200">${c ? c.razon_social : 'ID: ' + p.contribuyente_id}</div>
                             <div class="text-[11px] font-mono text-slate-400">${c ? c.rif : ''}</div>
@@ -216,26 +227,71 @@
                         <td class="py-3 px-4 text-slate-300">
                             <div>${p.banco_destino}</div>
                             <div class="text-[11px] font-mono text-slate-500">Ref: ${p.referencia_bancaria}</div>
+                            ${p.banco_origen ? `<div class="text-[10px] text-slate-400">Origen: ${p.banco_origen}</div>` : ''}
                         </td>
                         <td class="py-3 px-4 font-mono text-slate-300">${p.fecha_pago}</td>
-                        <td class="py-3 px-4 text-right font-mono font-bold text-emerald-400">
-                            ${Number(p.monto_bs || 0).toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs.
+                        <td class="py-3 px-4 text-right">
+                            <div class="font-mono font-bold ${isRechazado ? 'text-rose-400 line-through' : (isAbono ? 'text-amber-400' : 'text-emerald-400')}">
+                                ${montoReportado.toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs.
+                            </div>
+                            ${d && p.estado === 'pendiente' ? `
+                                <div class="text-[10px] text-slate-400 font-mono" title="Monto de la declaración">
+                                    Total: ${Number(d.impuesto_determinado_bs || 0).toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs.
+                                </div>
+                            ` : ''}
                         </td>
                         <td class="py-3 px-4 text-center">
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isConciliado ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'}">
-                                ${(p.estado || 'pendiente').toUpperCase()}
-                            </span>
-                        </td>
-                        <td class="py-3 px-4 text-right space-x-2">
-                            ${!isConciliado ? `
-                                <button onclick="window.CajaModule.conciliarPago(${p.id})" class="px-2.5 py-1 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 rounded-lg text-[11px] font-semibold transition" title="Conciliar y Validar">
-                                    <i class="fas fa-check"></i> Validar
-                                </button>
+                            ${isConciliado ? `
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isAbono ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'}">
+                                    ${isAbono ? 'ABONO CONCILIADO' : 'CONCILIADO'}
+                                </span>
+                            ` : isRechazado ? `
+                                <div>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                                        RECHAZADO
+                                    </span>
+                                    <div class="text-[10px] text-rose-400 italic mt-0.5 max-w-[140px] truncate mx-auto" title="${p.motivo_rechazo || ''}">
+                                        ${p.motivo_rechazo || 'Pago no admitido'}
+                                    </div>
+                                </div>
                             ` : `
-                                <button onclick="window.CajaModule.imprimirRecibo(${p.id})" class="px-2.5 py-1 bg-sky-600/20 hover:bg-sky-600/40 text-sky-400 border border-sky-500/30 rounded-lg text-[11px] font-semibold transition" title="Imprimir Recibo">
-                                    <i class="fas fa-print"></i> Recibo
-                                </button>
+                                <div>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                        PENDIENTE
+                                    </span>
+                                    ${isIncompleto ? `
+                                        <div class="text-[10px] font-bold text-amber-300 mt-1" title="Monto inferior a la declaración">
+                                            Incompleto (-${faltante.toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs.)
+                                        </div>
+                                    ` : ''}
+                                </div>
                             `}
+                        </td>
+                        <td class="py-3 px-4 text-right">
+                            <div class="flex items-center justify-end gap-1.5 flex-wrap">
+                                ${isConciliado ? `
+                                    <button onclick="window.CajaModule.imprimirRecibo(${p.id})" class="px-2.5 py-1 bg-sky-600/20 hover:bg-sky-600/40 text-sky-400 border border-sky-500/30 rounded-lg text-[11px] font-semibold transition" title="Imprimir Recibo">
+                                        <i class="fas fa-print"></i> Recibo
+                                    </button>
+                                ` : isRechazado ? `
+                                    <button onclick="window.CajaModule.verMotivoRechazo(${p.id})" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-rose-300 rounded-lg text-[11px] font-medium transition" title="Ver Detalle del Rechazo">
+                                        Ver Motivo
+                                    </button>
+                                ` : `
+                                    ${isIncompleto ? `
+                                        <button onclick="window.CajaModule.abonarPago(${p.id})" class="px-2.5 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 rounded-lg text-[11px] font-semibold transition flex items-center gap-1" title="Aceptar como abono parcial (Mantiene la deuda en mora)">
+                                            <i class="fas fa-coins text-[10px]"></i> Abonar
+                                        </button>
+                                    ` : `
+                                        <button onclick="window.CajaModule.conciliarPago(${p.id})" class="px-2.5 py-1 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 rounded-lg text-[11px] font-semibold transition flex items-center gap-1" title="Conciliar y Validar Pago Completo">
+                                            <i class="fas fa-check text-[10px]"></i> Validar
+                                        </button>
+                                    `}
+                                    <button onclick="window.CajaModule.rechazarPago(${p.id})" class="px-2 py-1 bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 border border-rose-500/30 rounded-lg text-[11px] font-semibold transition flex items-center gap-1" title="Rechazar Pago Incompleto o Falso">
+                                        <i class="fas fa-times text-[10px]"></i> Rechazar
+                                    </button>
+                                `}
+                            </div>
                         </td>
                     </tr>
                 `;
@@ -373,31 +429,229 @@
         },
 
         conciliarPago: async function(pagoId) {
-            const pagos = global.HaciendaStore.get('hacienda_pagos');
+            const store = global.HaciendaStore;
+            if (!store) return;
+            const pagos = store.get('hacienda_pagos') || [];
             const pago = pagos.find(p => String(p.id) === String(pagoId));
             if (!pago) return;
 
             pago.estado = 'conciliado';
+            pago.tipo_pago = 'total';
             pago.fecha_verificacion = new Date().toISOString();
-            await global.HaciendaStore.set('hacienda_pagos', pago);
+            pago.verificado_por = 'Taquilla Hacienda';
+            await store.set('hacienda_pagos', pago);
 
-            // Actualizar declaración si existe
+            // Actualizar declaración a pagada y saldo 0
             if (pago.declaracion_id) {
-                const declaraciones = global.HaciendaStore.get('hacienda_declaraciones');
+                const declaraciones = store.get('hacienda_declaraciones') || [];
                 const dec = declaraciones.find(d => String(d.id) === String(pago.declaracion_id));
                 if (dec) {
+                    dec.monto_pagado_bs = Number(dec.impuesto_determinado_bs || pago.monto_bs || 0);
+                    dec.saldo_pendiente_bs = 0;
                     dec.estado = 'pagada';
-                    await global.HaciendaStore.set('hacienda_declaraciones', dec);
+                    await store.set('hacienda_declaraciones', dec);
                 }
+            }
+
+            const container = document.getElementById('app-main-content');
+            if (container) this.render(container);
+
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Pago Conciliado',
+                    text: 'Pago validado en su totalidad y declaración saldada.',
+                    confirmButtonColor: '#059669',
+                    timer: 1800,
+                    showConfirmButton: false
+                });
+            }
+        },
+
+        abonarPago: async function(pagoId) {
+            const store = global.HaciendaStore;
+            if (!store) return;
+            const pagos = store.get('hacienda_pagos') || [];
+            const pago = pagos.find(p => String(p.id) === String(pagoId));
+            if (!pago) return;
+
+            const declaraciones = store.get('hacienda_declaraciones') || [];
+            const dec = declaraciones.find(d => String(d.id) === String(pago.declaracion_id));
+
+            const montoPago = Number(pago.monto_bs || 0);
+            const totalDec = dec ? Number(dec.impuesto_determinado_bs || 0) : montoPago;
+            const saldoActual = dec ? Number(dec.saldo_pendiente_bs != null ? dec.saldo_pendiente_bs : totalDec) : totalDec;
+            const nuevoSaldo = Math.max(0, saldoActual - montoPago);
+
+            if (typeof Swal !== 'undefined') {
+                const result = await Swal.fire({
+                    title: 'Aceptar Abono Parcial',
+                    html: `
+                        <div class="text-left text-xs space-y-2 text-slate-300">
+                            <p>El contribuyente reportó un pago por <b class="text-emerald-400 font-mono">${montoPago.toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs.</b></p>
+                            <p>Deuda total de la declaración: <b class="text-slate-100 font-mono">${totalDec.toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs.</b></p>
+                            <div class="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-amber-300">
+                                <b>Saldo restante tras el abono:</b> <span class="font-mono font-bold text-amber-200">${nuevoSaldo.toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs.</span>
+                                <p class="text-[11px] mt-1 text-amber-400/80">Nota: La declaración quedará en estado <b>PARCIAL</b> y el comercio seguirá en <b>MORA</b> hasta cancelar la totalidad. No se emitirá Solvencia Municipal.</p>
+                            </div>
+                        </div>
+                    `,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d97706',
+                    cancelButtonColor: '#334155',
+                    confirmButtonText: 'Sí, Registrar Abono',
+                    cancelButtonText: 'Cancelar'
+                });
+
+                if (!result.isConfirmed) return;
+            }
+
+            pago.estado = 'conciliado';
+            pago.tipo_pago = 'abono';
+            pago.fecha_verificacion = new Date().toISOString();
+            pago.verificado_por = 'Taquilla Hacienda';
+            await store.set('hacienda_pagos', pago);
+
+            if (dec) {
+                dec.monto_pagado_bs = Number((Number(dec.monto_pagado_bs || 0) + montoPago).toFixed(2));
+                dec.saldo_pendiente_bs = Number(nuevoSaldo.toFixed(2));
+                dec.estado = nuevoSaldo <= 0 ? 'pagada' : 'parcial';
+                await store.set('hacienda_declaraciones', dec);
+            }
+
+            const container = document.getElementById('app-main-content');
+            if (container) this.render(container);
+
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Abono Procesado',
+                    text: `Se registraron ${montoPago.toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs. Restan ${nuevoSaldo.toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs.`,
+                    confirmButtonColor: '#d97706',
+                    timer: 2200,
+                    showConfirmButton: false
+                });
+            }
+        },
+
+        rechazarPago: async function(pagoId) {
+            const store = global.HaciendaStore;
+            if (!store) return;
+            const pagos = store.get('hacienda_pagos') || [];
+            const pago = pagos.find(p => String(p.id) === String(pagoId));
+            if (!pago) return;
+
+            let motivo = 'Transferencia no recibida en la cuenta bancaria de la Alcaldía.';
+
+            if (typeof Swal !== 'undefined') {
+                const { value: formValues } = await Swal.fire({
+                    title: 'Rechazar Pago Reportado',
+                    html: `
+                        <div class="text-left text-xs space-y-3 text-slate-300">
+                            <p class="text-slate-400">Indica el motivo por el cual se rechaza el pago (el contribuyente verá esta razón en su portal):</p>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-400 mb-1">Motivo predeterminado:</label>
+                                <select id="swal-motivo-rapido" onchange="document.getElementById('swal-motivo-texto').value = this.value" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 outline-none">
+                                    <option value="Transferencia no recibida en la cuenta bancaria de la Alcaldía.">Transferencia no recibida en banco (Comprobante no válido o pago falso)</option>
+                                    <option value="Monto transferido es insuficiente o pago incompleto no autorizado.">Monto insuficiente / pago incompleto</option>
+                                    <option value="Número de referencia bancaria inválido o duplicado.">Número de referencia inválido o duplicado</option>
+                                    <option value="Banco emisor o datos no corresponden con el extracto bancario.">Datos no concuerdan con el extracto bancario</option>
+                                    <option value="">Otro motivo personalizado...</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-400 mb-1">Detalle del motivo:</label>
+                                <textarea id="swal-motivo-texto" rows="3" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs text-slate-100 outline-none focus:border-rose-500" placeholder="Escriba el motivo detallado del rechazo...">Transferencia no recibida en la cuenta bancaria de la Alcaldía.</textarea>
+                            </div>
+                        </div>
+                    `,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#e11d48',
+                    cancelButtonColor: '#334155',
+                    confirmButtonText: 'Rechazar Pago',
+                    cancelButtonText: 'Cancelar',
+                    preConfirm: () => {
+                        const m = document.getElementById('swal-motivo-texto')?.value.trim();
+                        if (!m) {
+                            Swal.showValidationMessage('Debe ingresar un motivo de rechazo.');
+                            return false;
+                        }
+                        return m;
+                    }
+                });
+
+                if (!formValues) return;
+                motivo = formValues;
+            }
+
+            pago.estado = 'rechazado';
+            pago.motivo_rechazo = motivo;
+            pago.fecha_verificacion = new Date().toISOString();
+            pago.verificado_por = 'Taquilla Hacienda';
+            await store.set('hacienda_pagos', pago);
+
+            const container = document.getElementById('app-main-content');
+            if (container) this.render(container);
+
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Pago Rechazado',
+                    text: 'El pago ha sido marcado como rechazado y el contribuyente fue notificado en su portal.',
+                    confirmButtonColor: '#e11d48',
+                    timer: 2200,
+                    showConfirmButton: false
+                });
+            }
+        },
+
+        verMotivoRechazo: function(pagoId) {
+            const store = global.HaciendaStore;
+            const pagos = store ? (store.get('hacienda_pagos') || []) : [];
+            const pago = pagos.find(p => String(p.id) === String(pagoId));
+            if (!pago) return;
+
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Detalle de Pago Rechazado',
+                    html: `
+                        <div class="text-left text-xs space-y-2 text-slate-300">
+                            <p><b>N° Recibo / Ref:</b> <span class="font-mono text-slate-100">${pago.numero_recibo || ''} (${pago.referencia_bancaria})</span></p>
+                            <p><b>Monto Reportado:</b> <span class="font-mono text-rose-400 font-bold">${Number(pago.monto_bs || 0).toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs.</span></p>
+                            <p><b>Fecha de Rechazo:</b> <span class="font-mono text-slate-400">${pago.fecha_verificacion ? new Date(pago.fecha_verificacion).toLocaleString('es-VE') : 'N/A'}</span></p>
+                            <div class="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-300">
+                                <b>Motivo del Rechazo:</b>
+                                <p class="mt-1 font-sans text-xs">${pago.motivo_rechazo || 'Comprobante no válido o pago no recibido en la cuenta bancaria de la Alcaldía.'}</p>
+                            </div>
+                        </div>
+                    `,
+                    confirmButtonColor: '#e11d48'
+                });
             }
         },
 
         imprimirRecibo: function(pagoId) {
+            const store = global.HaciendaStore;
+            const pagos = store ? (store.get('hacienda_pagos') || []) : [];
+            const pago = pagos.find(p => String(p.id) === String(pagoId));
+            const tipoLabel = pago && pago.tipo_pago === 'abono' ? 'Abono Parcial' : 'Cancelación Total';
+
             if (typeof Swal !== 'undefined') {
                 Swal.fire({
                     icon: 'info',
-                    title: 'Recibo de Pago',
-                    text: 'Recibo oficial disponible para impresión.',
+                    title: 'Recibo Oficial de Pago',
+                    html: `
+                        <div class="text-left text-xs space-y-2 text-slate-300 font-sans">
+                            <p><b>N° Recibo:</b> <span class="font-mono text-amber-400 font-bold">${pago ? pago.numero_recibo : 'REC-PEND'}</span></p>
+                            <p><b>Modalidad:</b> <span class="font-semibold text-slate-100">${tipoLabel}</span></p>
+                            <p><b>Monto:</b> <span class="font-mono text-emerald-400 font-bold">${Number(pago ? pago.monto_bs : 0).toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs.</span></p>
+                            <p><b>Referencia:</b> <span class="font-mono text-slate-300">${pago ? pago.referencia_bancaria : ''}</span></p>
+                            <p><b>Destino:</b> <span class="text-slate-300">${pago ? pago.banco_destino : ''}</span></p>
+                        </div>
+                    `,
                     confirmButtonColor: '#0284c7'
                 });
             }

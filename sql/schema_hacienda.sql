@@ -55,8 +55,10 @@ CREATE TABLE IF NOT EXISTS "public"."hacienda_declaraciones" (
     "impuesto_alicuota_bs" NUMERIC(18,2) DEFAULT 0.00,
     "minimo_tributable_bs" NUMERIC(18,2) DEFAULT 0.00,
     "impuesto_determinado_bs" NUMERIC(18,2) DEFAULT 0.00,
+    "monto_pagado_bs" NUMERIC(18,2) DEFAULT 0.00,
+    "saldo_pendiente_bs" NUMERIC(18,2) DEFAULT 0.00,
     "tasa_bcv_aplicada" NUMERIC(12,4) DEFAULT 0.0000,
-    "estado" TEXT NOT NULL DEFAULT 'declarada', -- 'borrador', 'declarada', 'liquidada', 'pagada'
+    "estado" TEXT NOT NULL DEFAULT 'declarada', -- 'borrador', 'declarada', 'parcial', 'liquidada', 'pagada'
     "fecha_declaracion" TIMESTAMPTZ DEFAULT NOW(),
     "created_at" TIMESTAMPTZ DEFAULT NOW(),
     "updated_at" TIMESTAMPTZ DEFAULT NOW(),
@@ -76,6 +78,8 @@ CREATE TABLE IF NOT EXISTS "public"."hacienda_pagos" (
     "monto_bs" NUMERIC(18,2) NOT NULL DEFAULT 0.00,
     "comprobante_url" TEXT,
     "metodo" TEXT NOT NULL DEFAULT 'transferencia', -- 'transferencia', 'punto_venta', 'efectivo', 'pago_movil'
+    "tipo_pago" TEXT NOT NULL DEFAULT 'total', -- 'total', 'abono'
+    "motivo_rechazo" TEXT,
     "estado" TEXT NOT NULL DEFAULT 'pendiente', -- 'pendiente', 'conciliado', 'rechazado'
     "verificado_por" TEXT,
     "fecha_verificacion" TIMESTAMPTZ,
@@ -429,3 +433,10 @@ BEGIN
         -- Ya estaban agregadas a la publicacion
     END;
 END $$;
+
+-- Actualizaciones de columnas para Abonos Parciales y Rechazos de Pago
+ALTER TABLE "public"."hacienda_declaraciones" ADD COLUMN IF NOT EXISTS "monto_pagado_bs" NUMERIC(18,2) DEFAULT 0.00;
+ALTER TABLE "public"."hacienda_declaraciones" ADD COLUMN IF NOT EXISTS "saldo_pendiente_bs" NUMERIC(18,2) DEFAULT 0.00;
+ALTER TABLE "public"."hacienda_pagos" ADD COLUMN IF NOT EXISTS "motivo_rechazo" TEXT;
+ALTER TABLE "public"."hacienda_pagos" ADD COLUMN IF NOT EXISTS "tipo_pago" TEXT DEFAULT 'total';
+

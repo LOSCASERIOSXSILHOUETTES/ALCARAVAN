@@ -140,6 +140,14 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.10.9 — 22/11/2026
+- **Gestión Avanzada de Pagos Incompletos (Abonos Parciales) y Rechazo de Pagos Falsos en Taquilla ERP:**
+  - **Detección Automática de Pagos Incompletos:** En la tabla de Taquilla / Recaudación del ERP (`taquilla.js`), el sistema compara automáticamente el monto transferido (`p.monto_bs`) contra el saldo de la declaración (`d.impuesto_determinado_bs`). Si el monto es inferior, despliega una alerta visual: `Incompleto (-X Bs.)` y desactiva la validación como pago total.
+  - **Soporte de Abonos Parciales:** Incorporada la acción **Abonar Parcial** (`abonarPago`), permitiendo al cajero registrar legalmente los fondos que entraron a las cuentas de la Alcaldía, actualizando `d.monto_pagado_bs` y recalculando `d.saldo_pendiente_bs`. La declaración pasa al estado `'parcial'` y el comercio se mantiene en estatus **Moroso** (sin derecho a Solvencia Municipal) hasta cancelar la totalidad.
+  - **Módulo de Rechazo de Pagos Falsos o Inválidos:** Botón **Rechazar** (`rechazarPago`) con modal interactivo para documentar el motivo exacto del rechazo (comprobante no válido, transferencia no recibida en banco, referencia duplicada, etc.). El pago pasa a `'rechazado'` y no computa en la recaudación efectiva.
+  - **Transparencia en el Portal del Contribuyente:** En la pestaña Historial del portal, los pagos rechazados se muestran con distintivo rojo y el motivo explicativo. En la pestaña Pagar, las declaraciones con abonos reflejan el saldo restante exacto pendiente por liquidar.
+  - **Esquema de Base de Datos y Bi-Sync:** Incorporados los campos `monto_pagado_bs` y `saldo_pendiente_bs` en `hacienda_declaraciones`, y `motivo_rechazo` y `tipo_pago` en `hacienda_pagos`.
+
 ### Version 3.10.8 — 22/11/2026
 - **Selector Oficial de Banco Emisor (Origen) en Reporte de Pagos de Impuestos:**
   - **Reemplazo de Input de Texto Libre:** Se sustituyó el campo de texto libre `#pago-banco-origen` por un menú desplegable `<select>` pre-cargado con el catálogo oficial completo de la banca venezolana (SUDEBAN).

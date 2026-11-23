@@ -51,12 +51,14 @@
             'id', 'contribuyente_id', 'patente_id', 'anio', 'mes',
             'base_imponible_bs', 'alicuota_aplicada', 'impuesto_alicuota_bs',
             'minimo_tributable_bs', 'impuesto_determinado_bs', 'tasa_bcv_aplicada',
+            'monto_pagado_bs', 'saldo_pendiente_bs',
             'estado', 'fecha_declaracion', 'created_at', 'updated_at'
         ],
         'hacienda_pagos': [
             'id', 'numero_recibo', 'contribuyente_id', 'declaracion_id',
             'banco_origen', 'banco_destino', 'referencia_bancaria', 'fecha_pago',
             'monto_bs', 'comprobante_url', 'metodo', 'cuenta_id', 'metodo_pago_id',
+            'tipo_pago', 'motivo_rechazo',
             'estado', 'verificado_por', 'fecha_verificacion', 'created_at', 'updated_at'
         ],
         'hacienda_solvencias': [

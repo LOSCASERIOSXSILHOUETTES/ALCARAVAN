@@ -946,8 +946,11 @@
             // Datos del contribuyente
             const patentes = (store.get('hacienda_patentes') || []).filter(p => String(p.contribuyente_id) === String(c.id));
             const declaraciones = (store.get('hacienda_declaraciones') || []).filter(d => String(d.contribuyente_id) === String(c.id));
-            const declaracionesPendientes = declaraciones.filter(d => d.estado === 'pendiente');
-            const totalDeudaBs = declaracionesPendientes.reduce((acc, d) => acc + Number(d.impuesto_determinado_bs || 0), 0);
+            const declaracionesPendientes = declaraciones.filter(d => d.estado !== 'pagada');
+            const totalDeudaBs = declaracionesPendientes.reduce((acc, d) => {
+                const saldo = d.saldo_pendiente_bs != null ? Number(d.saldo_pendiente_bs) : Number(d.impuesto_determinado_bs || 0);
+                return acc + saldo;
+            }, 0);
             const esSolvente = declaracionesPendientes.length === 0;
 
             const inmuebles = (store.get('hacienda_inmuebles') || []).filter(i => String(i.contribuyente_id) === String(c.id));
@@ -1600,12 +1603,19 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div class="space-y-1.5">
                                     <label class="text-[11px] font-medium text-neutral-400 uppercase tracking-wider block">Declaración a Cancelar</label>
-                                    <select id="pago-declaracion-id" class="w-full bg-[#18181b] border border-white/10 text-white text-xs font-medium rounded-2xl px-4 py-3 outline-none focus:border-white/30 transition">
+                                    <select id="pago-declaracion-id" onchange="window.PortalComercio.alCambiarDeclaracionPago(this.value)" class="w-full bg-[#18181b] border border-white/10 text-white text-xs font-medium rounded-2xl px-4 py-3 outline-none focus:border-white/30 transition">
                                         ${declaracionesPendientes.length === 0 ? `
                                             <option value="">No tienes declaraciones pendientes</option>
-                                        ` : declaracionesPendientes.map(d => `
-                                            <option value="${d.id}">${MESES[d.mes - 1]} ${d.anio} — ${Number(d.impuesto_determinado_bs || 0).toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs.</option>
-                                        `).join('')}
+                                        ` : declaracionesPendientes.map(d => {
+                                            const saldo = d.saldo_pendiente_bs != null ? Number(d.saldo_pendiente_bs) : Number(d.impuesto_determinado_bs || 0);
+                                            const esParcial = d.estado === 'parcial' || (d.monto_pagado_bs && Number(d.monto_pagado_bs) > 0);
+                                            const infoDetalle = esParcial
+                                                ? ` [Resta: ${saldo.toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs · Abonado: ${Number(d.monto_pagado_bs).toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs]`
+                                                : ` — ${saldo.toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs.`;
+                                            return `<option value="${d.id}" data-saldo="${saldo}">
+                                                ${MESES[d.mes - 1]} ${d.anio}${infoDetalle}
+                                            </option>`;
+                                        }).join('')}
                                     </select>
                                 </div>
                                 <div class="space-y-1.5">
@@ -2134,9 +2144,26 @@
                                             <td class="py-3 px-2 text-sky-400">${p.referencia_bancaria}</td>
                                             <td class="py-3 px-2 text-right font-bold text-white">${Number(p.monto_bs || 0).toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs.</td>
                                             <td class="py-3 px-2 text-center">
-                                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-sans font-medium ${p.estado === 'conciliado' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-800 text-slate-400'}">
-                                                    ${p.estado}
-                                                </span>
+                                                ${p.estado === 'conciliado' ? `
+                                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-sans font-bold ${p.tipo_pago === 'abono' ? 'bg-amber-500/10 text-amber-300 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'}">
+                                                        ${p.tipo_pago === 'abono' ? 'ABONO PARCIAL' : 'CONCILIADO'}
+                                                    </span>
+                                                ` : p.estado === 'rechazado' ? `
+                                                    <div>
+                                                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-sans font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                                                            RECHAZADO
+                                                        </span>
+                                                        ${p.motivo_rechazo ? `
+                                                            <div class="text-[10px] text-rose-400 font-sans mt-0.5 max-w-[180px] mx-auto text-center" title="${p.motivo_rechazo}">
+                                                                ${p.motivo_rechazo}
+                                                            </div>
+                                                        ` : ''}
+                                                    </div>
+                                                ` : `
+                                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-sans font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                                        EN REVISIÓN
+                                                    </span>
+                                                `}
                                             </td>
                                         </tr>
                                     `).join('')}
@@ -2709,6 +2736,17 @@
             }
 
             this.cambiarEmpresaTab('pagar');
+        },
+
+        alCambiarDeclaracionPago: function(decId) {
+            const select = document.getElementById('pago-declaracion-id');
+            const opt = select && select.selectedIndex >= 0 ? select.options[select.selectedIndex] : null;
+            if (!opt || !opt.dataset) return;
+            const saldo = parseFloat(opt.dataset.saldo || 0);
+            const inputMonto = document.getElementById('pago-monto');
+            if (inputMonto && saldo > 0) {
+                inputMonto.value = saldo.toFixed(2);
+            }
         },
 
         alCambiarMetodoPago: function(metodoId) {
