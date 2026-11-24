@@ -140,6 +140,11 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.10.17 — 24/11/2026
+- **Ajuste de Tarifas Base por Tipo de Vehículo según SATRIMG (`store.js`, `catalogo-vehiculos.js`):**
+  - Actualización de las semillas de `hacienda_tarifas_ordenanza` para reflejar el cobro directo en TCMMV por tipo de vehículo (Motos base `10.00 TCMMV`, Automóviles, Camionetas, Transporte de Pasajeros, Carga y Maquinaria Especial), con mapeo automático en `sugerirTarifaParaVehiculo()`.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.10.17`.
+
 ### Version 3.10.16 — 24/11/2026
 - **Liquidación Vehicular Anual y Trimestral en TCMMV (`catalogo-vehiculos.js`, `portal-comercio.js`, `comercial.js`):**
   - Motor compartido de cálculo y liquidación vehicular conectado a `hacienda_tarifas_ordenanza` y a la tasa BCV vigente (`TasasBCVService`).

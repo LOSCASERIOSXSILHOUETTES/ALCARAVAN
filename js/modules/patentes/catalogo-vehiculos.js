@@ -549,7 +549,9 @@
             let prefijo = 'VEH-PART';
             if (tipo === 'moto') prefijo = 'VEH-MOTO-200';
             else if (tipo === 'camioneta') prefijo = 'VEH-PART-2000';
-            else if (['camion_350', 'camion_750', 'gandola', 'volteo', 'remolque', 'minibus', 'autobus'].includes(tipo)) prefijo = 'VEH-CARGA';
+            else if (tipo === 'minibus' || tipo === 'autobus') prefijo = 'VEH-TRANSP';
+            else if (tipo === 'maquinaria') prefijo = 'VEH-ESP';
+            else if (['camion_350', 'camion_750', 'gandola', 'volteo', 'remolque'].includes(tipo)) prefijo = 'VEH-CARGA';
 
             return tarifas.find(t => String(t.codigo || '').startsWith(prefijo)) || tarifas[0];
         },
