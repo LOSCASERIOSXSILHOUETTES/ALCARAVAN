@@ -140,6 +140,11 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.10.12 — 24/11/2026
+- **Cobertura Total de Marcas Reales en Catálogo de Vehículos (`catalogo-vehiculos.js`):**
+  - Ampliación completa del catálogo con todas las marcas reales de motos, automóviles, camionetas, transporte y carga del listado SATGUAICA (incluyendo Dayun, Enfield, FYM, Gilera, Hyosung, Jialing, Jincheng, Jonway, Lifan, LML, Malaguti, Moto Morini, Qipai, Sumo, Traxx, United Motors, Verucci, Wangye, Xingfu, Znen, Zukida, Alfa Romeo, ARO, Baic, Buick, Cadillac, Chana, Changhe, Dacia, Daihatsu, GAC, Geely, GMC, Hafei, Haima, Hummer, Infiniti, JMC, Kaiyi, Lada, Lexus, Lincoln, Maxus, Mercury, MG, Mini, Plymouth, Pontiac, Porsche, Rover, Saic Wuling, Saturn, Seat, Skoda, Ssangyong, Subaru, Volvo, Willys, Zhongxing, ZXAuto, Marcopolo, Ebro, Kamaz, Pegaso, Dorsey, Fruehauf, Great Dane y Wabash National), depurando duplicados y typos.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.10.12`.
+
 ### Version 3.10.11 — 24/11/2026
 - **Catálogo Dinámico de Vehículos en Cascada estilo SATGUAICA (`catalogo-vehiculos.js`, `portal-comercio.js`, `comercial.js`):**
   - **Clasificación Tributaria por Tipo:** Al seleccionar el Tipo / Clase (ej. Motocicleta, Automóvil, Camioneta, Transporte, Carga o Maquinaria), se despliegan automáticamente los rangos fiscales oficiales de cilindrada (C.C.) y peso (Kg) tomados de la estructura de SATGUAICA.
