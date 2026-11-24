@@ -3359,7 +3359,7 @@
 
                                     <div class="space-y-1">
                                         <label class="text-[11px] text-neutral-400 block font-medium">Tipo / Clase <span class="text-rose-400">*</span></label>
-                                        <select id="veh-tipo" class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none focus:border-emerald-500 transition cursor-pointer">
+                                        <select id="veh-tipo" onchange="window.PortalComercio.alCambiarTipoVehiculo()" class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none focus:border-emerald-500 transition cursor-pointer">
                                             <option value="automovil">Automóvil (Sedán / Coupé / Hatchback)</option>
                                             <option value="camioneta">Camioneta (Pick-Up / SUV / Rústico 4x4)</option>
                                             <option value="moto">Motocicleta / Moto</option>
@@ -3376,37 +3376,28 @@
 
                                     <div class="space-y-1">
                                         <label class="text-[11px] text-neutral-400 block font-medium">Marca <span class="text-rose-400">*</span></label>
-                                        <select id="veh-marca-select" onchange="window.PortalComercio.alCambiarMarcaVehiculo(this.value)" class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none focus:border-emerald-500 transition cursor-pointer">
+                                        <select id="veh-marca-select" onchange="window.PortalComercio.alCambiarMarcaVehiculo()" class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none focus:border-emerald-500 transition cursor-pointer">
                                             <option value="Chevrolet">Chevrolet</option>
-                                            <option value="Ford">Ford</option>
-                                            <option value="Toyota">Toyota</option>
-                                            <option value="Fiat">Fiat</option>
-                                            <option value="Renault">Renault</option>
-                                            <option value="Hyundai">Hyundai</option>
-                                            <option value="Chery">Chery</option>
-                                            <option value="Mitsubishi">Mitsubishi</option>
-                                            <option value="Nissan">Nissan</option>
-                                            <option value="Jeep">Jeep</option>
-                                            <option value="Kia">Kia</option>
-                                            <option value="Volkswagen">Volkswagen</option>
-                                            <option value="Honda">Honda</option>
-                                            <option value="Mazda">Mazda</option>
-                                            <option value="Mack">Mack</option>
-                                            <option value="Iveco">Iveco</option>
-                                            <option value="Bera">Bera</option>
-                                            <option value="Empire Keeway">Empire Keeway</option>
-                                            <option value="Motos Toro">Motos Toro</option>
-                                            <option value="OTRA">Otra Marca...</option>
                                         </select>
-                                        <input type="text" id="veh-marca-otra" placeholder="Especifique marca" class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2 outline-none mt-1 hidden focus:border-emerald-500">
+                                        <input type="text" id="veh-marca-otra" placeholder="Especifique marca" class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2 outline-none mt-1 hidden focus:border-emerald-500 uppercase">
                                     </div>
+                                </div>
+
+                                <div class="space-y-1 pt-1">
+                                    <label class="text-[11px] text-neutral-400 block font-medium">Clasificación Tributaria (Cilindrada / Peso - Ordenanza)</label>
+                                    <select id="veh-subtipo-fiscal" class="w-full bg-[#18181b] border border-white/10 text-emerald-300 text-[11px] font-medium rounded-xl px-3 py-2.5 outline-none focus:border-emerald-500 transition cursor-pointer">
+                                        <option value="">Cargando clasificaciones...</option>
+                                    </select>
                                 </div>
 
                                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
                                     <div class="space-y-1">
                                         <label class="text-[11px] text-neutral-400 block font-medium">Modelo <span class="text-rose-400">*</span></label>
-                                        <input type="text" id="veh-modelo" placeholder="Ej: Silverado / Hilux / Aveo" 
-                                               class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none focus:border-emerald-500 transition">
+                                        <select id="veh-modelo-select" onchange="window.PortalComercio.alCambiarModeloVehiculo()" class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none focus:border-emerald-500 transition cursor-pointer">
+                                            <option value="OTRO">Otro modelo...</option>
+                                        </select>
+                                        <input type="text" id="veh-modelo" placeholder="Especifique modelo" 
+                                               class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2 outline-none mt-1 hidden focus:border-emerald-500">
                                     </div>
 
                                     <div class="space-y-1">
@@ -3540,16 +3531,32 @@
             `;
         },
 
-        alCambiarMarcaVehiculo: function(val) {
-            const inputOtra = document.getElementById('veh-marca-otra');
-            if (inputOtra) {
-                if (val === 'OTRA') {
-                    inputOtra.classList.remove('hidden');
-                    inputOtra.focus();
-                } else {
-                    inputOtra.classList.add('hidden');
-                    inputOtra.value = '';
-                }
+        _vehiculoCfg: {
+            tipoId: 'veh-tipo',
+            subtipoId: 'veh-subtipo-fiscal',
+            marcaSelectId: 'veh-marca-select',
+            marcaOtraId: 'veh-marca-otra',
+            modeloSelectId: 'veh-modelo-select',
+            modeloOtroId: 'veh-modelo',
+            puestosId: 'veh-puestos',
+            usoId: 'veh-uso'
+        },
+
+        alCambiarTipoVehiculo: function() {
+            if (global.HaciendaVehiculosCatalogo) {
+                global.HaciendaVehiculosCatalogo.alCambiarTipo(this._vehiculoCfg, false);
+            }
+        },
+
+        alCambiarMarcaVehiculo: function() {
+            if (global.HaciendaVehiculosCatalogo) {
+                global.HaciendaVehiculosCatalogo.alCambiarMarca(this._vehiculoCfg);
+            }
+        },
+
+        alCambiarModeloVehiculo: function() {
+            if (global.HaciendaVehiculosCatalogo) {
+                global.HaciendaVehiculosCatalogo.alCambiarModelo(this._vehiculoCfg);
             }
         },
 
@@ -3559,10 +3566,6 @@
 
             const inputId = document.getElementById('veh-id');
             const inputPlaca = document.getElementById('veh-placa');
-            const selectTipo = document.getElementById('veh-tipo');
-            const selectMarca = document.getElementById('veh-marca-select');
-            const inputMarcaOtra = document.getElementById('veh-marca-otra');
-            const inputModelo = document.getElementById('veh-modelo');
             const selectAnio = document.getElementById('veh-anio');
             const selectColor = document.getElementById('veh-color');
             const selectUso = document.getElementById('veh-uso');
@@ -3584,24 +3587,9 @@
                 if (v) {
                     if (inputId) inputId.value = v.id;
                     if (inputPlaca) inputPlaca.value = v.placa || '';
-                    if (selectTipo) selectTipo.value = v.tipo || 'automovil';
-
-                    const marcasComunes = new Set(['Chevrolet', 'Ford', 'Toyota', 'Fiat', 'Renault', 'Hyundai', 'Chery', 'Mitsubishi', 'Nissan', 'Jeep', 'Kia', 'Volkswagen', 'Honda', 'Mazda', 'Mack', 'Iveco', 'Bera', 'Empire Keeway', 'Motos Toro']);
-                    if (marcasComunes.has(v.marca)) {
-                        if (selectMarca) selectMarca.value = v.marca;
-                        if (inputMarcaOtra) {
-                            inputMarcaOtra.classList.add('hidden');
-                            inputMarcaOtra.value = '';
-                        }
-                    } else if (v.marca) {
-                        if (selectMarca) selectMarca.value = 'OTRA';
-                        if (inputMarcaOtra) {
-                            inputMarcaOtra.classList.remove('hidden');
-                            inputMarcaOtra.value = v.marca;
-                        }
+                    if (global.HaciendaVehiculosCatalogo) {
+                        global.HaciendaVehiculosCatalogo.cargarValores(this._vehiculoCfg, v);
                     }
-
-                    if (inputModelo) inputModelo.value = v.modelo || '';
                     if (selectAnio) selectAnio.value = String(v.anio || new Date().getFullYear());
                     if (selectColor) selectColor.value = v.color || 'Blanco';
                     if (selectUso) selectUso.value = v.uso || 'particular';
@@ -3619,13 +3607,9 @@
             } else {
                 if (inputId) inputId.value = '';
                 if (inputPlaca) inputPlaca.value = '';
-                if (selectTipo) selectTipo.value = 'automovil';
-                if (selectMarca) selectMarca.value = 'Chevrolet';
-                if (inputMarcaOtra) {
-                    inputMarcaOtra.classList.add('hidden');
-                    inputMarcaOtra.value = '';
+                if (global.HaciendaVehiculosCatalogo) {
+                    global.HaciendaVehiculosCatalogo.cargarValores(this._vehiculoCfg, null);
                 }
-                if (inputModelo) inputModelo.value = '';
                 if (selectAnio) selectAnio.value = String(new Date().getFullYear());
                 if (selectColor) selectColor.value = 'Blanco';
                 if (selectUso) selectUso.value = 'particular';
@@ -3655,10 +3639,11 @@
 
             const idExistente = document.getElementById('veh-id')?.value;
             const placa = document.getElementById('veh-placa')?.value.trim().toUpperCase() || '';
-            const selectMarca = document.getElementById('veh-marca-select')?.value || 'Chevrolet';
-            const marcaOtra = document.getElementById('veh-marca-otra')?.value.trim() || '';
-            const marcaFinal = selectMarca === 'OTRA' ? (marcaOtra || 'Otra Marca') : selectMarca;
-            const modelo = document.getElementById('veh-modelo')?.value.trim() || '';
+            const valoresCat = global.HaciendaVehiculosCatalogo
+                ? global.HaciendaVehiculosCatalogo.obtenerValores(this._vehiculoCfg)
+                : { marca: document.getElementById('veh-marca-select')?.value || '', modelo: document.getElementById('veh-modelo')?.value.trim() || '' };
+            const marcaFinal = valoresCat.marca;
+            const modelo = valoresCat.modelo;
             const tipo = document.getElementById('veh-tipo')?.value || 'automovil';
             const anio = parseInt(document.getElementById('veh-anio')?.value || new Date().getFullYear(), 10);
             const color = document.getElementById('veh-color')?.value || 'Blanco';

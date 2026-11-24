@@ -282,7 +282,7 @@
 
                                     <div>
                                         <label class="block text-[11px] font-bold text-slate-400 mb-1">Tipo / Clase <span class="text-rose-400">*</span></label>
-                                        <select id="erp-veh-tipo" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 outline-none focus:border-indigo-500 cursor-pointer">
+                                        <select id="erp-veh-tipo" onchange="window.PatentesModule.alCambiarTipoVehiculo()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 outline-none focus:border-indigo-500 cursor-pointer">
                                             <option value="automovil">Automóvil (Sedán / Coupé / Hatchback)</option>
                                             <option value="camioneta">Camioneta (Pick-Up / SUV / Rústico 4x4)</option>
                                             <option value="moto">Motocicleta / Moto</option>
@@ -299,36 +299,28 @@
 
                                     <div>
                                         <label class="block text-[11px] font-bold text-slate-400 mb-1">Marca <span class="text-rose-400">*</span></label>
-                                        <select id="erp-veh-marca" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 outline-none focus:border-indigo-500 cursor-pointer">
+                                        <select id="erp-veh-marca" onchange="window.PatentesModule.alCambiarMarcaVehiculo()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 outline-none focus:border-indigo-500 cursor-pointer">
                                             <option value="Chevrolet">Chevrolet</option>
-                                            <option value="Ford">Ford</option>
-                                            <option value="Toyota">Toyota</option>
-                                            <option value="Fiat">Fiat</option>
-                                            <option value="Renault">Renault</option>
-                                            <option value="Hyundai">Hyundai</option>
-                                            <option value="Chery">Chery</option>
-                                            <option value="Mitsubishi">Mitsubishi</option>
-                                            <option value="Nissan">Nissan</option>
-                                            <option value="Jeep">Jeep</option>
-                                            <option value="Kia">Kia</option>
-                                            <option value="Volkswagen">Volkswagen</option>
-                                            <option value="Honda">Honda</option>
-                                            <option value="Mazda">Mazda</option>
-                                            <option value="Mack">Mack</option>
-                                            <option value="Iveco">Iveco</option>
-                                            <option value="Bera">Bera</option>
-                                            <option value="Empire Keeway">Empire Keeway</option>
-                                            <option value="Motos Toro">Motos Toro</option>
-                                            <option value="Otra">Otra Marca</option>
                                         </select>
+                                        <input type="text" id="erp-veh-marca-otra" placeholder="Especifique marca" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 outline-none mt-1 hidden focus:border-indigo-500 uppercase">
                                     </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-[11px] font-bold text-slate-400 mb-1">Clasificación Tributaria (Cilindrada / Peso - Ordenanza)</label>
+                                    <select id="erp-veh-subtipo-fiscal" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-indigo-300 text-[11px] font-medium outline-none focus:border-indigo-500 cursor-pointer">
+                                        <option value="">Cargando clasificaciones...</option>
+                                    </select>
                                 </div>
 
                                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                     <div>
                                         <label class="block text-[11px] font-bold text-slate-400 mb-1">Modelo <span class="text-rose-400">*</span></label>
-                                        <input type="text" id="erp-veh-modelo" required placeholder="Ej: Silverado / Hilux / Aveo"
-                                               class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 outline-none focus:border-indigo-500">
+                                        <select id="erp-veh-modelo-select" onchange="window.PatentesModule.alCambiarModeloVehiculo()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 outline-none focus:border-indigo-500 cursor-pointer">
+                                            <option value="OTRO">Otro modelo...</option>
+                                        </select>
+                                        <input type="text" id="erp-veh-modelo" placeholder="Especifique modelo"
+                                               class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 outline-none mt-1 hidden focus:border-indigo-500">
                                     </div>
 
                                     <div>
@@ -838,9 +830,13 @@
                 if (v) {
                     if (inputId) inputId.value = v.id;
                     if (inputPlaca) inputPlaca.value = v.placa || '';
-                    if (selectTipo) selectTipo.value = v.tipo || 'automovil';
-                    if (selectMarca) selectMarca.value = v.marca || 'Chevrolet';
-                    if (inputModelo) inputModelo.value = v.modelo || '';
+                    if (global.HaciendaVehiculosCatalogo) {
+                        global.HaciendaVehiculosCatalogo.cargarValores(this._vehiculoCfg, v);
+                    } else {
+                        if (selectTipo) selectTipo.value = v.tipo || 'automovil';
+                        if (selectMarca) selectMarca.value = v.marca || 'Chevrolet';
+                        if (inputModelo) inputModelo.value = v.modelo || '';
+                    }
                     if (selectAnio) selectAnio.value = String(v.anio || new Date().getFullYear());
                     if (selectColor) selectColor.value = v.color || 'Blanco';
                     if (selectUso) selectUso.value = v.uso || 'particular';
@@ -860,9 +856,13 @@
             } else {
                 if (inputId) inputId.value = '';
                 if (inputPlaca) inputPlaca.value = '';
-                if (selectTipo) selectTipo.value = 'automovil';
-                if (selectMarca) selectMarca.value = 'Chevrolet';
-                if (inputModelo) inputModelo.value = '';
+                if (global.HaciendaVehiculosCatalogo) {
+                    global.HaciendaVehiculosCatalogo.cargarValores(this._vehiculoCfg, null);
+                } else {
+                    if (selectTipo) selectTipo.value = 'automovil';
+                    if (selectMarca) selectMarca.value = 'Chevrolet';
+                    if (inputModelo) inputModelo.value = '';
+                }
                 if (selectAnio) selectAnio.value = String(new Date().getFullYear());
                 if (selectColor) selectColor.value = 'Blanco';
                 if (selectUso) selectUso.value = 'particular';
@@ -879,6 +879,35 @@
             }
 
             modal.classList.remove('hidden');
+        },
+
+        _vehiculoCfg: {
+            tipoId: 'erp-veh-tipo',
+            subtipoId: 'erp-veh-subtipo-fiscal',
+            marcaSelectId: 'erp-veh-marca',
+            marcaOtraId: 'erp-veh-marca-otra',
+            modeloSelectId: 'erp-veh-modelo-select',
+            modeloOtroId: 'erp-veh-modelo',
+            puestosId: 'erp-veh-puestos',
+            usoId: 'erp-veh-uso'
+        },
+
+        alCambiarTipoVehiculo: function() {
+            if (global.HaciendaVehiculosCatalogo) {
+                global.HaciendaVehiculosCatalogo.alCambiarTipo(this._vehiculoCfg, false);
+            }
+        },
+
+        alCambiarMarcaVehiculo: function() {
+            if (global.HaciendaVehiculosCatalogo) {
+                global.HaciendaVehiculosCatalogo.alCambiarMarca(this._vehiculoCfg);
+            }
+        },
+
+        alCambiarModeloVehiculo: function() {
+            if (global.HaciendaVehiculosCatalogo) {
+                global.HaciendaVehiculosCatalogo.alCambiarModelo(this._vehiculoCfg);
+            }
         },
 
         cerrarModalVehiculo: function() {
@@ -905,8 +934,11 @@
             const idExistente = document.getElementById('erp-veh-id')?.value;
             const placa = document.getElementById('erp-veh-placa')?.value.trim().toUpperCase() || '';
             const tipo = document.getElementById('erp-veh-tipo')?.value || 'automovil';
-            const marca = document.getElementById('erp-veh-marca')?.value || 'Chevrolet';
-            const modelo = document.getElementById('erp-veh-modelo')?.value.trim() || '';
+            const valoresCat = global.HaciendaVehiculosCatalogo
+                ? global.HaciendaVehiculosCatalogo.obtenerValores(this._vehiculoCfg)
+                : { marca: document.getElementById('erp-veh-marca')?.value || 'Chevrolet', modelo: document.getElementById('erp-veh-modelo')?.value.trim() || '' };
+            const marca = valoresCat.marca;
+            const modelo = valoresCat.modelo;
             const anio = parseInt(document.getElementById('erp-veh-anio')?.value || new Date().getFullYear(), 10);
             const color = document.getElementById('erp-veh-color')?.value || 'Blanco';
             const uso = document.getElementById('erp-veh-uso')?.value || 'particular';

@@ -140,6 +140,13 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.10.11 — 24/11/2026
+- **Catálogo Dinámico de Vehículos en Cascada estilo SATGUAICA (`catalogo-vehiculos.js`, `portal-comercio.js`, `comercial.js`):**
+  - **Clasificación Tributaria por Tipo:** Al seleccionar el Tipo / Clase (ej. Motocicleta, Automóvil, Camioneta, Transporte, Carga o Maquinaria), se despliegan automáticamente los rangos fiscales oficiales de cilindrada (C.C.) y peso (Kg) tomados de la estructura de SATGUAICA.
+  - **Marcas y Modelos Filtrados en Cascada:** Las marcas se filtran según el tipo de vehículo (por ejemplo, al elegir Moto solo aparecen marcas de motos como Bera, Empire Keeway, Motos Toro, Yamaha, Suzuki, Kawasaki, etc.), y al elegir la marca se listan sus modelos correspondientes con opción manual (`Otra Marca...` / `Otro modelo...`) para casos atípicos.
+  - **Componente Compartido:** Centralizado en `js/modules/patentes/catalogo-vehiculos.js` (`window.HaciendaVehiculosCatalogo`) para dar servicio tanto al Portal del Contribuyente (`index.html`) como al ERP Municipal (`admin.html`).
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.10.11`.
+
 ### Version 3.10.10 — 22/11/2026
 - **Blindaje Total de Datos y Autodetección en Tarjetas de Métodos de Pago (`portal-comercio.js`):**
   - **Autodetección Inteligente por Nombre y Canal:** Se implementó detección semántica de tipo de canal evaluando tanto `m.tipo` / `m.canal` como palabras clave en `m.nombre` ("pago móvil", "transferencia", "punto", "efectivo"), garantizando que canales creados o importados sin el campo estricto se clasifiquen y estilicen correctamente.
