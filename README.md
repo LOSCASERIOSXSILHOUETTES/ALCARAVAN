@@ -140,6 +140,13 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.10.14 — 24/11/2026
+- **Configuración Visual de Tasas, Alícuotas LOCAT y Ramos de Ingreso (`comercial.js`):**
+  - Nueva sub-vista **"Tasas y Tarifas LOCAT"** dentro del módulo de Licencias y Patentes del ERP (`admin.html`), conectada directamente a `hacienda_actividades_locat` y `hacienda_ramos_ingreso` en `HaciendaStore` (ciclo 0ms + sincronización Supabase).
+  - Permite buscar, filtrar por categoría, crear, editar (alícuota % y mínimo tributable TCMMV) y activar/desactivar actividades económicas LOCAT en vivo, reflejándose inmediatamente en el selector de patentes y cálculos de autoliquidación.
+  - Gestión completa de Ramos de Ingreso y Tasas Municipales (código contable, nombre, descripción legal y estado).
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.10.14`.
+
 ### Version 3.10.13 — 24/11/2026
 - **Entradas Directas de Modelos/Líneas Populares de Moto en Selector (`catalogo-vehiculos.js`):**
   - Incorporación directa de `Owen`, `Horse`, `Keeway`, `Jaguar`, `Matrix`, `Outlook`, `Pulsar` y `SBR` en el selector de marcas de motocicletas (además de mantenerse bajo `Empire Keeway`, `Bera`, `Motos Toro` y `Bajaj`), reflejando cómo figuran en los títulos del INTT y SATGUAICA.

@@ -5,8 +5,10 @@
 (function definePatentesModule(global) {
     "use strict";
 
-    let subVistaActiva = 'comercial'; // 'comercial' o 'vehiculos'
+    let subVistaActiva = 'comercial'; // 'comercial', 'vehiculos' o 'tasas'
     let filtroVehiculoTexto = '';
+    let filtroLocatTexto = '';
+    let filtroLocatCategoria = 'todas';
 
     const Patentes = {
         subVista: 'comercial',
@@ -22,6 +24,8 @@
             const patentes = global.HaciendaStore ? global.HaciendaStore.get('hacienda_patentes') : [];
             const vehiculos = global.HaciendaStore ? global.HaciendaStore.get('hacienda_vehiculos') : [];
             const contribuyentes = global.HaciendaStore ? global.HaciendaStore.get('hacienda_contribuyentes') : [];
+            const actividadesLocat = global.HaciendaStore ? global.HaciendaStore.get('hacienda_actividades_locat') : [];
+            const ramosIngreso = global.HaciendaStore ? global.HaciendaStore.get('hacienda_ramos_ingreso') : [];
 
             const vehiculosFiltrados = vehiculos.filter(v => {
                 if (!filtroVehiculoTexto) return true;
@@ -48,7 +52,7 @@
                                 </h2>
                             </div>
                             <!-- Pestañas de Sub-Vistas -->
-                            <div class="flex items-center gap-2 bg-slate-950 p-1.5 rounded-xl border border-slate-800">
+                            <div class="flex flex-wrap items-center gap-2 bg-slate-950 p-1.5 rounded-xl border border-slate-800">
                                 <button onclick="window.PatentesModule.cambiarSubVista('comercial')" 
                                         class="px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 ${subVistaActiva === 'comercial' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'}">
                                     <i class="fas fa-store text-xs"></i>
@@ -61,6 +65,12 @@
                                     <span>Patente sobre Vehículos</span>
                                     <span class="px-1.5 py-0.5 rounded-md bg-white/20 text-[10px] font-mono">${vehiculos.length}</span>
                                 </button>
+                                <button onclick="window.PatentesModule.cambiarSubVista('tasas')" 
+                                        class="px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 ${subVistaActiva === 'tasas' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'}">
+                                    <i class="fas fa-sliders-h text-xs"></i>
+                                    <span>Tasas y Tarifas LOCAT</span>
+                                    <span class="px-1.5 py-0.5 rounded-md bg-white/20 text-[10px] font-mono">${actividadesLocat.length}</span>
+                                </button>
                             </div>
                         </div>
 
@@ -69,11 +79,22 @@
                                 <i class="fas fa-plus"></i>
                                 <span>Nueva Licencia / Patente</span>
                             </button>
-                        ` : `
+                        ` : subVistaActiva === 'vehiculos' ? `
                             <button onclick="window.PatentesModule.abrirModalVehiculo()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg transition flex items-center gap-2">
                                 <i class="fas fa-plus"></i>
                                 <span>Registrar Vehículo</span>
                             </button>
+                        ` : `
+                            <div class="flex flex-wrap items-center gap-2">
+                                <button onclick="window.PatentesModule.abrirModalRamo()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl border border-slate-700 transition flex items-center gap-2">
+                                    <i class="fas fa-folder-plus text-amber-400"></i>
+                                    <span>Nuevo Ramo / Tasa</span>
+                                </button>
+                                <button onclick="window.PatentesModule.abrirModalActividadLocat()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg transition flex items-center gap-2">
+                                    <i class="fas fa-plus"></i>
+                                    <span>Nueva Actividad LOCAT</span>
+                                </button>
+                            </div>
                         `}
                     </div>
 
@@ -99,7 +120,7 @@
                                 </table>
                             </div>
                         </div>
-                    ` : `
+                    ` : subVistaActiva === 'vehiculos' ? `
                         <!-- SECCIÓN: VEHÍCULOS MUNICIPALES (SATGUAICA / LOS TEQUES) -->
                         <div class="space-y-4">
                             <!-- Buscador en Vivo -->
@@ -139,6 +160,9 @@
                                 </div>
                             </div>
                         </div>
+                    ` : `
+                        <!-- SECCIÓN: CONFIGURACIÓN DE TASAS, ALÍCUOTAS LOCAT Y RAMOS DE INGRESO -->
+                        ${this.renderVistaTasas(actividadesLocat, ramosIngreso)}
                     `}
                 </div>
 
@@ -218,6 +242,9 @@
 
                 <!-- Modal Registrar / Editar Vehículo en ERP (Los Teques / SATGUAICA) -->
                 ${this.renderModalVehiculoERP()}
+
+                <!-- Modales de Configuración de Tasas, Alícuotas LOCAT y Ramos -->
+                ${this.renderModalesTasas()}
             `;
         },
 
@@ -1098,6 +1125,412 @@
                     showConfirmButton: false
                 });
             }
+        },
+
+        // =====================================================================
+        // MÓDULO DE CONFIGURACIÓN DE TASAS, ALÍCUOTAS LOCAT Y RAMOS DE INGRESO
+        // =====================================================================
+
+        renderVistaTasas: function(actividadesLocat, ramosIngreso) {
+            const lista = Array.isArray(actividadesLocat) ? actividadesLocat : [];
+            const categorias = [...new Set(lista.map(a => a.categoria).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+            const filtradas = this._filtrarListaLocat(lista);
+            const ramos = Array.isArray(ramosIngreso) ? ramosIngreso : [];
+
+            return `
+                <div class="space-y-6">
+                    <!-- Bloque 1: Clasificador de Actividades Económicas LOCAT -->
+                    <div class="space-y-4">
+                        <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex flex-wrap items-center justify-between gap-4">
+                            <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto flex-1">
+                                <div class="relative w-full sm:w-80">
+                                    <i class="fas fa-search absolute left-3.5 top-3 text-slate-500 text-xs"></i>
+                                    <input type="text" placeholder="Buscar código (COM-001), actividad o categoría..."
+                                           value="${filtroLocatTexto}"
+                                           oninput="window.PatentesModule.filtrarTasasLocat(this.value, null)"
+                                           class="w-full bg-slate-950 border border-slate-800 text-slate-200 text-xs rounded-xl pl-9 pr-4 py-2.5 outline-none focus:border-indigo-500 transition">
+                                </div>
+                                <select onchange="window.PatentesModule.filtrarTasasLocat(null, this.value)"
+                                        class="bg-slate-950 border border-slate-800 text-slate-200 text-xs rounded-xl px-3 py-2.5 outline-none focus:border-indigo-500 cursor-pointer">
+                                    <option value="todas" ${filtroLocatCategoria === 'todas' ? 'selected' : ''}>Todas las Categorías</option>
+                                    ${categorias.map(c => `<option value="${c}" ${filtroLocatCategoria === c ? 'selected' : ''}>${c}</option>`).join('')}
+                                </select>
+                            </div>
+                            <span id="contador-tasas-locat" class="text-xs font-mono text-slate-400">${filtradas.length} actividad(es) LOCAT</span>
+                        </div>
+
+                        <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+                            <div class="overflow-x-auto max-h-[520px] overflow-y-auto">
+                                <table class="w-full text-left text-xs">
+                                    <thead class="bg-slate-950/95 text-slate-400 uppercase tracking-wider border-b border-slate-800 sticky top-0 z-10">
+                                        <tr>
+                                            <th class="py-3 px-4 font-bold">Código</th>
+                                            <th class="py-3 px-4 font-bold">Categoría</th>
+                                            <th class="py-3 px-4 font-bold">Actividad Económica / Ramo</th>
+                                            <th class="py-3 px-4 font-bold text-center">Alícuota (%)</th>
+                                            <th class="py-3 px-4 font-bold text-center">Mínimo (TCMMV)</th>
+                                            <th class="py-3 px-4 font-bold text-center">Estado</th>
+                                            <th class="py-3 px-4 font-bold text-right">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbody-tasas-locat" class="divide-y divide-slate-800/60 font-medium">
+                                        ${this.generarFilasTasasLocat(filtradas)}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bloque 2: Ramos de Ingreso y Tasas Municipales -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+                        <div class="px-6 py-4 bg-slate-950/60 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-100 flex items-center gap-2">
+                                    <i class="fas fa-coins text-amber-400"></i>
+                                    <span>Ramos de Ingreso y Tasas Municipales (ONAPRE / Ordenanzas)</span>
+                                </h3>
+                                <p class="text-[11px] text-slate-400">Catálogo de conceptos recaudadores (Patentes, Aseo Urbano, Catastro, Vehículos, Espectáculos, Tasas)</p>
+                            </div>
+                            <span class="text-xs font-mono text-slate-400">${ramos.length} ramo(s)</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-slate-950/80 text-slate-400 uppercase tracking-wider border-b border-slate-800">
+                                    <tr>
+                                        <th class="py-3 px-4 font-bold">Código Contable</th>
+                                        <th class="py-3 px-4 font-bold">Nombre del Ramo / Tasa</th>
+                                        <th class="py-3 px-4 font-bold">Descripción / Ordenanza</th>
+                                        <th class="py-3 px-4 font-bold text-center">Estado</th>
+                                        <th class="py-3 px-4 font-bold text-right">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-800/60 font-medium">
+                                    ${ramos.length === 0 ? `
+                                        <tr><td colspan="5" class="py-8 text-center text-slate-500 italic">No hay ramos registrados. Presione "Nuevo Ramo / Tasa" para crear uno.</td></tr>
+                                    ` : ramos.map(r => {
+                                        const activo = r.activo !== false;
+                                        return `
+                                            <tr class="hover:bg-slate-800/40 transition">
+                                                <td class="py-3 px-4 font-mono font-bold text-amber-400 whitespace-nowrap">${r.codigo || '—'}</td>
+                                                <td class="py-3 px-4 font-bold text-slate-200">${r.nombre || ''}</td>
+                                                <td class="py-3 px-4 text-slate-400 max-w-md truncate" title="${r.descripcion || ''}">${r.descripcion || '—'}</td>
+                                                <td class="py-3 px-4 text-center">
+                                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${activo ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}">
+                                                        ${activo ? 'ACTIVO' : 'INACTIVO'}
+                                                    </span>
+                                                </td>
+                                                <td class="py-3 px-4 text-right space-x-1 whitespace-nowrap">
+                                                    <button onclick="window.PatentesModule.abrirModalRamo('${r.id}')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-[11px] transition" title="Editar Ramo">
+                                                        <i class="fas fa-edit"></i> Editar
+                                                    </button>
+                                                    <button onclick="window.PatentesModule.toggleEstadoRamo('${r.id}')" class="px-2.5 py-1 ${activo ? 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-400' : 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400'} rounded-lg text-[11px] transition" title="${activo ? 'Desactivar' : 'Activar'}">
+                                                        <i class="fas ${activo ? 'fa-ban' : 'fa-check'}"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+        },
+
+        _filtrarListaLocat: function(lista) {
+            return (lista || []).filter(a => {
+                if (filtroLocatCategoria !== 'todas' && a.categoria !== filtroLocatCategoria) return false;
+                if (!filtroLocatTexto) return true;
+                const q = filtroLocatTexto.toLowerCase();
+                return (a.codigo && a.codigo.toLowerCase().includes(q)) ||
+                       (a.nombre && a.nombre.toLowerCase().includes(q)) ||
+                       (a.categoria && a.categoria.toLowerCase().includes(q));
+            }).sort((a, b) => String(a.codigo || '').localeCompare(String(b.codigo || '')));
+        },
+
+        generarFilasTasasLocat: function(items) {
+            if (!items || items.length === 0) {
+                return `<tr><td colspan="7" class="py-8 text-center text-slate-500 italic">No se encontraron actividades LOCAT con ese filtro.</td></tr>`;
+            }
+            return items.map(a => {
+                const activo = a.activo !== false;
+                return `
+                    <tr class="hover:bg-slate-800/40 transition ${!activo ? 'opacity-50' : ''}">
+                        <td class="py-3 px-4 font-mono font-bold text-indigo-400 whitespace-nowrap">${a.codigo}</td>
+                        <td class="py-3 px-4 text-slate-400 whitespace-nowrap">${a.categoria || 'General'}</td>
+                        <td class="py-3 px-4 text-slate-200 max-w-md">${a.nombre}</td>
+                        <td class="py-3 px-4 text-center font-mono font-bold text-emerald-400">${(Number(a.alicuota || 0) * 100).toFixed(2)}%</td>
+                        <td class="py-3 px-4 text-center font-mono font-bold text-amber-400">${Number(a.minimo_tcmmv || 0).toFixed(2)} TCMMV</td>
+                        <td class="py-3 px-4 text-center">
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${activo ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}">
+                                ${activo ? 'ACTIVA' : 'INACTIVA'}
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 text-right space-x-1 whitespace-nowrap">
+                            <button onclick="window.PatentesModule.abrirModalActividadLocat('${a.id}')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-[11px] transition" title="Editar Alícuota y Mínimo">
+                                <i class="fas fa-edit"></i> Editar
+                            </button>
+                            <button onclick="window.PatentesModule.toggleEstadoActividadLocat('${a.id}')" class="px-2.5 py-1 ${activo ? 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-400' : 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400'} rounded-lg text-[11px] transition" title="${activo ? 'Desactivar' : 'Activar'}">
+                                <i class="fas ${activo ? 'fa-ban' : 'fa-check'}"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        },
+
+        filtrarTasasLocat: function(texto, categoria) {
+            if (texto !== null && texto !== undefined) filtroLocatTexto = String(texto).trim();
+            if (categoria !== null && categoria !== undefined) filtroLocatCategoria = categoria;
+
+            const lista = global.HaciendaStore ? global.HaciendaStore.get('hacienda_actividades_locat') : [];
+            const filtradas = this._filtrarListaLocat(lista);
+            const tbody = document.getElementById('tbody-tasas-locat');
+            const cont = document.getElementById('contador-tasas-locat');
+            if (tbody) tbody.innerHTML = this.generarFilasTasasLocat(filtradas);
+            if (cont) cont.textContent = `${filtradas.length} actividad(es) LOCAT`;
+        },
+
+        renderModalesTasas: function() {
+            return `
+                <!-- Modal Actividad Económica LOCAT -->
+                <div id="modal-actividad-locat" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+                    <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden">
+                        <div class="bg-slate-950 px-6 py-4 border-b border-slate-800 flex justify-between items-center">
+                            <h3 id="modal-locat-titulo" class="text-sm font-bold text-slate-100 flex items-center gap-2">
+                                <i class="fas fa-sliders-h text-indigo-400"></i>
+                                <span>Configurar Actividad y Tasa LOCAT</span>
+                            </h3>
+                            <button type="button" onclick="window.PatentesModule.cerrarModalActividadLocat()" class="text-slate-400 hover:text-slate-200">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <form id="form-actividad-locat" onsubmit="window.PatentesModule.guardarActividadLocat(event)" class="p-6 space-y-4 text-xs">
+                            <input type="hidden" id="locat-edit-id" value="">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-[11px] font-bold text-slate-400 mb-1">Código LOCAT <span class="text-rose-400">*</span></label>
+                                    <input type="text" id="locat-edit-codigo" required placeholder="Ej: COM-024"
+                                           oninput="this.value = this.value.toUpperCase().trim()"
+                                           class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 font-mono font-bold outline-none focus:border-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold text-slate-400 mb-1">Categoría <span class="text-rose-400">*</span></label>
+                                    <input type="text" id="locat-edit-categoria" required placeholder="Ej: Comercio de Alimentos y Víveres"
+                                           class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 outline-none focus:border-indigo-500">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-400 mb-1">Descripción de la Actividad Económica <span class="text-rose-400">*</span></label>
+                                <textarea id="locat-edit-nombre" rows="2" required placeholder="Descripción oficial según ordenanza..."
+                                          class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 outline-none focus:border-indigo-500"></textarea>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-[11px] font-bold text-slate-400 mb-1">Alícuota Mensual (%) <span class="text-rose-400">*</span></label>
+                                    <input type="number" id="locat-edit-alicuota" step="0.01" min="0" max="100" required placeholder="Ej: 1.50"
+                                           class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-emerald-400 font-mono font-bold outline-none focus:border-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold text-slate-400 mb-1">Mínimo Tributable (TCMMV) <span class="text-rose-400">*</span></label>
+                                    <input type="number" id="locat-edit-minimo" step="0.01" min="0" required placeholder="Ej: 0.50"
+                                           class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-amber-400 font-mono font-bold outline-none focus:border-indigo-500">
+                                </div>
+                            </div>
+                            <div class="pt-3 flex justify-end gap-3 border-t border-slate-800">
+                                <button type="button" onclick="window.PatentesModule.cerrarModalActividadLocat()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl">Cancelar</button>
+                                <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-lg">Guardar Cambios</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Modal Ramo de Ingreso / Tasa Municipal -->
+                <div id="modal-ramo-ingreso" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+                    <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden">
+                        <div class="bg-slate-950 px-6 py-4 border-b border-slate-800 flex justify-between items-center">
+                            <h3 id="modal-ramo-titulo" class="text-sm font-bold text-slate-100 flex items-center gap-2">
+                                <i class="fas fa-coins text-amber-400"></i>
+                                <span>Configurar Ramo de Ingreso / Tasa</span>
+                            </h3>
+                            <button type="button" onclick="window.PatentesModule.cerrarModalRamo()" class="text-slate-400 hover:text-slate-200">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <form id="form-ramo-ingreso" onsubmit="window.PatentesModule.guardarRamo(event)" class="p-6 space-y-4 text-xs">
+                            <input type="hidden" id="ramo-edit-id" value="">
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-400 mb-1">Código Presupuestario / Contable <span class="text-rose-400">*</span></label>
+                                <input type="text" id="ramo-edit-codigo" required placeholder="Ej: 3.01.03.01.00"
+                                       class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-amber-400 font-mono font-bold outline-none focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-400 mb-1">Nombre del Ramo o Tasa <span class="text-rose-400">*</span></label>
+                                <input type="text" id="ramo-edit-nombre" required placeholder="Ej: Tasa de Aseo Urbano y Domiciliario"
+                                       class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 font-bold outline-none focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-400 mb-1">Descripción / Base Legal (Ordenanza)</label>
+                                <textarea id="ramo-edit-descripcion" rows="2" placeholder="Ej: Tarifa aplicable según Ordenanza de Aseo Urbano vigente..."
+                                          class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 outline-none focus:border-indigo-500"></textarea>
+                            </div>
+                            <div class="pt-3 flex justify-end gap-3 border-t border-slate-800">
+                                <button type="button" onclick="window.PatentesModule.cerrarModalRamo()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl">Cancelar</button>
+                                <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-lg">Guardar Ramo</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+        },
+
+        abrirModalActividadLocat: function(id = null) {
+            const modal = document.getElementById('modal-actividad-locat');
+            if (!modal) return;
+            const lista = global.HaciendaStore ? global.HaciendaStore.get('hacienda_actividades_locat') : [];
+            const item = id ? lista.find(a => String(a.id) === String(id)) : null;
+
+            document.getElementById('locat-edit-id').value = item ? item.id : '';
+            document.getElementById('locat-edit-codigo').value = item ? (item.codigo || '') : '';
+            document.getElementById('locat-edit-categoria').value = item ? (item.categoria || '') : '';
+            document.getElementById('locat-edit-nombre').value = item ? (item.nombre || '') : '';
+            document.getElementById('locat-edit-alicuota').value = item ? (Number(item.alicuota || 0) * 100).toFixed(2) : '';
+            document.getElementById('locat-edit-minimo').value = item ? Number(item.minimo_tcmmv || 0).toFixed(2) : '';
+            document.getElementById('modal-locat-titulo').innerHTML = `<i class="fas fa-sliders-h text-indigo-400"></i><span>${item ? 'Editar Tasa LOCAT (' + item.codigo + ')' : 'Nueva Actividad Económica LOCAT'}</span>`;
+
+            modal.classList.remove('hidden');
+        },
+
+        cerrarModalActividadLocat: function() {
+            const modal = document.getElementById('modal-actividad-locat');
+            if (modal) modal.classList.add('hidden');
+        },
+
+        guardarActividadLocat: async function(e) {
+            if (e && e.preventDefault) e.preventDefault();
+            const store = global.HaciendaStore;
+            if (!store) return;
+
+            const idExistente = document.getElementById('locat-edit-id')?.value;
+            const codigo = document.getElementById('locat-edit-codigo')?.value.trim().toUpperCase();
+            const categoria = document.getElementById('locat-edit-categoria')?.value.trim();
+            const nombre = document.getElementById('locat-edit-nombre')?.value.trim();
+            const alicuotaPct = parseFloat(document.getElementById('locat-edit-alicuota')?.value || 0);
+            const minimoTcmmv = parseFloat(document.getElementById('locat-edit-minimo')?.value || 0);
+
+            if (!codigo || !categoria || !nombre) return;
+
+            const lista = store.get('hacienda_actividades_locat') || [];
+            const anterior = idExistente ? lista.find(a => String(a.id) === String(idExistente)) : null;
+
+            const obj = {
+                id: idExistente || ('locat_' + Date.now()),
+                codigo: codigo,
+                categoria: categoria,
+                nombre: nombre,
+                alicuota: Number((alicuotaPct / 100).toFixed(6)),
+                minimo_tcmmv: Number(minimoTcmmv.toFixed(2)),
+                activo: anterior ? (anterior.activo !== false) : true,
+                created_at: anterior ? (anterior.created_at || new Date().toISOString()) : new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            };
+
+            await store.set('hacienda_actividades_locat', obj);
+            this.cerrarModalActividadLocat();
+            const container = document.getElementById('app-main-content');
+            if (container) this.render(container);
+
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({ icon: 'success', title: 'Tasa Actualizada', text: `${codigo} guardada (${alicuotaPct.toFixed(2)}% · ${minimoTcmmv.toFixed(2)} TCMMV).`, confirmButtonColor: '#4f46e5', timer: 1800, showConfirmButton: false });
+            }
+        },
+
+        toggleEstadoActividadLocat: async function(id) {
+            const store = global.HaciendaStore;
+            if (!store) return;
+            const lista = store.get('hacienda_actividades_locat') || [];
+            const item = lista.find(a => String(a.id) === String(id));
+            if (!item) return;
+
+            await store.set('hacienda_actividades_locat', {
+                ...item,
+                activo: item.activo === false,
+                updated_at: new Date().toISOString()
+            });
+            const container = document.getElementById('app-main-content');
+            if (container) this.render(container);
+        },
+
+        abrirModalRamo: function(id = null) {
+            const modal = document.getElementById('modal-ramo-ingreso');
+            if (!modal) return;
+            const lista = global.HaciendaStore ? global.HaciendaStore.get('hacienda_ramos_ingreso') : [];
+            const item = id ? lista.find(r => String(r.id) === String(id)) : null;
+
+            document.getElementById('ramo-edit-id').value = item ? item.id : '';
+            document.getElementById('ramo-edit-codigo').value = item ? (item.codigo || '') : '';
+            document.getElementById('ramo-edit-nombre').value = item ? (item.nombre || '') : '';
+            document.getElementById('ramo-edit-descripcion').value = item ? (item.descripcion || '') : '';
+            document.getElementById('modal-ramo-titulo').innerHTML = `<i class="fas fa-coins text-amber-400"></i><span>${item ? 'Editar Ramo (' + item.codigo + ')' : 'Nuevo Ramo de Ingreso / Tasa'}</span>`;
+
+            modal.classList.remove('hidden');
+        },
+
+        cerrarModalRamo: function() {
+            const modal = document.getElementById('modal-ramo-ingreso');
+            if (modal) modal.classList.add('hidden');
+        },
+
+        guardarRamo: async function(e) {
+            if (e && e.preventDefault) e.preventDefault();
+            const store = global.HaciendaStore;
+            if (!store) return;
+
+            const idExistente = document.getElementById('ramo-edit-id')?.value;
+            const codigo = document.getElementById('ramo-edit-codigo')?.value.trim();
+            const nombre = document.getElementById('ramo-edit-nombre')?.value.trim();
+            const descripcion = document.getElementById('ramo-edit-descripcion')?.value.trim();
+
+            if (!codigo || !nombre) return;
+
+            const lista = store.get('hacienda_ramos_ingreso') || [];
+            const anterior = idExistente ? lista.find(r => String(r.id) === String(idExistente)) : null;
+
+            const obj = {
+                id: idExistente || ('ramo_' + Date.now()),
+                codigo: codigo,
+                nombre: nombre,
+                descripcion: descripcion,
+                activo: anterior ? (anterior.activo !== false) : true,
+                created_at: anterior ? (anterior.created_at || new Date().toISOString()) : new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            };
+
+            await store.set('hacienda_ramos_ingreso', obj);
+            this.cerrarModalRamo();
+            const container = document.getElementById('app-main-content');
+            if (container) this.render(container);
+
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({ icon: 'success', title: 'Ramo Guardado', text: `${nombre} registrado en el catálogo.`, confirmButtonColor: '#4f46e5', timer: 1800, showConfirmButton: false });
+            }
+        },
+
+        toggleEstadoRamo: async function(id) {
+            const store = global.HaciendaStore;
+            if (!store) return;
+            const lista = store.get('hacienda_ramos_ingreso') || [];
+            const item = lista.find(r => String(r.id) === String(id));
+            if (!item) return;
+
+            await store.set('hacienda_ramos_ingreso', {
+                ...item,
+                activo: item.activo === false,
+                updated_at: new Date().toISOString()
+            });
+            const container = document.getElementById('app-main-content');
+            if (container) this.render(container);
         },
 
         declararMesRapido: function(patenteId) {
