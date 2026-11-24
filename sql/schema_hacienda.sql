@@ -440,3 +440,32 @@ ALTER TABLE "public"."hacienda_declaraciones" ADD COLUMN IF NOT EXISTS "saldo_pe
 ALTER TABLE "public"."hacienda_pagos" ADD COLUMN IF NOT EXISTS "motivo_rechazo" TEXT;
 ALTER TABLE "public"."hacienda_pagos" ADD COLUMN IF NOT EXISTS "tipo_pago" TEXT DEFAULT 'total';
 
+-- 19. TABLA: hacienda_tarifas_ordenanza (Tarifario Paramétrico Multi-Ramo: Vehículos, Catastro, Aseo, Publicidad, Espectáculos, Trámites)
+CREATE TABLE IF NOT EXISTS "public"."hacienda_tarifas_ordenanza" (
+    "id" TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    "ramo" TEXT NOT NULL DEFAULT 'vehiculos',
+    "codigo" TEXT NOT NULL,
+    "nombre" TEXT NOT NULL,
+    "unidad_calculo" TEXT NOT NULL DEFAULT 'tcmmv_fijo',
+    "valor" NUMERIC(12,4) NOT NULL DEFAULT 0.0000,
+    "periodicidad" TEXT NOT NULL DEFAULT 'anual',
+    "descripcion" TEXT,
+    "activo" BOOLEAN NOT NULL DEFAULT true,
+    "created_at" TIMESTAMPTZ DEFAULT NOW(),
+    "updated_at" TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE "public"."hacienda_tarifas_ordenanza" ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Permisivo hacienda_tarifas_ordenanza" ON "public"."hacienda_tarifas_ordenanza";
+CREATE POLICY "Permisivo hacienda_tarifas_ordenanza" ON "public"."hacienda_tarifas_ordenanza" FOR ALL USING (true) WITH CHECK (true);
+GRANT ALL ON "public"."hacienda_tarifas_ordenanza" TO "anon", "authenticated", "service_role";
+
+DO $$
+BEGIN
+    BEGIN
+        ALTER PUBLICATION supabase_realtime ADD TABLE "public"."hacienda_tarifas_ordenanza";
+    EXCEPTION WHEN duplicate_object THEN
+        -- Ya estaba agregada a la publicacion
+    END;
+END $$;
+

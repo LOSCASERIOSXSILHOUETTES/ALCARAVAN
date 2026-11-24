@@ -31,7 +31,8 @@
         'hacienda_carrusel',
         'user_profiles',
         'hacienda_actividades_locat',
-        'hacienda_metodos_pago'
+        'hacienda_metodos_pago',
+        'hacienda_tarifas_ordenanza'
     ];
 
     const TABLE_SCHEMAS = {
@@ -106,6 +107,9 @@
         ],
         'hacienda_metodos_pago': [
             'id', 'cuenta_id', 'tipo', 'nombre', 'banco', 'telefono', 'identificacion', 'titular', 'instrucciones', 'activo', 'orden', 'created_at', 'updated_at'
+        ],
+        'hacienda_tarifas_ordenanza': [
+            'id', 'ramo', 'codigo', 'nombre', 'unidad_calculo', 'valor', 'periodicidad', 'descripcion', 'activo', 'created_at', 'updated_at'
         ]
     };
 
@@ -400,6 +404,31 @@
                 }
             }
 
+            // Sembrar tarifario multi-ramo parametrizable si está vacío
+            if (!this._cache['hacienda_tarifas_ordenanza'] || this._cache['hacienda_tarifas_ordenanza'].length === 0) {
+                const ahoraTarifa = new Date().toISOString();
+                const tarifasSemilla = [
+                    { id: 'tar_veh_moto_200', ramo: 'vehiculos', codigo: 'VEH-MOTO-200', nombre: 'Motos y Motonetas hasta 200 C.C.', unidad_calculo: 'tcmmv_fijo', valor: 3.00, periodicidad: 'anual', descripcion: 'Patente anual de motocicleta hasta 200 C.C. (LOCAT)', activo: true },
+                    { id: 'tar_veh_moto_400', ramo: 'vehiculos', codigo: 'VEH-MOTO-400', nombre: 'Motos de 201 a 400 C.C.', unidad_calculo: 'tcmmv_fijo', valor: 5.00, periodicidad: 'anual', descripcion: 'Patente anual de motocicleta de 201 a 400 C.C.', activo: true },
+                    { id: 'tar_veh_part_1000', ramo: 'vehiculos', codigo: 'VEH-PART-1000', nombre: 'Vehículos Particulares hasta 1.000 Kg', unidad_calculo: 'tcmmv_fijo', valor: 8.00, periodicidad: 'anual', descripcion: 'Patente anual automóviles de uso particular', activo: true },
+                    { id: 'tar_veh_part_2000', ramo: 'vehiculos', codigo: 'VEH-PART-2000', nombre: 'Vehículos Particulares / Camionetas 1.001 a 2.000 Kg', unidad_calculo: 'tcmmv_fijo', valor: 12.00, periodicidad: 'anual', descripcion: 'Patente anual camionetas y SUV', activo: true },
+                    { id: 'tar_veh_carga', ramo: 'vehiculos', codigo: 'VEH-CARGA-LIV', nombre: 'Transporte de Carga Liviana / Pesada', unidad_calculo: 'tcmmv_fijo', valor: 20.00, periodicidad: 'anual', descripcion: 'Camiones 350, 750, volteos y gandolas', activo: true },
+                    { id: 'tar_aseo_dom', ramo: 'aseo', codigo: 'ASEO-DOM', nombre: 'Aseo Domiciliario Residencial', unidad_calculo: 'tcmmv_fijo', valor: 1.50, periodicidad: 'mensual', descripcion: 'Tasa mensual de recolección domiciliaria (TCMMV)', activo: true },
+                    { id: 'tar_aseo_min', ramo: 'aseo', codigo: 'ASEO-COM-MIN', nombre: 'Aseo Comercial Minorista', unidad_calculo: 'tcmmv_fijo', valor: 5.00, periodicidad: 'mensual', descripcion: 'Comercios formales minoristas (TCMMV)', activo: true },
+                    { id: 'tar_aseo_may', ramo: 'aseo', codigo: 'ASEO-COM-MAY', nombre: 'Aseo Distribuidoras y Mayoristas', unidad_calculo: 'tcmmv_fijo', valor: 12.00, periodicidad: 'mensual', descripcion: 'Mayoristas, supermercados y distribuidoras (TCMMV)', activo: true },
+                    { id: 'tar_inm_res', ramo: 'inmuebles', codigo: 'INM-URB-RES', nombre: 'Inmueble Urbano Residencial', unidad_calculo: 'porcentaje', valor: 0.50, periodicidad: 'anual', descripcion: 'Alícuota anual sobre valor fiscal catastral (%)', activo: true },
+                    { id: 'tar_inm_com', ramo: 'inmuebles', codigo: 'INM-URB-COM', nombre: 'Inmueble Urbano Comercial / Industrial', unidad_calculo: 'porcentaje', valor: 1.00, periodicidad: 'anual', descripcion: 'Alícuota anual sobre valor fiscal comercial (%)', activo: true },
+                    { id: 'tar_pub_valla', ramo: 'publicidad', codigo: 'PUB-VALLA-M2', nombre: 'Valla o Aviso Luminoso (por m2)', unidad_calculo: 'tcmmv_m2', valor: 2.00, periodicidad: 'anual', descripcion: 'Tasa anual por metro cuadrado de publicidad exterior', activo: true },
+                    { id: 'tar_esp_perm', ramo: 'espectaculos', codigo: 'ESP-PERM', nombre: 'Permiso de Espectáculo Público', unidad_calculo: 'tcmmv_fijo', valor: 5.00, periodicidad: 'unico', descripcion: 'Tasa administrativa por evento o espectáculo', activo: true },
+                    { id: 'tar_tram_solv', ramo: 'tramites', codigo: 'TRAM-SOLV', nombre: 'Emisión de Solvencia Municipal', unidad_calculo: 'tcmmv_fijo', valor: 2.00, periodicidad: 'unico', descripcion: 'Tasa administrativa por solvencia (TCMMV)', activo: true },
+                    { id: 'tar_tram_lic', ramo: 'tramites', codigo: 'TRAM-LIC-OTORG', nombre: 'Otorgamiento / Renovación de Licencia', unidad_calculo: 'tcmmv_fijo', valor: 5.00, periodicidad: 'anual', descripcion: 'Tasa administrativa por tramitación de licencia', activo: true }
+                ].map(t => ({ ...t, created_at: ahoraTarifa, updated_at: ahoraTarifa }));
+                this._cache['hacienda_tarifas_ordenanza'] = tarifasSemilla;
+                if (this._localStore) {
+                    try { await this._localStore.setItem('tbl_hacienda_tarifas_ordenanza', tarifasSemilla); } catch (e) {}
+                }
+            }
+
             console.log('[HaciendaStore] Inicializado a 0ms en LocalForage');
             this.syncPendingAll();
             return true;
@@ -679,7 +708,7 @@
             if (!global.supabaseClient || !navigator.onLine) return;
             // En el portal público, bloquear descargas masivas de tablas privadas/administrativas
             if (this.isPortal()) {
-                const PUBLIC_PORTAL_TABLES = ['hacienda_popups', 'hacienda_carrusel', 'hacienda_actividades_locat', 'hacienda_cuentas', 'hacienda_metodos_pago'];
+                const PUBLIC_PORTAL_TABLES = ['hacienda_popups', 'hacienda_carrusel', 'hacienda_actividades_locat', 'hacienda_cuentas', 'hacienda_metodos_pago', 'hacienda_tarifas_ordenanza'];
                 if (!PUBLIC_PORTAL_TABLES.includes(table)) {
                     return;
                 }

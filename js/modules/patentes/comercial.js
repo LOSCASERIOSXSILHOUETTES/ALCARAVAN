@@ -9,6 +9,7 @@
     let filtroVehiculoTexto = '';
     let filtroLocatTexto = '';
     let filtroLocatCategoria = 'todas';
+    let filtroTarifaRamo = 'todos';
 
     const Patentes = {
         subVista: 'comercial',
@@ -26,6 +27,7 @@
             const contribuyentes = global.HaciendaStore ? global.HaciendaStore.get('hacienda_contribuyentes') : [];
             const actividadesLocat = global.HaciendaStore ? global.HaciendaStore.get('hacienda_actividades_locat') : [];
             const ramosIngreso = global.HaciendaStore ? global.HaciendaStore.get('hacienda_ramos_ingreso') : [];
+            const tarifasOrdenanza = global.HaciendaStore ? global.HaciendaStore.get('hacienda_tarifas_ordenanza') : [];
 
             const vehiculosFiltrados = vehiculos.filter(v => {
                 if (!filtroVehiculoTexto) return true;
@@ -86,9 +88,13 @@
                             </button>
                         ` : `
                             <div class="flex flex-wrap items-center gap-2">
+                                <button onclick="window.PatentesModule.abrirModalTarifa()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-lg transition flex items-center gap-2">
+                                    <i class="fas fa-plus"></i>
+                                    <span>Nueva Tarifa Multi-Ramo</span>
+                                </button>
                                 <button onclick="window.PatentesModule.abrirModalRamo()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl border border-slate-700 transition flex items-center gap-2">
                                     <i class="fas fa-folder-plus text-amber-400"></i>
-                                    <span>Nuevo Ramo / Tasa</span>
+                                    <span>Nuevo Ramo</span>
                                 </button>
                                 <button onclick="window.PatentesModule.abrirModalActividadLocat()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg transition flex items-center gap-2">
                                     <i class="fas fa-plus"></i>
@@ -162,7 +168,7 @@
                         </div>
                     ` : `
                         <!-- SECCIÓN: CONFIGURACIÓN DE TASAS, ALÍCUOTAS LOCAT Y RAMOS DE INGRESO -->
-                        ${this.renderVistaTasas(actividadesLocat, ramosIngreso)}
+                        ${this.renderVistaTasas(actividadesLocat, ramosIngreso, tarifasOrdenanza)}
                     `}
                 </div>
 
@@ -1131,11 +1137,28 @@
         // MÓDULO DE CONFIGURACIÓN DE TASAS, ALÍCUOTAS LOCAT Y RAMOS DE INGRESO
         // =====================================================================
 
-        renderVistaTasas: function(actividadesLocat, ramosIngreso) {
+        renderVistaTasas: function(actividadesLocat, ramosIngreso, tarifasOrdenanza) {
             const lista = Array.isArray(actividadesLocat) ? actividadesLocat : [];
             const categorias = [...new Set(lista.map(a => a.categoria).filter(Boolean))].sort((a, b) => a.localeCompare(b));
             const filtradas = this._filtrarListaLocat(lista);
             const ramos = Array.isArray(ramosIngreso) ? ramosIngreso : [];
+            const tarifas = Array.isArray(tarifasOrdenanza) ? tarifasOrdenanza : [];
+            const tarifasFiltradas = tarifas.filter(t => filtroTarifaRamo === 'todos' || t.ramo === filtroTarifaRamo);
+
+            const mapRamoLabel = {
+                'vehiculos': 'Vehículos',
+                'aseo': 'Aseo Urbano',
+                'inmuebles': 'Catastro / Inmuebles',
+                'publicidad': 'Publicidad',
+                'espectaculos': 'Espectáculos',
+                'tramites': 'Trámites / Solvencias'
+            };
+            const mapUnidadLabel = {
+                'tcmmv_fijo': 'TCMMV (Fijo)',
+                'tcmmv_m2': 'TCMMV / m2',
+                'porcentaje': '% Sobre Base',
+                'ut': 'U.T. (Unid. Trib.)'
+            };
 
             return `
                 <div class="space-y-6">
@@ -1181,7 +1204,84 @@
                         </div>
                     </div>
 
-                    <!-- Bloque 2: Ramos de Ingreso y Tasas Municipales -->
+                    <!-- Bloque 2: Tarifario Multi-Ramo por Ordenanza (Vehículos, Aseo, Catastro, Publicidad, Espectáculos, Trámites) -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+                        <div class="px-6 py-4 bg-slate-950/60 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-100 flex items-center gap-2">
+                                    <i class="fas fa-balance-scale text-emerald-400"></i>
+                                    <span>Tarifario Multi-Ramo por Ordenanza Municipal (Multi-Alcaldía)</span>
+                                </h3>
+                                <p class="text-[11px] text-slate-400">Configura tarifas y porcentajes de Vehículos, Aseo Urbano, Catastro/Inmuebles, Publicidad, Espectáculos y Trámites</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <select onchange="window.PatentesModule.filtrarTarifasPorRamo(this.value)"
+                                        class="bg-slate-950 border border-slate-800 text-slate-200 text-xs rounded-xl px-3 py-2 outline-none focus:border-emerald-500 cursor-pointer">
+                                    <option value="todos" ${filtroTarifaRamo === 'todos' ? 'selected' : ''}>Todos los Ramos</option>
+                                    <option value="vehiculos" ${filtroTarifaRamo === 'vehiculos' ? 'selected' : ''}>Vehículos (Motos / Carros / Carga)</option>
+                                    <option value="aseo" ${filtroTarifaRamo === 'aseo' ? 'selected' : ''}>Aseo Urbano y Domiciliario</option>
+                                    <option value="inmuebles" ${filtroTarifaRamo === 'inmuebles' ? 'selected' : ''}>Catastro / Inmuebles</option>
+                                    <option value="publicidad" ${filtroTarifaRamo === 'publicidad' ? 'selected' : ''}>Publicidad y Propaganda</option>
+                                    <option value="espectaculos" ${filtroTarifaRamo === 'espectaculos' ? 'selected' : ''}>Espectáculos Públicos</option>
+                                    <option value="tramites" ${filtroTarifaRamo === 'tramites' ? 'selected' : ''}>Trámites y Solvencias</option>
+                                </select>
+                                <span class="text-xs font-mono text-slate-400">${tarifasFiltradas.length} tarifa(s)</span>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-slate-950/80 text-slate-400 uppercase tracking-wider border-b border-slate-800">
+                                    <tr>
+                                        <th class="py-3 px-4 font-bold">Ramo</th>
+                                        <th class="py-3 px-4 font-bold">Código</th>
+                                        <th class="py-3 px-4 font-bold">Concepto / Categoría</th>
+                                        <th class="py-3 px-4 font-bold text-center">Tarifa / Valor</th>
+                                        <th class="py-3 px-4 font-bold text-center">Unidad</th>
+                                        <th class="py-3 px-4 font-bold text-center">Cobro</th>
+                                        <th class="py-3 px-4 font-bold text-center">Estado</th>
+                                        <th class="py-3 px-4 font-bold text-right">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-800/60 font-medium">
+                                    ${tarifasFiltradas.length === 0 ? `
+                                        <tr><td colspan="8" class="py-8 text-center text-slate-500 italic">No hay tarifas para este ramo. Presione "Nueva Tarifa Multi-Ramo".</td></tr>
+                                    ` : tarifasFiltradas.map(t => {
+                                        const activo = t.activo !== false;
+                                        return `
+                                            <tr class="hover:bg-slate-800/40 transition ${!activo ? 'opacity-50' : ''}">
+                                                <td class="py-3 px-4 whitespace-nowrap">
+                                                    <span class="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold uppercase">${mapRamoLabel[t.ramo] || t.ramo}</span>
+                                                </td>
+                                                <td class="py-3 px-4 font-mono font-bold text-slate-300 whitespace-nowrap">${t.codigo}</td>
+                                                <td class="py-3 px-4">
+                                                    <div class="font-bold text-slate-200">${t.nombre}</div>
+                                                    ${t.descripcion ? `<div class="text-[10px] text-slate-400">${t.descripcion}</div>` : ''}
+                                                </td>
+                                                <td class="py-3 px-4 text-center font-mono font-bold text-amber-400">${Number(t.valor || 0).toFixed(2)}</td>
+                                                <td class="py-3 px-4 text-center text-slate-300 whitespace-nowrap">${mapUnidadLabel[t.unidad_calculo] || t.unidad_calculo}</td>
+                                                <td class="py-3 px-4 text-center uppercase text-[10px] font-mono text-sky-400">${t.periodicidad || 'anual'}</td>
+                                                <td class="py-3 px-4 text-center">
+                                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${activo ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}">
+                                                        ${activo ? 'ACTIVA' : 'INACTIVA'}
+                                                    </span>
+                                                </td>
+                                                <td class="py-3 px-4 text-right space-x-1 whitespace-nowrap">
+                                                    <button onclick="window.PatentesModule.abrirModalTarifa('${t.id}')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-[11px] transition" title="Editar Tarifa">
+                                                        <i class="fas fa-edit"></i> Editar
+                                                    </button>
+                                                    <button onclick="window.PatentesModule.toggleEstadoTarifa('${t.id}')" class="px-2.5 py-1 ${activo ? 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-400' : 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400'} rounded-lg text-[11px] transition" title="${activo ? 'Desactivar' : 'Activar'}">
+                                                        <i class="fas ${activo ? 'fa-ban' : 'fa-check'}"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Bloque 3: Ramos de Ingreso y Tasas Municipales -->
                     <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
                         <div class="px-6 py-4 bg-slate-950/60 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
                             <div>
@@ -1382,7 +1482,172 @@
                         </form>
                     </div>
                 </div>
+
+                <!-- Modal Tarifa Multi-Ramo por Ordenanza -->
+                <div id="modal-tarifa-ordenanza" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+                    <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden">
+                        <div class="bg-slate-950 px-6 py-4 border-b border-slate-800 flex justify-between items-center">
+                            <h3 id="modal-tarifa-titulo" class="text-sm font-bold text-slate-100 flex items-center gap-2">
+                                <i class="fas fa-balance-scale text-emerald-400"></i>
+                                <span>Configurar Tarifa por Ordenanza</span>
+                            </h3>
+                            <button type="button" onclick="window.PatentesModule.cerrarModalTarifa()" class="text-slate-400 hover:text-slate-200">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <form id="form-tarifa-ordenanza" onsubmit="window.PatentesModule.guardarTarifa(event)" class="p-6 space-y-4 text-xs">
+                            <input type="hidden" id="tarifa-edit-id" value="">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-[11px] font-bold text-slate-400 mb-1">Ramo Municipal <span class="text-rose-400">*</span></label>
+                                    <select id="tarifa-edit-ramo" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 outline-none focus:border-emerald-500 cursor-pointer">
+                                        <option value="vehiculos">Vehículos (Motos / Carros / Carga)</option>
+                                        <option value="aseo">Aseo Urbano y Domiciliario</option>
+                                        <option value="inmuebles">Catastro / Inmuebles</option>
+                                        <option value="publicidad">Publicidad y Propaganda</option>
+                                        <option value="espectaculos">Espectáculos Públicos</option>
+                                        <option value="tramites">Trámites y Solvencias</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold text-slate-400 mb-1">Código Interno <span class="text-rose-400">*</span></label>
+                                    <input type="text" id="tarifa-edit-codigo" required placeholder="Ej: VEH-MOTO-200"
+                                           oninput="this.value = this.value.toUpperCase().trim()"
+                                           class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 font-mono font-bold outline-none focus:border-emerald-500">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-400 mb-1">Nombre del Concepto / Categoría <span class="text-rose-400">*</span></label>
+                                <input type="text" id="tarifa-edit-nombre" required placeholder="Ej: Motos y Motonetas hasta 200 C.C."
+                                       class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 font-bold outline-none focus:border-emerald-500">
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div>
+                                    <label class="block text-[11px] font-bold text-slate-400 mb-1">Unidad de Cálculo</label>
+                                    <select id="tarifa-edit-unidad" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 outline-none focus:border-emerald-500 cursor-pointer">
+                                        <option value="tcmmv_fijo">TCMMV (Fijo)</option>
+                                        <option value="tcmmv_m2">TCMMV / m2</option>
+                                        <option value="porcentaje">% Sobre Base</option>
+                                        <option value="ut">U.T. (Unid. Trib.)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold text-slate-400 mb-1">Valor / Porcentaje <span class="text-rose-400">*</span></label>
+                                    <input type="number" id="tarifa-edit-valor" step="0.01" min="0" required placeholder="Ej: 3.00"
+                                           class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-amber-400 font-mono font-bold outline-none focus:border-emerald-500">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold text-slate-400 mb-1">Periodicidad</label>
+                                    <select id="tarifa-edit-periodicidad" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 outline-none focus:border-emerald-500 cursor-pointer">
+                                        <option value="mensual">Mensual</option>
+                                        <option value="trimestral">Trimestral</option>
+                                        <option value="anual">Anual</option>
+                                        <option value="unico">Pago Único</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-400 mb-1">Base Legal / Observaciones</label>
+                                <textarea id="tarifa-edit-descripcion" rows="2" placeholder="Ej: Según Art. X de la Ordenanza vigente..."
+                                          class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 outline-none focus:border-emerald-500"></textarea>
+                            </div>
+                            <div class="pt-3 flex justify-end gap-3 border-t border-slate-800">
+                                <button type="button" onclick="window.PatentesModule.cerrarModalTarifa()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl">Cancelar</button>
+                                <button type="submit" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg">Guardar Tarifa</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             `;
+        },
+
+        filtrarTarifasPorRamo: function(ramo) {
+            filtroTarifaRamo = ramo || 'todos';
+            const container = document.getElementById('app-main-content');
+            if (container) this.render(container);
+        },
+
+        abrirModalTarifa: function(id = null) {
+            const modal = document.getElementById('modal-tarifa-ordenanza');
+            if (!modal) return;
+            const lista = global.HaciendaStore ? global.HaciendaStore.get('hacienda_tarifas_ordenanza') : [];
+            const item = id ? lista.find(t => String(t.id) === String(id)) : null;
+
+            document.getElementById('tarifa-edit-id').value = item ? item.id : '';
+            document.getElementById('tarifa-edit-ramo').value = item ? (item.ramo || 'vehiculos') : (filtroTarifaRamo !== 'todos' ? filtroTarifaRamo : 'vehiculos');
+            document.getElementById('tarifa-edit-codigo').value = item ? (item.codigo || '') : '';
+            document.getElementById('tarifa-edit-nombre').value = item ? (item.nombre || '') : '';
+            document.getElementById('tarifa-edit-unidad').value = item ? (item.unidad_calculo || 'tcmmv_fijo') : 'tcmmv_fijo';
+            document.getElementById('tarifa-edit-valor').value = item ? Number(item.valor || 0).toFixed(2) : '';
+            document.getElementById('tarifa-edit-periodicidad').value = item ? (item.periodicidad || 'anual') : 'anual';
+            document.getElementById('tarifa-edit-descripcion').value = item ? (item.descripcion || '') : '';
+            document.getElementById('modal-tarifa-titulo').innerHTML = `<i class="fas fa-balance-scale text-emerald-400"></i><span>${item ? 'Editar Tarifa (' + item.codigo + ')' : 'Nueva Tarifa Multi-Ramo'}</span>`;
+
+            modal.classList.remove('hidden');
+        },
+
+        cerrarModalTarifa: function() {
+            const modal = document.getElementById('modal-tarifa-ordenanza');
+            if (modal) modal.classList.add('hidden');
+        },
+
+        guardarTarifa: async function(e) {
+            if (e && e.preventDefault) e.preventDefault();
+            const store = global.HaciendaStore;
+            if (!store) return;
+
+            const idExistente = document.getElementById('tarifa-edit-id')?.value;
+            const ramo = document.getElementById('tarifa-edit-ramo')?.value || 'vehiculos';
+            const codigo = document.getElementById('tarifa-edit-codigo')?.value.trim().toUpperCase();
+            const nombre = document.getElementById('tarifa-edit-nombre')?.value.trim();
+            const unidad_calculo = document.getElementById('tarifa-edit-unidad')?.value || 'tcmmv_fijo';
+            const valor = parseFloat(document.getElementById('tarifa-edit-valor')?.value || 0);
+            const periodicidad = document.getElementById('tarifa-edit-periodicidad')?.value || 'anual';
+            const descripcion = document.getElementById('tarifa-edit-descripcion')?.value.trim();
+
+            if (!codigo || !nombre) return;
+
+            const lista = store.get('hacienda_tarifas_ordenanza') || [];
+            const anterior = idExistente ? lista.find(t => String(t.id) === String(idExistente)) : null;
+
+            const obj = {
+                id: idExistente || ('tar_' + Date.now()),
+                ramo,
+                codigo,
+                nombre,
+                unidad_calculo,
+                valor: Number(valor.toFixed(4)),
+                periodicidad,
+                descripcion,
+                activo: anterior ? (anterior.activo !== false) : true,
+                created_at: anterior ? (anterior.created_at || new Date().toISOString()) : new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            };
+
+            await store.set('hacienda_tarifas_ordenanza', obj);
+            this.cerrarModalTarifa();
+            const container = document.getElementById('app-main-content');
+            if (container) this.render(container);
+
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({ icon: 'success', title: 'Tarifa Guardada', text: `${codigo} actualizada correctamente.`, confirmButtonColor: '#10b981', timer: 1800, showConfirmButton: false });
+            }
+        },
+
+        toggleEstadoTarifa: async function(id) {
+            const store = global.HaciendaStore;
+            if (!store) return;
+            const lista = store.get('hacienda_tarifas_ordenanza') || [];
+            const item = lista.find(t => String(t.id) === String(id));
+            if (!item) return;
+
+            await store.set('hacienda_tarifas_ordenanza', {
+                ...item,
+                activo: item.activo === false,
+                updated_at: new Date().toISOString()
+            });
+            const container = document.getElementById('app-main-content');
+            if (container) this.render(container);
         },
 
         abrirModalActividadLocat: function(id = null) {

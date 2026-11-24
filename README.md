@@ -140,6 +140,13 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.10.15 — 24/11/2026
+- **Tarifario Paramétrico Multi-Ramo para Venta Multi-Municipio (`hacienda_tarifas_ordenanza`):**
+  - Nueva tabla `hacienda_tarifas_ordenanza` en `sql/schema_hacienda.sql`, `js/core/store.js` y `js/core/realtime-sync.js` (ciclo 0ms + Realtime + RLS + semillas iniciales en TCMMV y %).
+  - Permite configurar sin tocar código las tarifas de **Vehículos** (motos, carros, camionetas, carga), **Aseo Urbano** (domiciliario, minorista, mayorista), **Catastro / Inmuebles**, **Publicidad**, **Espectáculos Públicos** y **Trámites / Solvencias**.
+  - Interfaz completa en la pestaña **Tasas y Tarifas LOCAT** de `comercial.js` con filtro por ramo, alta, edición y activación/desactivación.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.10.15`.
+
 ### Version 3.10.14 — 24/11/2026
 - **Configuración Visual de Tasas, Alícuotas LOCAT y Ramos de Ingreso (`comercial.js`):**
   - Nueva sub-vista **"Tasas y Tarifas LOCAT"** dentro del módulo de Licencias y Patentes del ERP (`admin.html`), conectada directamente a `hacienda_actividades_locat` y `hacienda_ramos_ingreso` en `HaciendaStore` (ciclo 0ms + sincronización Supabase).
