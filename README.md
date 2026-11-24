@@ -140,6 +140,11 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.10.13 — 24/11/2026
+- **Entradas Directas de Modelos/Líneas Populares de Moto en Selector (`catalogo-vehiculos.js`):**
+  - Incorporación directa de `Owen`, `Horse`, `Keeway`, `Jaguar`, `Matrix`, `Outlook`, `Pulsar` y `SBR` en el selector de marcas de motocicletas (además de mantenerse bajo `Empire Keeway`, `Bera`, `Motos Toro` y `Bajaj`), reflejando cómo figuran en los títulos del INTT y SATGUAICA.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.10.13`.
+
 ### Version 3.10.12 — 24/11/2026
 - **Cobertura Total de Marcas Reales en Catálogo de Vehículos (`catalogo-vehiculos.js`):**
   - Ampliación completa del catálogo con todas las marcas reales de motos, automóviles, camionetas, transporte y carga del listado SATGUAICA (incluyendo Dayun, Enfield, FYM, Gilera, Hyosung, Jialing, Jincheng, Jonway, Lifan, LML, Malaguti, Moto Morini, Qipai, Sumo, Traxx, United Motors, Verucci, Wangye, Xingfu, Znen, Zukida, Alfa Romeo, ARO, Baic, Buick, Cadillac, Chana, Changhe, Dacia, Daihatsu, GAC, Geely, GMC, Hafei, Haima, Hummer, Infiniti, JMC, Kaiyi, Lada, Lexus, Lincoln, Maxus, Mercury, MG, Mini, Plymouth, Pontiac, Porsche, Rover, Saic Wuling, Saturn, Seat, Skoda, Ssangyong, Subaru, Volvo, Willys, Zhongxing, ZXAuto, Marcopolo, Ebro, Kamaz, Pegaso, Dorsey, Fruehauf, Great Dane y Wabash National), depurando duplicados y typos.
