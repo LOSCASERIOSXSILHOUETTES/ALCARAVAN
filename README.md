@@ -140,6 +140,13 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.10.16 — 24/11/2026
+- **Liquidación Vehicular Anual y Trimestral en TCMMV (`catalogo-vehiculos.js`, `portal-comercio.js`, `comercial.js`):**
+  - Motor compartido de cálculo y liquidación vehicular conectado a `hacienda_tarifas_ordenanza` y a la tasa BCV vigente (`TasasBCVService`).
+  - Permite liquidar **Anualidad Completa** (100% de la tarifa anual en TCMMV) o **Cuota Trimestral** (`Trimestre I..IV`, equivalente a 1/4 de la anualidad), previniendo duplicados y conflictos de modalidad en el mismo año fiscal.
+  - Disponible tanto para el contribuyente desde **Mis Vehículos** (`portal-comercio.js`) como para el funcionario desde **Patentes -> Vehículos** (`comercial.js`), integrándose directo con **Reportar Pago**, **Taquilla de Caja** y **Solvencias QR** sin cambios de DDL en Supabase.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.10.16`.
+
 ### Version 3.10.15 — 24/11/2026
 - **Tarifario Paramétrico Multi-Ramo para Venta Multi-Municipio (`hacienda_tarifas_ordenanza`):**
   - Nueva tabla `hacienda_tarifas_ordenanza` en `sql/schema_hacienda.sql`, `js/core/store.js` y `js/core/realtime-sync.js` (ciclo 0ms + Realtime + RLS + semillas iniciales en TCMMV y %).

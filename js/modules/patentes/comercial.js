@@ -574,7 +574,10 @@
                                 ${(v.estado || 'activo').toUpperCase()}
                             </span>
                         </td>
-                        <td class="py-3 px-4 text-right space-x-2">
+                        <td class="py-3 px-4 text-right space-x-1 whitespace-nowrap">
+                            <button onclick="window.PatentesModule.liquidarVehiculoRapido('${v.id}')" class="px-2.5 py-1 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 rounded-lg text-[11px] font-semibold transition" title="Liquidar Anualidad o Trimestre">
+                                <i class="fas fa-calculator"></i> Liquidar
+                            </button>
                             <button onclick="window.PatentesModule.abrirModalVehiculo('${v.id}')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[11px] transition" title="Editar">
                                 <i class="fas fa-edit"></i>
                             </button>
@@ -591,6 +594,78 @@
             filtroVehiculoTexto = txt.trim();
             const container = document.getElementById('app-main-content');
             if (container) this.render(container);
+        },
+
+        liquidarVehiculoRapido: async function(vehiculoId) {
+            const store = global.HaciendaStore;
+            const cat = global.HaciendaVehiculosCatalogo;
+            if (!store || !cat || typeof Swal === 'undefined') return;
+
+            const vehiculos = store.get('hacienda_vehiculos') || [];
+            const v = vehiculos.find(item => String(item.id) === String(vehiculoId));
+            if (!v) return;
+
+            const tarifas = cat.getTarifasVehiculos();
+            const sugerida = cat.sugerirTarifaParaVehiculo(v);
+            const anioActual = new Date().getFullYear();
+            const trimActual = Math.ceil((new Date().getMonth() + 1) / 3);
+
+            const { value: formVals } = await Swal.fire({
+                title: `Liquidar Patente — ${v.placa}`,
+                html: `
+                    <div class="text-left space-y-3 text-xs">
+                        <div>
+                            <label class="block font-bold mb-1">Categoría / Tarifa (TCMMV)</label>
+                            <select id="swal-liq-tarifa" class="w-full border rounded-lg p-2">
+                                ${tarifas.map(t => `<option value="${t.id}" ${sugerida && t.id === sugerida.id ? 'selected' : ''}>${t.nombre} (${Number(t.valor || 0).toFixed(2)} TCMMV/año)</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block font-bold mb-1">Modalidad</label>
+                                <select id="swal-liq-mod" class="w-full border rounded-lg p-2" onchange="document.getElementById('swal-liq-trim-wrap').style.display = this.value === 'trimestral' ? 'block' : 'none'">
+                                    <option value="anual">Anualidad (100%)</option>
+                                    <option value="trimestral">Trimestral (1/4)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-bold mb-1">Año Fiscal</label>
+                                <input id="swal-liq-anio" type="number" class="w-full border rounded-lg p-2" value="${anioActual}">
+                            </div>
+                        </div>
+                        <div id="swal-liq-trim-wrap" style="display:none">
+                            <label class="block font-bold mb-1">Trimestre</label>
+                            <select id="swal-liq-trim" class="w-full border rounded-lg p-2">
+                                <option value="1" ${trimActual === 1 ? 'selected' : ''}>Trimestre I (Ene-Mar)</option>
+                                <option value="2" ${trimActual === 2 ? 'selected' : ''}>Trimestre II (Abr-Jun)</option>
+                                <option value="3" ${trimActual === 3 ? 'selected' : ''}>Trimestre III (Jul-Sep)</option>
+                                <option value="4" ${trimActual === 4 ? 'selected' : ''}>Trimestre IV (Oct-Dic)</option>
+                            </select>
+                        </div>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Generar Liquidación',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#10b981',
+                preConfirm: () => ({
+                    tarifaId: document.getElementById('swal-liq-tarifa')?.value,
+                    modalidad: document.getElementById('swal-liq-mod')?.value,
+                    anio: document.getElementById('swal-liq-anio')?.value,
+                    trimestre: document.getElementById('swal-liq-trim')?.value
+                })
+            });
+
+            if (!formVals) return;
+            const res = await cat.liquidarVehiculo(v, formVals);
+            if (!res.ok) {
+                const msg = res.motivo === 'duplicada'
+                    ? 'Ese vehículo ya tiene liquidado ese período.'
+                    : 'Ya existe liquidación bajo la otra modalidad (Anual vs Trimestral) para ese año.';
+                Swal.fire({ icon: 'warning', title: 'No se pudo liquidar', text: msg, confirmButtonColor: '#4f46e5' });
+                return;
+            }
+            Swal.fire({ icon: 'success', title: 'Liquidación Generada', text: `Cuota vehicular por Bs. ${res.calc.montoBs.toLocaleString('es-VE', { minimumFractionDigits: 2 })} lista para cobro en Taquilla.`, confirmButtonColor: '#10b981' });
         },
 
         alCambiarActividad: function() {

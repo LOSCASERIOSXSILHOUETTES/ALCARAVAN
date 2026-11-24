@@ -1637,8 +1637,12 @@
                                             const infoDetalle = esParcial
                                                 ? ` [Resta: ${saldo.toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs · Abonado: ${Number(d.monto_pagado_bs).toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs]`
                                                 : ` — ${saldo.toLocaleString('es-VE', { minimumFractionDigits: 2 })} Bs.`;
+                                            const etiquetaVeh = (global.HaciendaVehiculosCatalogo && global.HaciendaVehiculosCatalogo.getEtiquetaPeriodoVehiculo(d.mes));
+                                            const labelPeriodo = etiquetaVeh
+                                                ? `Vehículo · ${etiquetaVeh}`
+                                                : (MESES[(d.mes || 1) - 1] || ('Mes ' + d.mes));
                                             return `<option value="${d.id}" data-saldo="${saldo}">
-                                                ${MESES[d.mes - 1]} ${d.anio}${infoDetalle}
+                                                ${labelPeriodo} ${d.anio}${infoDetalle}
                                             </option>`;
                                         }).join('')}
                                     </select>
@@ -2046,22 +2050,48 @@
                                                 </div>
                                             </div>
 
-                                            <!-- Acciones de Tarjeta -->
-                                            <div class="flex items-center justify-between pt-2 border-t border-white/5 text-xs">
-                                                <span class="text-[10px] font-mono text-emerald-400 flex items-center gap-1">
-                                                    <i class="fas fa-check-circle text-[9px]"></i>
-                                                    <span>Estatus: ${(v.estado || 'activo').toUpperCase()}</span>
-                                                </span>
-                                                <div class="flex items-center gap-2">
-                                                    <button onclick="window.PortalComercio.abrirModalVehiculo('${v.id}')" 
-                                                            class="px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-300 hover:text-white transition text-[11px] font-medium flex items-center gap-1">
-                                                        <i class="fas fa-edit text-[10px]"></i>
-                                                        <span>Editar</span>
-                                                    </button>
-                                                    <button onclick="window.PortalComercio.eliminarVehiculo('${v.id}')" 
-                                                            class="px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 transition text-[11px] font-medium">
-                                                        <i class="fas fa-trash text-[10px]"></i>
-                                                    </button>
+                                            <!-- Liquidaciones y Acciones de Tarjeta -->
+                                            <div class="space-y-2.5 pt-2 border-t border-white/5 text-xs">
+                                                ${(() => {
+                                                    const allDecs = global.HaciendaStore ? (global.HaciendaStore.get('hacienda_declaraciones') || []) : [];
+                                                    const decsVeh = allDecs.filter(d => String(d.patente_id) === String(v.id));
+                                                    const pendVeh = decsVeh.filter(d => d.estado !== 'pagada');
+                                                    const deudaVeh = pendVeh.reduce((acc, d) => acc + Number(d.saldo_pendiente_bs != null ? d.saldo_pendiente_bs : (d.impuesto_determinado_bs || 0)), 0);
+                                                    if (decsVeh.length === 0) {
+                                                        return `<div class="text-[11px] text-neutral-500 font-mono">Sin liquidaciones emitidas para este vehículo.</div>`;
+                                                    }
+                                                    return `
+                                                        <div class="flex items-center justify-between px-3 py-2 rounded-xl ${deudaVeh > 0 ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-emerald-500/10 border border-emerald-500/20'}">
+                                                            <span class="text-[11px] font-medium ${deudaVeh > 0 ? 'text-amber-300' : 'text-emerald-300'}">
+                                                                ${deudaVeh > 0 ? `${pendVeh.length} cuota(s) pendiente(s):` : 'Patente Vehicular al día'}
+                                                            </span>
+                                                            <span class="font-mono font-bold ${deudaVeh > 0 ? 'text-amber-300' : 'text-emerald-400'}">
+                                                                ${deudaVeh > 0 ? 'Bs. ' + deudaVeh.toLocaleString('es-VE', { minimumFractionDigits: 2 }) : 'SOLVENTE'}
+                                                            </span>
+                                                        </div>
+                                                    `;
+                                                })()}
+
+                                                <div class="flex flex-wrap items-center justify-between gap-2">
+                                                    <span class="text-[10px] font-mono text-emerald-400 flex items-center gap-1">
+                                                        <i class="fas fa-check-circle text-[9px]"></i>
+                                                        <span>Estatus: ${(v.estado || 'activo').toUpperCase()}</span>
+                                                    </span>
+                                                    <div class="flex flex-wrap items-center gap-1.5">
+                                                        <button onclick="window.PortalComercio.abrirModalLiquidarVehiculo('${v.id}')" 
+                                                                class="px-3 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/25 transition text-[11px] font-semibold flex items-center gap-1">
+                                                            <i class="fas fa-calculator text-[10px]"></i>
+                                                            <span>Liquidar Anual / Trim.</span>
+                                                        </button>
+                                                        <button onclick="window.PortalComercio.abrirModalVehiculo('${v.id}')" 
+                                                                class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-300 hover:text-white transition text-[11px] font-medium flex items-center gap-1">
+                                                            <i class="fas fa-edit text-[10px]"></i>
+                                                        </button>
+                                                        <button onclick="window.PortalComercio.eliminarVehiculo('${v.id}')" 
+                                                                class="px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 transition text-[11px] font-medium">
+                                                            <i class="fas fa-trash text-[10px]"></i>
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -2073,6 +2103,7 @@
                 </div>
 
                 ${this.renderModalNuevoVehiculo()}
+                ${this.renderModalLiquidarVehiculo()}
             `;
         },
 
@@ -2711,7 +2742,7 @@
             const totalPagar = Math.max(impAlicuota, minimoBs);
 
             const declaraciones = store.get('hacienda_declaraciones') || [];
-            const yaExiste = declaraciones.some(d => String(d.contribuyente_id) === String(activeContribuyente.id) && d.mes === mes && d.anio === anio);
+            const yaExiste = declaraciones.some(d => String(d.contribuyente_id) === String(activeContribuyente.id) && String(d.patente_id) === String(p.id) && d.mes === mes && d.anio === anio);
             if (yaExiste) {
                 if (typeof Swal !== 'undefined') {
                     Swal.fire({ icon: 'warning', title: 'Período ya declarado', text: `Ya existe una declaración para ${MESES[mes - 1]} ${anio}.`, confirmButtonColor: '#000000' });
@@ -3767,6 +3798,177 @@
                         showConfirmButton: false
                     });
                 }
+            }
+        },
+
+        renderModalLiquidarVehiculo: function() {
+            const anioActual = new Date().getFullYear();
+            return `
+                <div id="modal-liquidar-vehiculo" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+                    <div class="bg-[#121214] border border-white/10 rounded-3xl w-full max-w-lg shadow-2xl p-6 sm:p-8 space-y-5">
+                        <div class="flex items-center justify-between border-b border-white/5 pb-3">
+                            <div>
+                                <span class="text-[10px] font-mono text-emerald-400 uppercase tracking-widest block">Patente sobre Vehículos (LOCAT)</span>
+                                <h3 id="liq-veh-titulo" class="text-sm font-semibold text-white">Liquidar Patente Vehicular</h3>
+                            </div>
+                            <button onclick="window.PortalComercio.cerrarModalLiquidarVehiculo()" class="text-neutral-500 hover:text-white"><i class="fas fa-times"></i></button>
+                        </div>
+
+                        <input type="hidden" id="liq-veh-id" value="">
+
+                        <div class="space-y-3 text-xs">
+                            <div>
+                                <label class="text-[11px] text-neutral-400 block mb-1">Categoría / Tarifa Aplicable (Ordenanza)</label>
+                                <select id="liq-veh-tarifa" onchange="window.PortalComercio.actualizarPreviewLiquidacionVehiculo()"
+                                        class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none focus:border-emerald-500 cursor-pointer">
+                                </select>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="text-[11px] text-neutral-400 block mb-1">Modalidad de Pago</label>
+                                    <select id="liq-veh-modalidad" onchange="window.PortalComercio.actualizarPreviewLiquidacionVehiculo()"
+                                            class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none focus:border-emerald-500 cursor-pointer">
+                                        <option value="anual">Anualidad Completa (100%)</option>
+                                        <option value="trimestral">Trimestral (1/4 de Anualidad)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="text-[11px] text-neutral-400 block mb-1">Año Fiscal</label>
+                                    <select id="liq-veh-anio" onchange="window.PortalComercio.actualizarPreviewLiquidacionVehiculo()"
+                                            class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 font-mono outline-none focus:border-emerald-500 cursor-pointer">
+                                        <option value="${anioActual}">${anioActual}</option>
+                                        <option value="${anioActual - 1}">${anioActual - 1}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div id="liq-veh-trimestre-box" class="hidden">
+                                <label class="text-[11px] text-neutral-400 block mb-1">Seleccione el Trimestre</label>
+                                <select id="liq-veh-trimestre" onchange="window.PortalComercio.actualizarPreviewLiquidacionVehiculo()"
+                                        class="w-full bg-[#18181b] border border-white/10 text-white rounded-xl px-3 py-2.5 outline-none focus:border-emerald-500 cursor-pointer">
+                                    <option value="1">Trimestre I (Enero - Marzo)</option>
+                                    <option value="2">Trimestre II (Abril - Junio)</option>
+                                    <option value="3">Trimestre III (Julio - Septiembre)</option>
+                                    <option value="4">Trimestre IV (Octubre - Diciembre)</option>
+                                </select>
+                            </div>
+
+                            <div class="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 space-y-1.5 font-mono">
+                                <div class="flex justify-between text-[11px] text-neutral-300">
+                                    <span>Tasa Aplicada (TCMMV):</span>
+                                    <span id="liq-veh-prev-tcmmv" class="font-bold text-emerald-300">0.00 TCMMV</span>
+                                </div>
+                                <div class="flex justify-between text-[11px] text-neutral-400">
+                                    <span>Tasa BCV Vigente:</span>
+                                    <span id="liq-veh-prev-bcv">Bs. 0,00</span>
+                                </div>
+                                <div class="flex justify-between text-sm font-bold text-white pt-1.5 border-t border-emerald-500/20">
+                                    <span>Total a Liquidar:</span>
+                                    <span id="liq-veh-prev-bs" class="text-emerald-400">Bs. 0,00</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end gap-3 pt-2 border-t border-white/5">
+                            <button onclick="window.PortalComercio.cerrarModalLiquidarVehiculo()" class="px-4 py-2 text-xs text-neutral-400 hover:text-white rounded-xl">Cancelar</button>
+                            <button onclick="window.PortalComercio.confirmarLiquidacionVehiculo()" class="bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-bold rounded-full px-6 py-2.5 transition shadow-lg">
+                                Generar Liquidación
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        },
+
+        abrirModalLiquidarVehiculo: function(vehiculoId) {
+            const modal = document.getElementById('modal-liquidar-vehiculo');
+            const store = global.HaciendaStore;
+            if (!modal || !store || !global.HaciendaVehiculosCatalogo) return;
+
+            const vehiculos = store.get('hacienda_vehiculos') || [];
+            const v = vehiculos.find(item => String(item.id) === String(vehiculoId));
+            if (!v) return;
+
+            document.getElementById('liq-veh-id').value = v.id;
+            document.getElementById('liq-veh-titulo').textContent = `Liquidar Placa ${v.placa} (${v.marca} ${v.modelo})`;
+
+            const tarifas = global.HaciendaVehiculosCatalogo.getTarifasVehiculos();
+            const sugerida = global.HaciendaVehiculosCatalogo.sugerirTarifaParaVehiculo(v);
+            const selTarifa = document.getElementById('liq-veh-tarifa');
+            if (selTarifa) {
+                selTarifa.innerHTML = tarifas.map(t =>
+                    `<option value="${t.id}" ${sugerida && t.id === sugerida.id ? 'selected' : ''}>${t.nombre} — ${Number(t.valor || 0).toFixed(2)} TCMMV/año</option>`
+                ).join('');
+            }
+
+            const mesActual = new Date().getMonth() + 1;
+            const trimActual = Math.ceil(mesActual / 3);
+            const selTrim = document.getElementById('liq-veh-trimestre');
+            if (selTrim) selTrim.value = String(trimActual);
+
+            this.actualizarPreviewLiquidacionVehiculo();
+            modal.classList.remove('hidden');
+        },
+
+        cerrarModalLiquidarVehiculo: function() {
+            const modal = document.getElementById('modal-liquidar-vehiculo');
+            if (modal) modal.classList.add('hidden');
+        },
+
+        actualizarPreviewLiquidacionVehiculo: function() {
+            if (!global.HaciendaVehiculosCatalogo) return;
+            const tarifaId = document.getElementById('liq-veh-tarifa')?.value;
+            const modalidad = document.getElementById('liq-veh-modalidad')?.value || 'anual';
+            const trimBox = document.getElementById('liq-veh-trimestre-box');
+            if (trimBox) trimBox.classList.toggle('hidden', modalidad !== 'trimestral');
+
+            const calc = global.HaciendaVehiculosCatalogo.calcularMontoVehiculo({ tarifaId, modalidad });
+            const elTcmmv = document.getElementById('liq-veh-prev-tcmmv');
+            const elBcv = document.getElementById('liq-veh-prev-bcv');
+            const elBs = document.getElementById('liq-veh-prev-bs');
+            if (elTcmmv) elTcmmv.textContent = `${calc.tcmmvAplicado.toFixed(2)} TCMMV`;
+            if (elBcv) elBcv.textContent = `Bs. ${calc.tasa.toLocaleString('es-VE', { minimumFractionDigits: 2 })}`;
+            if (elBs) elBs.textContent = `Bs. ${calc.montoBs.toLocaleString('es-VE', { minimumFractionDigits: 2 })}`;
+        },
+
+        confirmarLiquidacionVehiculo: async function() {
+            const store = global.HaciendaStore;
+            if (!store || !global.HaciendaVehiculosCatalogo) return;
+
+            const vehId = document.getElementById('liq-veh-id')?.value;
+            const tarifaId = document.getElementById('liq-veh-tarifa')?.value;
+            const modalidad = document.getElementById('liq-veh-modalidad')?.value || 'anual';
+            const trimestre = document.getElementById('liq-veh-trimestre')?.value || '1';
+            const anio = document.getElementById('liq-veh-anio')?.value;
+
+            const vehiculos = store.get('hacienda_vehiculos') || [];
+            const v = vehiculos.find(item => String(item.id) === String(vehId));
+            if (!v) return;
+
+            const res = await global.HaciendaVehiculosCatalogo.liquidarVehiculo(v, { tarifaId, modalidad, trimestre, anio });
+            if (!res.ok) {
+                if (typeof Swal !== 'undefined') {
+                    const msg = res.motivo === 'duplicada'
+                        ? 'Ya existe una liquidación generada para ese vehículo en ese período.'
+                        : res.motivo === 'conflicto_modalidad'
+                            ? 'Ya liquidaste bajo la otra modalidad (Anual vs Trimestral) en ese mismo año.'
+                            : 'El monto calculado debe ser mayor a cero.';
+                    Swal.fire({ icon: 'warning', title: 'Aviso de Liquidación', text: msg, confirmButtonColor: '#000000' });
+                }
+                return;
+            }
+
+            this.cerrarModalLiquidarVehiculo();
+            this.navegarModulo('vehiculos');
+
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Liquidación Generada',
+                    text: `Cuota vehicular por Bs. ${res.calc.montoBs.toLocaleString('es-VE', { minimumFractionDigits: 2 })} lista en Reportar Pago / Taquilla.`,
+                    confirmButtonColor: '#10b981'
+                });
             }
         },
 

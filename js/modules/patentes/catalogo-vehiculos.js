@@ -529,6 +529,120 @@
             const modelo = modeloSel === 'OTRO' ? modeloOtro : modeloSel;
 
             return { marca, modelo };
+        },
+
+        // =====================================================================
+        // MOTOR DE LIQUIDACIÓN VEHICULAR (ANUAL / TRIMESTRAL EN TCMMV)
+        // =====================================================================
+
+        getTarifasVehiculos: function () {
+            const store = global.HaciendaStore;
+            const todas = store ? (store.get('hacienda_tarifas_ordenanza') || []) : [];
+            return todas.filter(t => t.ramo === 'vehiculos' && t.activo !== false);
+        },
+
+        sugerirTarifaParaVehiculo: function (vehiculo) {
+            const tarifas = this.getTarifasVehiculos();
+            if (tarifas.length === 0) return null;
+            const tipo = (vehiculo && vehiculo.tipo) ? vehiculo.tipo : 'automovil';
+
+            let prefijo = 'VEH-PART';
+            if (tipo === 'moto') prefijo = 'VEH-MOTO-200';
+            else if (tipo === 'camioneta') prefijo = 'VEH-PART-2000';
+            else if (['camion_350', 'camion_750', 'gandola', 'volteo', 'remolque', 'minibus', 'autobus'].includes(tipo)) prefijo = 'VEH-CARGA';
+
+            return tarifas.find(t => String(t.codigo || '').startsWith(prefijo)) || tarifas[0];
+        },
+
+        getTasaBcvActual: function () {
+            if (global.TasasBCVService && typeof global.TasasBCVService.getTasaActual === 'function') {
+                const t = Number(global.TasasBCVService.getTasaActual());
+                if (t > 0) return t;
+            }
+            if (global.HaciendaConfig && Number(global.HaciendaConfig.tasa_bcv) > 0) {
+                return Number(global.HaciendaConfig.tasa_bcv);
+            }
+            return 45.00;
+        },
+
+        getEtiquetaPeriodoVehiculo: function (mesCode) {
+            const m = Number(mesCode);
+            if (m === 100) return 'Anualidad Completa';
+            if (m === 101) return 'Trimestre I (Ene-Mar)';
+            if (m === 102) return 'Trimestre II (Abr-Jun)';
+            if (m === 103) return 'Trimestre III (Jul-Sep)';
+            if (m === 104) return 'Trimestre IV (Oct-Dic)';
+            return null;
+        },
+
+        calcularMontoVehiculo: function ({ tarifaId, modalidad, tasaBcv }) {
+            const tarifas = this.getTarifasVehiculos();
+            const tarifa = tarifas.find(t => String(t.id) === String(tarifaId)) || tarifas[0];
+            const tasa = Number(tasaBcv) || this.getTasaBcvActual();
+            const valorAnualTcmmv = tarifa ? Number(tarifa.valor || 0) : 0;
+            const tcmmvAplicado = modalidad === 'trimestral'
+                ? Number((valorAnualTcmmv / 4).toFixed(4))
+                : Number(valorAnualTcmmv.toFixed(4));
+            const montoBs = Number((tcmmvAplicado * tasa).toFixed(2));
+            return { tarifa, tasa, tcmmvAplicado, montoBs };
+        },
+
+        liquidarVehiculo: async function (vehiculo, { tarifaId, modalidad, trimestre, anio }) {
+            const store = global.HaciendaStore;
+            if (!store || !vehiculo) throw new Error('Store o vehículo no disponible');
+
+            const anioNum = parseInt(anio || new Date().getFullYear(), 10);
+            const mesCode = modalidad === 'trimestral' ? (100 + parseInt(trimestre || 1, 10)) : 100;
+
+            const declaraciones = store.get('hacienda_declaraciones') || [];
+            const yaExiste = declaraciones.find(d =>
+                String(d.patente_id) === String(vehiculo.id) &&
+                Number(d.anio) === anioNum &&
+                Number(d.mes) === mesCode
+            );
+
+            if (yaExiste) {
+                return { ok: false, motivo: 'duplicada', declaracion: yaExiste };
+            }
+
+            // Si intenta liquidar anualidad cuando ya liquidó algún trimestre ese año (o viceversa), avisar
+            const conflictoModo = declaraciones.find(d =>
+                String(d.patente_id) === String(vehiculo.id) &&
+                Number(d.anio) === anioNum &&
+                ((mesCode === 100 && Number(d.mes) >= 101 && Number(d.mes) <= 104) ||
+                 (mesCode >= 101 && Number(d.mes) === 100))
+            );
+            if (conflictoModo) {
+                return { ok: false, motivo: 'conflicto_modalidad', declaracion: conflictoModo };
+            }
+
+            const calc = this.calcularMontoVehiculo({ tarifaId, modalidad });
+            if (calc.montoBs <= 0) {
+                return { ok: false, motivo: 'monto_cero' };
+            }
+
+            const nuevaDec = {
+                id: 'dec_veh_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+                contribuyente_id: vehiculo.contribuyente_id,
+                patente_id: vehiculo.id,
+                anio: anioNum,
+                mes: mesCode,
+                base_imponible_bs: 0,
+                alicuota_aplicada: 0,
+                impuesto_alicuota_bs: 0,
+                minimo_tributable_bs: calc.montoBs,
+                impuesto_determinado_bs: calc.montoBs,
+                tasa_bcv_aplicada: calc.tasa,
+                monto_pagado_bs: 0,
+                saldo_pendiente_bs: calc.montoBs,
+                estado: 'pendiente',
+                fecha_declaracion: new Date().toISOString().split('T')[0],
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            };
+
+            await store.set('hacienda_declaraciones', nuevaDec);
+            return { ok: true, declaracion: nuevaDec, calc };
         }
     };
 
