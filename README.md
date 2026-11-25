@@ -140,6 +140,12 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.10.18 — 25/11/2026
+- **Carga de Imagenes via Edge Function `imgbb-proxy` (`js/core/uploader.js`, `portal-comercio.js`, `comunicacion.js`, `index.html`):**
+  - Refactorizacion de `HaciendaUploader.subirAImgBB()` para invocar la Edge Function `imgbb-proxy` de Supabase (con compresion previa en canvas y fallback automatico a Base64 si esta offline), eliminando la dependencia de keys en el frontend.
+  - Inclusion de `js/core/uploader.js` en `index.html`, campo para adjuntar capture del comprobante bancario (`comprobante_url`) en **Reportar Pago** (`portal-comercio.js`) y boton de subida directa en **Comunicacion / Popups** (`comunicacion.js`).
+  - Respaldo de la Edge Function en `supabase/functions/imgbb-proxy/index.ts` y bump de Service Worker a `alcaravan-v3-cache-v3.10.18`.
+
 ### Version 3.10.17 — 24/11/2026
 - **Ajuste de Tarifas Base por Tipo de Vehículo según SATRIMG (`store.js`, `catalogo-vehiculos.js`):**
   - Actualización de las semillas de `hacienda_tarifas_ordenanza` para reflejar el cobro directo en TCMMV por tipo de vehículo (Motos base `10.00 TCMMV`, Automóviles, Camionetas, Transporte de Pasajeros, Carga y Maquinaria Especial), con mapeo automático en `sugerirTarifaParaVehiculo()`.

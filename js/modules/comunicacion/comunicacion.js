@@ -649,8 +649,15 @@
 
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 mb-1">URL de Imagen / Volante (Opcional)</label>
-                                <input type="url" id="pop-imagen" placeholder="https://ejemplo.com/volante.jpg" 
-                                       class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 outline-none focus:border-pink-500">
+                                <div class="flex gap-2">
+                                    <input type="url" id="pop-imagen" placeholder="https://ejemplo.com/volante.jpg" 
+                                           class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100 outline-none focus:border-pink-500">
+                                    <input type="file" id="pop-imagen-file" accept="image/*" class="hidden" onchange="window.ComunicacionModule.subirImagenPopup(this)">
+                                    <button type="button" onclick="document.getElementById('pop-imagen-file').click()"
+                                            class="px-3 py-2 bg-pink-600/20 hover:bg-pink-600 text-pink-300 hover:text-white border border-pink-500/30 rounded-xl text-xs font-bold transition-colors shrink-0">
+                                        <i class="fas fa-upload mr-1"></i> Subir
+                                    </button>
+                                </div>
                             </div>
 
                             <div>
@@ -797,6 +804,35 @@
             await store.remove('hacienda_popups', id);
             const container = document.getElementById('app-main-content');
             if (container) this.render(container);
+        },
+
+        subirImagenPopup: async function(inputEl) {
+            if (!inputEl || !inputEl.files || !inputEl.files.length) return;
+            if (!global.HaciendaUploader) return;
+
+            const file = inputEl.files[0];
+            const urlInput = document.getElementById('pop-imagen');
+            try {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: 'Subiendo imagen...',
+                        allowOutsideClick: false,
+                        didOpen: () => Swal.showLoading()
+                    });
+                }
+                const url = await global.HaciendaUploader.subirAImgBB(file);
+                if (urlInput && url) urlInput.value = url;
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({ icon: 'success', title: 'Imagen cargada', timer: 1300, showConfirmButton: false });
+                }
+            } catch (err) {
+                console.error('[ComunicacionModule] Error subiendo imagen:', err);
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({ icon: 'error', title: 'Error', text: err.message || 'No se pudo subir la imagen.' });
+                }
+            } finally {
+                inputEl.value = '';
+            }
         },
 
         // Aliases para retrocompatibilidad con llamadas a PopupsModule

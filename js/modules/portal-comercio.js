@@ -1698,6 +1698,12 @@
                                     <input type="date" id="pago-fecha" value="${new Date().toISOString().split('T')[0]}" 
                                            class="w-full bg-[#18181b] border border-white/10 text-white text-xs font-medium rounded-2xl px-4 py-3 outline-none focus:border-white/30 transition">
                                 </div>
+                                <div class="space-y-1.5 sm:col-span-2">
+                                    <label class="text-[11px] font-medium text-neutral-400 uppercase tracking-wider block">Capture / Foto del Comprobante (Opcional)</label>
+                                    <input type="file" id="pago-comprobante" accept="image/*"
+                                           class="w-full bg-[#18181b] border border-white/10 text-neutral-300 text-xs rounded-2xl px-4 py-2.5 file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-white file:text-black hover:file:bg-neutral-200 cursor-pointer">
+                                    <p class="text-[10px] text-neutral-500">Se comprime automaticamente para agilizar la verificacion en taquilla.</p>
+                                </div>
                             </div>
 
                             <div class="flex justify-end pt-2">
@@ -2855,6 +2861,23 @@
             const metodoObj = metodos.find(m => String(m.id) === String(metodoId));
             const cuentaIdFinal = (metodoObj && metodoObj.cuenta_id) ? metodoObj.cuenta_id : (cuentaIdDesdeMetodo || cuentaIdDesdeDestino || null);
 
+            let compUrl = null;
+            const fileInput = document.getElementById('pago-comprobante');
+            if (fileInput && fileInput.files && fileInput.files.length > 0 && window.HaciendaUploader) {
+                try {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            title: 'Subiendo comprobante...',
+                            allowOutsideClick: false,
+                            didOpen: () => Swal.showLoading()
+                        });
+                    }
+                    compUrl = await window.HaciendaUploader.subirAImgBB(fileInput.files[0]);
+                } catch (err) {
+                    console.warn('[PortalComercio] Error subiendo comprobante:', err);
+                }
+            }
+
             const nuevoPago = {
                 id: Date.now(),
                 numero_recibo: 'REC-' + new Date().getFullYear() + '-' + String(Date.now()).slice(-4),
@@ -2867,6 +2890,7 @@
                 referencia_bancaria: referencia,
                 fecha_pago: fecha,
                 monto_bs: monto,
+                comprobante_url: compUrl,
                 metodo: canalMetodo,
                 estado: 'pendiente',
                 verificado_por: null
