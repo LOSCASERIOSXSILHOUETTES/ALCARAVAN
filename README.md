@@ -140,6 +140,12 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.10.21 — 25/11/2026
+- **Persistencia de Sesión del Contribuyente ante F5 (`js/modules/portal-comercio.js`):**
+  - Guardado de la sesión activa (`alcaravan_portal_sesion`) en `localStorage` al iniciar sesión o activar clave, y limpieza explícita al cerrar consulta (`cerrarConsulta()`).
+  - Restauración automática a 0ms en `render()` tras recargar la página (`F5`), con sincronización quirúrgica en segundo plano (`syncContribuyenteSurgical`) para refrescar datos desde Supabase.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.10.21`.
+
 ### Version 3.10.20 — 25/11/2026
 - **Eliminacion de Popup Inicial Hardcodeado (`js/core/store.js`, `js/modules/portal-comercio.js`):**
   - Removida la semilla inicial `pop_guaribe_locat_01` de `store.js` y la constante de respaldo `POPUP_ACTIVO` de `portal-comercio.js`.

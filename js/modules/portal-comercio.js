@@ -8,6 +8,42 @@
     "use strict";
 
     let activeContribuyente = null;
+    let _sesionRestauradaSync = false;
+    const PORTAL_SESSION_KEY = 'alcaravan_portal_sesion';
+
+    function guardarSesionContribuyente(c) {
+        if (!c || !c.id) return;
+        try {
+            localStorage.setItem(PORTAL_SESSION_KEY, JSON.stringify({
+                id: c.id,
+                contribuyente: c,
+                savedAt: Date.now()
+            }));
+        } catch (_e) {}
+    }
+
+    function limpiarSesionContribuyente() {
+        try {
+            localStorage.removeItem(PORTAL_SESSION_KEY);
+        } catch (_e) {}
+    }
+
+    function restaurarSesionContribuyente(store) {
+        if (activeContribuyente) return activeContribuyente;
+        try {
+            const raw = localStorage.getItem(PORTAL_SESSION_KEY);
+            if (!raw) return null;
+            const parsed = JSON.parse(raw);
+            if (!parsed || !parsed.id) return null;
+
+            const lista = store ? (store.get('hacienda_contribuyentes') || []) : [];
+            const fresco = lista.find(c => String(c.id) === String(parsed.id));
+            activeContribuyente = fresco || parsed.contribuyente || null;
+            return activeContribuyente;
+        } catch (_e) {
+            return null;
+        }
+    }
     let activeModule = 'grid'; // 'grid', 'empresas', 'inmuebles', 'vehiculos', 'publicidad', 'tasas', 'cuentas'
     let activeEmpresaTab = 'declarar'; // 'declarar', 'pagar', 'solvencia', 'historial'
     let loginModo = 'rif'; // 'rif' o 'correo'
@@ -241,6 +277,22 @@
             if (!store) {
                 container.innerHTML = '<div class="p-12 text-center text-neutral-500 font-mono text-xs">Cargando sistema...</div>';
                 return;
+            }
+
+            if (!activeContribuyente) {
+                restaurarSesionContribuyente(store);
+                if (activeContribuyente && !_sesionRestauradaSync && store && typeof store.syncContribuyenteSurgical === 'function') {
+                    _sesionRestauradaSync = true;
+                    store.syncContribuyenteSurgical(activeContribuyente.id).then(() => {
+                        const lista = store.get('hacienda_contribuyentes') || [];
+                        const fresco = lista.find(c => String(c.id) === String(activeContribuyente.id));
+                        if (fresco) {
+                            activeContribuyente = fresco;
+                            guardarSesionContribuyente(fresco);
+                        }
+                        if (activeContribuyente && container) this.renderDashboardSuite(container);
+                    }).catch(() => {});
+                }
             }
 
             if (!activeContribuyente) {
@@ -2439,6 +2491,7 @@
 
             activeContribuyente = match;
             activeModule = 'grid'; // Abre la Suite Principal
+            guardarSesionContribuyente(match);
 
             // Sincronización quirúrgica exclusiva de este contribuyente
             if (store && typeof store.syncContribuyenteSurgical === 'function') {
@@ -2461,6 +2514,7 @@
             if (match) {
                 activeContribuyente = match;
                 activeModule = 'grid';
+                guardarSesionContribuyente(match);
                 const container = document.getElementById('portal-main-content');
                 if (container) this.render(container);
             }
@@ -2534,6 +2588,7 @@
 
             activeContribuyente = c;
             activeModule = 'grid';
+            guardarSesionContribuyente(c);
 
             if (store && typeof store.syncContribuyenteSurgical === 'function') {
                 await store.syncContribuyenteSurgical(c.id);
@@ -2630,6 +2685,8 @@
         cerrarConsulta: function() {
             activeContribuyente = null;
             activeModule = 'grid';
+            _sesionRestauradaSync = false;
+            limpiarSesionContribuyente();
 
             // Si estamos en el portal público, limpiar los datos del contribuyente anterior de la memoria y cache
             const store = global.HaciendaStore;
