@@ -233,17 +233,6 @@
         }
     ];
 
-    const POPUP_ACTIVO = {
-        id: 'popup_guaribe_locat_2026',
-        activo: true,
-        badge: 'COMUNICADO OFICIAL · ALCALDÍA',
-        titulo: 'Actualización y Empadronamiento Tributario LOCAT 2026',
-        mensaje: 'La Alcaldía del Municipio San José de Guaribe y la Administración Tributaria Municipal informan a todos los comerciantes y contribuyentes que está activa la jornada especial de censo y adecuación de licencias de actividades económicas conforme a la Ley Orgánica de Armonización Tributaria (LOCAT). Realiza tu consulta o registro directamente desde este portal.',
-        fecha: 'Ejercicio Fiscal 2026',
-        enlace_texto: 'Descargar Ordenanza LOCAT en PDF',
-        ordenanza_id: 'ord_locat'
-    };
-
     const Portal = {
         getActiveContribuyente: () => activeContribuyente,
 
@@ -689,7 +678,7 @@
                 const activo = popups.find(p => p.activo && (p.destino === 'portal' || p.destino === 'ambos'));
                 if (activo) return activo;
             }
-            return POPUP_ACTIVO;
+            return null;
         },
 
         renderPopupOficial: function() {

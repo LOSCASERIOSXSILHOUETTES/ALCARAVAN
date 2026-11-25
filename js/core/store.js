@@ -351,26 +351,9 @@
                 }
             }
 
-            // Sembrar popup oficial inicial si está vacío
-            if (!this._cache['hacienda_popups'] || this._cache['hacienda_popups'].length === 0) {
-                const popupsIniciales = [
-                    {
-                        id: 'pop_guaribe_locat_01',
-                        titulo: 'Censo y Empadronamiento Tributario LOCAT 2026',
-                        mensaje: 'La Alcaldía del Municipio San José de Guaribe y la Administración Tributaria Municipal informan que se encuentra abierta la jornada especial de censo y adecuación de licencias comerciales. Ponte al día con tu municipio sin sanciones.',
-                        tipo: 'mixto',
-                        imagen_url: '',
-                        enlace_url: '#seccion-ordenanzas',
-                        destino: 'portal',
-                        activo: true,
-                        created_at: new Date().toISOString(),
-                        updated_at: new Date().toISOString()
-                    }
-                ];
-                this._cache['hacienda_popups'] = popupsIniciales;
-                if (this._localStore) {
-                    await this._localStore.setItem('tbl_hacienda_popups', popupsIniciales);
-                }
+            // Popups del portal: 100% configurables desde Comunicacion -> Popups (sin semilla hardcodeada)
+            if (!this._cache['hacienda_popups']) {
+                this._cache['hacienda_popups'] = [];
             }
 
             // Sembrar Superadmin inicial en user_profiles si está vacío

@@ -140,6 +140,12 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.10.20 — 25/11/2026
+- **Eliminacion de Popup Inicial Hardcodeado (`js/core/store.js`, `js/modules/portal-comercio.js`):**
+  - Removida la semilla inicial `pop_guaribe_locat_01` de `store.js` y la constante de respaldo `POPUP_ACTIVO` de `portal-comercio.js`.
+  - Ahora el modal inicial de `index.html` solo se muestra si existe un popup activo configurado en la tabla `hacienda_popups` desde **Comunicación -> Popups**.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.10.20`.
+
 ### Version 3.10.19 — 25/11/2026
 - **Validación estricta de subida en `HaciendaUploader` (`js/core/uploader.js`, `portal-comercio.js`):**
   - `subirAImgBB()` ahora lanza error explícito si está offline, si `imgbb-proxy` falla o si no retorna una URL `http(s)` válida (reservando Base64 solo cuando se pida explícitamente `allowOfflineFallback: true`).
