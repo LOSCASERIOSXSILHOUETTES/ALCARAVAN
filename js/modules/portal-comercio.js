@@ -2863,7 +2863,18 @@
 
             let compUrl = null;
             const fileInput = document.getElementById('pago-comprobante');
-            if (fileInput && fileInput.files && fileInput.files.length > 0 && window.HaciendaUploader) {
+            if (fileInput && fileInput.files && fileInput.files.length > 0) {
+                if (!window.HaciendaUploader) {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Modulo de subida no disponible',
+                            text: 'Recarga la pagina con Ctrl+Shift+R e intenta nuevamente.',
+                            confirmButtonColor: '#000000'
+                        });
+                    }
+                    return;
+                }
                 try {
                     if (typeof Swal !== 'undefined') {
                         Swal.fire({
@@ -2874,7 +2885,16 @@
                     }
                     compUrl = await window.HaciendaUploader.subirAImgBB(fileInput.files[0]);
                 } catch (err) {
-                    console.warn('[PortalComercio] Error subiendo comprobante:', err);
+                    console.error('[PortalComercio] Error subiendo comprobante:', err);
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'No se pudo subir el comprobante',
+                            text: (err && err.message ? err.message : 'Error de conexion con ImgBB.') + ' El pago NO fue enviado. Reintenta o quita el archivo para enviar sin adjunto.',
+                            confirmButtonColor: '#000000'
+                        });
+                    }
+                    return;
                 }
             }
 

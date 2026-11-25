@@ -50,40 +50,63 @@
         },
 
         /**
-         * Sube a ImgBB mediante la Edge Function imgbb-proxy de Supabase,
-         * o devuelve la dataUrl base64 comprimida como fallback 0ms si esta offline.
+         * Sube a ImgBB mediante la Edge Function imgbb-proxy de Supabase.
+         * Por defecto lanza Error si falla la subida (para no guardar registros sin imagen).
+         * Solo devuelve dataUrl base64 si options.allowOfflineFallback === true.
          */
-        subirAImgBB: async function(file) {
+        subirAImgBB: async function(file, options = {}) {
             const dataUrl = await this.comprimirImagen(file);
+            const allowFallback = Boolean(options && options.allowOfflineFallback === true);
 
-            if (!navigator.onLine || !global.supabaseClient || !global.supabaseClient.functions) {
-                console.log('[Uploader] Modo Offline/Local: usando base64 comprimida');
-                return dataUrl;
+            if (!navigator.onLine) {
+                if (allowFallback) {
+                    console.warn('[Uploader] Sin internet: usando fallback base64 comprimida');
+                    return dataUrl;
+                }
+                throw new Error('Sin conexion a internet. No se pudo subir la imagen a ImgBB.');
             }
 
-            try {
-                const base64Data = dataUrl.split(',')[1];
-                const { data, error } = await global.supabaseClient.functions.invoke('imgbb-proxy', {
-                    body: { image: base64Data }
-                });
-
-                if (error) {
-                    throw new Error(error.message || 'Error invocando imgbb-proxy');
+            if (!global.supabaseClient || !global.supabaseClient.functions) {
+                if (allowFallback) {
+                    console.warn('[Uploader] Sin cliente Supabase: usando fallback base64');
+                    return dataUrl;
                 }
-                if (data && data.error) {
-                    throw new Error(data.error);
-                }
-                if (data && data.url) {
-                    console.log('[Uploader] Subida exitosa via imgbb-proxy:', data.url);
-                    return data.url;
-                }
-
-                console.warn('[Uploader] imgbb-proxy no devolvio URL, usando fallback base64:', data);
-                return dataUrl;
-            } catch (err) {
-                console.warn('[Uploader] Fallo con imgbb-proxy, usando fallback base64:', err);
-                return dataUrl;
+                throw new Error('Cliente de Supabase no disponible para invocar imgbb-proxy.');
             }
+
+            const base64Data = dataUrl.split(',')[1];
+            if (!base64Data) {
+                throw new Error('No se pudo generar la imagen comprimida en Base64.');
+            }
+
+            const { data, error } = await global.supabaseClient.functions.invoke('imgbb-proxy', {
+                body: { image: base64Data }
+            });
+
+            if (error) {
+                if (allowFallback) {
+                    console.warn('[Uploader] Error imgbb-proxy, usando fallback base64:', error);
+                    return dataUrl;
+                }
+                throw new Error(error.message || 'Error invocando imgbb-proxy');
+            }
+            if (data && data.error) {
+                if (allowFallback) {
+                    console.warn('[Uploader] Respuesta error imgbb-proxy, usando fallback base64:', data.error);
+                    return dataUrl;
+                }
+                throw new Error(data.error);
+            }
+            if (!data || typeof data.url !== 'string' || !data.url.startsWith('http')) {
+                if (allowFallback) {
+                    console.warn('[Uploader] URL invalida de imgbb-proxy, usando fallback base64:', data);
+                    return dataUrl;
+                }
+                throw new Error('imgbb-proxy no devolvio una URL de imagen valida.');
+            }
+
+            console.log('[Uploader] Subida exitosa via imgbb-proxy:', data.url);
+            return data.url;
         }
     };
 

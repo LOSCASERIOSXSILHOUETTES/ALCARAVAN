@@ -140,6 +140,12 @@ Para sincronizar entre multiples dispositivos o usuarios concurrentes:
 
 ## Bitacora de Decisiones y Cambios
 
+### Version 3.10.19 — 25/11/2026
+- **Validación estricta de subida en `HaciendaUploader` (`js/core/uploader.js`, `portal-comercio.js`):**
+  - `subirAImgBB()` ahora lanza error explícito si está offline, si `imgbb-proxy` falla o si no retorna una URL `http(s)` válida (reservando Base64 solo cuando se pida explícitamente `allowOfflineFallback: true`).
+  - Tanto `portal-comercio.js` como `taquilla.js` abortan el registro del pago y alertan al usuario si seleccionó un comprobante y la subida falló, evitando guardar pagos sin su imagen.
+  - Bump de Service Worker a `alcaravan-v3-cache-v3.10.19`.
+
 ### Version 3.10.18 — 25/11/2026
 - **Carga de Imagenes via Edge Function `imgbb-proxy` (`js/core/uploader.js`, `portal-comercio.js`, `comunicacion.js`, `index.html`):**
   - Refactorizacion de `HaciendaUploader.subirAImgBB()` para invocar la Edge Function `imgbb-proxy` de Supabase (con compresion previa en canvas y fallback automatico a Base64 si esta offline), eliminando la dependencia de keys en el frontend.
